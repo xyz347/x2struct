@@ -11,7 +11,7 @@ DEPFILES=$(OBJFILES:.o=.d)
 LIBNAME=libx2struct.a
 
 
-objs/%.d:%.cpp
+objs/%.d:%.cpp objs
 	$(CC) -MM -MT $(@:.d=.o) $< $(FLAGS) $(INCS) >$@
 
 
@@ -23,7 +23,8 @@ $(LIBNAME):$(OBJFILES)
 	$(AR) crus $@ $^
 
 
--include $(DEPFILES)
+objs:
+	@mkdir $@
 
 clean:
 	-rm -rf $(LIBNAME) objs/* test/xtest
@@ -37,3 +38,8 @@ test/xtest:test/x2struct_test.cpp $(LIBNAME)
 	thirdparty/mongo/lib/libmongoclient.a \
 	thirdparty/config++/lib/libconfig++.a \
 	-lboost_date_time -lboost_thread
+
+
+ifneq ($(MAKECMDGOALS), clean)
+-include $(DEPFILES)
+endif
