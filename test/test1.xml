@@ -1,0 +1,42 @@
+<config>
+    <a>1</a>
+    <b>Hello</b>
+    <s>
+        <s1>2</s1>
+        <s2>hahaha</s2>
+    </s>
+    <s>
+        <s1>99</s1>
+        <s2>nani</s2>
+    </s>
+    <con myip="2" cfgip="1">
+        <redis>
+            <host>1.1.1.1</host>
+            <port>200</port>
+        </redis>
+        <redis>
+            <host>1.1.1.2</host>
+            <port>200</port>
+        </redis>
+    </con>
+    <con myip="2" cfgip="2">
+        <redis>
+            <host>2.1.1.1</host>
+            <port>200</port>
+        </redis>
+        <redis>
+            <host>2.1.1.2</host>
+            <port>200</port>
+        </redis>
+    </con>
+    <con myip="2" cfgip="3">
+        <redis>
+            <host>3.1.1.1</host>
+            <port>200</port>
+        </redis>
+        <redis>
+            <host>3.1.1.2</host>
+            <port>200</port>
+        </redis>
+    </con>
+</config>
