@@ -19,9 +19,6 @@
 #include "x2struct_bson.hpp"
 #endif
 
-#include <mongo/bson/bson.h>
-#include <mongo/db/json.h>
-
 using namespace std;
 using namespace x2struct;
 
