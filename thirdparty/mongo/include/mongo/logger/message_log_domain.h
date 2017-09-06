@@ -1,9 +1,4 @@
-/** @file bsoninlines.h
-          a goal here is that the most common bson methods can be used inline-only, a la boost.
-          thus some things are inline that wouldn't necessarily be otherwise.
-*/
-
-/*    Copyright 2009 10gen Inc.
+/*    Copyright 2013 10gen Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +15,18 @@
 
 #pragma once
 
+#include <boost/scoped_ptr.hpp>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "mongo/logger/log_domain.h"
+#include "mongo/logger/message_event.h"
+
 namespace mongo {
+namespace logger {
 
-template <class T>
-inline BSONObjBuilder& BSONObjBuilderValueStream::operator<<(T value) {
-    _builder->append(_fieldName, value);
-    _fieldName = StringData();
-    return *_builder;
-}
+typedef LogDomain<MessageEventEphemeral> MessageLogDomain;
 
-template <class T>
-inline BSONObjBuilder& Labeler::operator<<(T value) {
-    s_->subobj()->append(l_.l_, value);
-    return *s_->_builder;
-}
-}
+}  // namespace logger
+}  // namespace mongo

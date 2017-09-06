@@ -1,7 +1,7 @@
 CC=g++
 AR=ar
 FLAGS=-std=c++11
-INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml
+INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml  -Ithirdparty/mongo/include
 
 CPPFILES=$(wildcard *.cpp)
 HPPFILES=$(wildcard *.hpp)

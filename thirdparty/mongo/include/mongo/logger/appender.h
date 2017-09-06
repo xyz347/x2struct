@@ -1,9 +1,4 @@
-/** @file bsoninlines.h
-          a goal here is that the most common bson methods can be used inline-only, a la boost.
-          thus some things are inline that wouldn't necessarily be otherwise.
-*/
-
-/*    Copyright 2009 10gen Inc.
+/*    Copyright 2013 10gen Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +15,30 @@
 
 #pragma once
 
+#include "mongo/base/status.h"
+
 namespace mongo {
+namespace logger {
 
-template <class T>
-inline BSONObjBuilder& BSONObjBuilderValueStream::operator<<(T value) {
-    _builder->append(_fieldName, value);
-    _fieldName = StringData();
-    return *_builder;
-}
+/**
+ * Interface for sinks in a logging system.  The core of logging is when events of type E are
+ * appended to instances of Appender<E>.
+ *
+ * Example concrete instances are ConsoleAppender<E>, SyslogAppender<E> and
+ * RotatableFileAppender<E>.
+ */
+template <typename E>
+class Appender {
+public:
+    typedef E Event;
 
-template <class T>
-inline BSONObjBuilder& Labeler::operator<<(T value) {
-    s_->subobj()->append(l_.l_, value);
-    return *s_->_builder;
-}
-}
+    virtual ~Appender() {}
+
+    /**
+     * Appends "event", returns Status::OK() on success.
+     */
+    virtual Status append(const Event& event) = 0;
+};
+
+}  // namespace logger
+}  // namespace mongo

@@ -1,9 +1,5 @@
-/** @file bsoninlines.h
-          a goal here is that the most common bson methods can be used inline-only, a la boost.
-          thus some things are inline that wouldn't necessarily be otherwise.
-*/
-
-/*    Copyright 2009 10gen Inc.
+/*
+ *    Copyright 2014 MongoDB Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +16,27 @@
 
 #pragma once
 
+#include "mongo/platform/cstdint.h"
+
 namespace mongo {
 
-template <class T>
-inline BSONObjBuilder& BSONObjBuilderValueStream::operator<<(T value) {
-    _builder->append(_fieldName, value);
-    _fieldName = StringData();
-    return *_builder;
-}
+class Timestamp_t {
+public:
+    Timestamp_t() : _seconds(), _increment() {}
 
-template <class T>
-inline BSONObjBuilder& Labeler::operator<<(T value) {
-    s_->subobj()->append(l_.l_, value);
-    return *s_->_builder;
-}
-}
+    Timestamp_t(const uint32_t seconds, const uint32_t increment)
+        : _seconds(seconds), _increment(increment) {}
+
+    uint32_t seconds() const {
+        return _seconds;
+    }
+    uint32_t increment() const {
+        return _increment;
+    }
+
+private:
+    const uint32_t _seconds;
+    const uint32_t _increment;
+};
+
+}  // namespace mongo

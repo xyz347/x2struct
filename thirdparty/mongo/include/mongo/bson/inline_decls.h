@@ -1,9 +1,6 @@
-/** @file bsoninlines.h
-          a goal here is that the most common bson methods can be used inline-only, a la boost.
-          thus some things are inline that wouldn't necessarily be otherwise.
-*/
+// inline_decls.h
 
-/*    Copyright 2009 10gen Inc.
+/*    Copyright 2010 10gen Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +17,19 @@
 
 #pragma once
 
-namespace mongo {
+#if defined(__GNUC__)
 
-template <class T>
-inline BSONObjBuilder& BSONObjBuilderValueStream::operator<<(T value) {
-    _builder->append(_fieldName, value);
-    _fieldName = StringData();
-    return *_builder;
-}
+#define NOINLINE_DECL __attribute__((noinline))
+#define PACKED_DECL __attribute__((packed))
 
-template <class T>
-inline BSONObjBuilder& Labeler::operator<<(T value) {
-    s_->subobj()->append(l_.l_, value);
-    return *s_->_builder;
-}
-}
+#elif defined(_MSC_VER)
+
+#define NOINLINE_DECL __declspec(noinline)
+#define PACKED_DECL
+
+#else
+
+#define NOINLINE_DECL
+#define PACKED_DECL
+
+#endif

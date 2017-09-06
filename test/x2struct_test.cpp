@@ -33,6 +33,9 @@
 
 #ifndef NO_BSON
 #include "x2struct_bson.hpp"
+
+#include <mongo/bson/bson.h> // for test
+#include <mongo/db/json.h>   // for test
 #endif
 
 using namespace std;

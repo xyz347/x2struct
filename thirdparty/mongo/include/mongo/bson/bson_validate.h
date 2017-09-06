@@ -1,9 +1,6 @@
-/** @file bsoninlines.h
-          a goal here is that the most common bson methods can be used inline-only, a la boost.
-          thus some things are inline that wouldn't necessarily be otherwise.
-*/
+// bson_Validate.h
 
-/*    Copyright 2009 10gen Inc.
+/*    Copyright 2012 10gen Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,18 +17,18 @@
 
 #pragma once
 
+#include "mongo/base/status.h"
+#include "mongo/base/string_data.h"
+#include "mongo/bson/bsontypes.h"
+#include "mongo/client/export_macros.h"
+#include "mongo/platform/cstdint.h"
+
 namespace mongo {
 
-template <class T>
-inline BSONObjBuilder& BSONObjBuilderValueStream::operator<<(T value) {
-    _builder->append(_fieldName, value);
-    _fieldName = StringData();
-    return *_builder;
-}
-
-template <class T>
-inline BSONObjBuilder& Labeler::operator<<(T value) {
-    s_->subobj()->append(l_.l_, value);
-    return *s_->_builder;
-}
+/**
+ * @param buf - bson data
+ * @param maxLength - maxLength of buffer
+ *                    this is NOT the bson size, but how far we know the buffer is valid
+ */
+MONGO_CLIENT_API Status MONGO_CLIENT_FUNC validateBSON(const char* buf, uint64_t maxLength);
 }
