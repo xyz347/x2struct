@@ -55,7 +55,7 @@ private:
     JsonObj(Json::Value& v);
 private:
     Json::Value* __v;
-    Json::Value& _v;
+    Json::Value* _v;
     std::vector<JsonObj> _gc;   //垃圾回收
 };
 

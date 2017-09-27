@@ -124,7 +124,7 @@ public:
         } else {
             _ss<<std::string(splen, ' ')<<"{";
         }
-        for (auto iter=data.begin(); iter!=data.end(); ++iter) {
+        for (typename std::map<std::string,TYPE>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
             _sep=",";
             this->convert(iter->first, iter->second, splen+space(), i++);
             _sep=oldsep;
@@ -142,7 +142,7 @@ public:
         } else {
             _ss<<std::string(splen, ' ')<<"{";
         }
-        for (auto iter=data.begin(); iter!=data.end(); ++iter) {
+        for (typename std::map<KEYTYPE,TYPE>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
             _sep=",";
             std::string _k = boost::lexical_cast<std::string>(iter->first);
             this->convert(_k, iter->second, splen+space(), i++);

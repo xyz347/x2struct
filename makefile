@@ -1,9 +1,17 @@
 CC=g++
 AR=ar
-FLAGS=-std=c++11
+#FLAGS=-std=c++11
+
+# remove this line if need bson support
+FLAGS=-DNO_BSON -g
 INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml  -Ithirdparty/mongo/include -Ithirdparty/config++/include
 
 CPPFILES=$(wildcard *.cpp)
+
+# remove bson. bson need c++11
+BSONFILES=bsonobj.cpp bsonstr.cpp
+CPPFILES:=$(filter-out $(BSONFILES),$(CPPFILES))
+
 HPPFILES=$(wildcard *.hpp)
 OBJFILES=$(foreach n,$(CPPFILES),objs/$(n:.cpp=.o))
 DEPFILES=$(OBJFILES:.o=.d)

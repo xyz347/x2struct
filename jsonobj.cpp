@@ -24,21 +24,21 @@ namespace x2struct {
 
 using namespace ::std;
 
-JsonObj::JsonObj(const std::string& str, bool isfile):XObj("json"),__v(new Json::Value),_v(*__v)
+JsonObj::JsonObj(const std::string& str, bool isfile):XObj("json"),__v(new Json::Value),_v(__v)
 {
     string err;
     Json::Reader reader;
     do {
         if (isfile) {
-            std::ifstream fs(str, std::ifstream::binary);
+            std::ifstream fs(str.c_str(), std::ifstream::binary);
             if (!fs) {
                 err = "Open file["+str+"] fail.";
                 break;
-            } else if (!reader.parse(fs, _v) || !_v.isObject()) {
+            } else if (!reader.parse(fs, *_v) || !_v->isObject()) {
                 err = "Parse json string["+str+"] fail.";
                 break;
             }
-        } else if (!reader.parse(str, _v) || !_v.isObject()) {
+        } else if (!reader.parse(str, *_v) || !_v->isObject()) {
             err = "Parse json string["+str+"] fail.";
             break;
         }
@@ -48,7 +48,7 @@ JsonObj::JsonObj(const std::string& str, bool isfile):XObj("json"),__v(new Json:
     throw std::runtime_error(err);
 }
 
-JsonObj::JsonObj(Json::Value& v):XObj("json"),__v(0),_v(v)
+JsonObj::JsonObj(Json::Value& v):XObj("json"),__v(0),_v(&v)
 {
 }
 
@@ -61,62 +61,62 @@ JsonObj::~JsonObj()
 
 void JsonObj::convert(std::string &val)
 {
-    val = _v.asString();
+    val = _v->asString();
 }
 
 void JsonObj::convert(bool &val)
 {
-    val = _v.asBool();
+    val = _v->asBool();
 }
 
 void JsonObj::convert(int32_t &val)
 {
-    val = _v.asInt();
+    val = _v->asInt();
 }
 
 void JsonObj::convert(uint32_t &val)
 {
-    val = _v.asUInt();
+    val = _v->asUInt();
 }
 
 void JsonObj::convert(int16_t &val)
 {
-    val = (int16_t)_v.asInt();
+    val = (int16_t)_v->asInt();
 }
 
 void JsonObj::convert(uint16_t &val)
 {
-    val = (uint16_t)_v.asUInt();
+    val = (uint16_t)_v->asUInt();
 }
 
 void JsonObj::convert(int64_t &val)
 {
-    val = _v.asInt64();
+    val = _v->asInt64();
 }
 
 void JsonObj::convert(uint64_t &val)
 {
-    val = _v.asUInt64();
+    val = _v->asUInt64();
 }
 
 void JsonObj::convert(double &val)
 {
-    val = _v.asDouble();
+    val = _v->asDouble();
 }
 
 void JsonObj::convert(float &val)
 {
-    val = _v.asFloat();
+    val = _v->asFloat();
 }
 
 bool JsonObj::has(const std::string&key)
 {
-    return _v.isMember(key);
+    return _v->isMember(key);
 }
 
 size_t JsonObj::size()
 {
-    return (size_t)_v.size();
+    return (size_t)_v->size();
 }
 
 XObj& JsonObj::operator[](const std::string&key)
@@ -126,8 +126,8 @@ XObj& JsonObj::operator[](const std::string&key)
 
 XObj& JsonObj::subobj(size_t index)
 {
-    if (_v.isArray()) {
-        JsonObj obj(_v[(Json::ArrayIndex)index]);
+    if (_v->isArray()) {
+        JsonObj obj((*_v)[(Json::ArrayIndex)index]);
         obj._key = _key;
         obj.set_path(_path, index);
         _gc.push_back(obj);
@@ -142,8 +142,8 @@ XObj& JsonObj::subobj(size_t index)
 
 XObj& JsonObj::subobj(const std::string&key)
 {
-    if (_v.isMember(key)) {
-        JsonObj obj(_v[key]);
+    if (_v->isMember(key)) {
+        JsonObj obj((*_v)[key]);
         obj._key = key;
         obj.set_path(_path, key);
         _gc.push_back(obj);
@@ -167,7 +167,7 @@ string JsonObj::attribute(const std::string&key)
 
 void JsonObj::getsubfields(std::vector<std::string>& fields)
 {
-    fields = _v.getMemberNames();
+    fields = _v->getMemberNames();
 }
 
 }

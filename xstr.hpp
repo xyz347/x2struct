@@ -19,7 +19,7 @@
 #define __X_TO_STRUCT_STRING_HPP
 
 #include <string>
-#include <type_traits>
+//#include <type_traits>
 
 namespace x2struct {
 
