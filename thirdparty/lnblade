@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ "$1" == "clear" ]; then
+    find -type l -delete
+    exit
+fi
+
+fs=$(find . -name lib)
+d=$(pwd)
+
+for i in $fs; do
+  ln -s ${d}/$i ${i}64_debug
+done
