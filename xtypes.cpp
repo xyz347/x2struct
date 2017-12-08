@@ -14,10 +14,8 @@
 * limitations under the License.
 */
 
-
+#define _XOPEN_SOURCE
 #include <time.h>
-#include <boost/date_time/posix_time/posix_time.hpp> 
-
 #include "xtypes.hpp"
 
 namespace x2struct {
@@ -28,19 +26,22 @@ std::string XDate::to_string() const
     tm     ttm;
 
     localtime_r(&tt, &ttm);
-    boost::posix_time::ptime pt = boost::posix_time::ptime_from_tm(ttm);
-    std::string str = boost::posix_time::to_iso_extended_string(pt);
-    str[10] = ' ';
-    return str;
+    char buf[64];
+    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ttm);
+    return buf;
 }
 
 void XDate::from_string(const std::string&str)
 {
-    time_t tt = 0;
-    boost::posix_time::ptime pt = boost::posix_time::time_from_string(str);    // no try here. if exception, just throw it.
-    tm tm1 = boost::posix_time::to_tm(pt);
-    tt = mktime(&tm1);
-    unix_time = (int64_t)tt;
+    tm ttm;
+
+    if (0 != strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &ttm)) {
+        unix_time = mktime(&ttm);
+    } else {
+        std::string err("invalid time string[");
+        err.append(str).append("]. use format YYYY-mm-dd H:M:S. ");
+        throw std::runtime_error(err);
+    }
 }
 
 }

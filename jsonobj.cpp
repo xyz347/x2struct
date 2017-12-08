@@ -38,7 +38,7 @@ JsonObj::JsonObj(const std::string& str, bool isfile):XObj("json"),__v(new Json:
                 err = "Parse json string["+str+"] fail.";
                 break;
             }
-        } else if (!reader.parse(str, *_v) || !_v->isObject()) {
+        } else if (!reader.parse(str, *_v)) {
             err = "Parse json string["+str+"] fail.";
             break;
         }

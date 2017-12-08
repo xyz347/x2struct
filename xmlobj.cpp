@@ -16,7 +16,6 @@
 
 
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
 #include <tinyxml.h>
 #include "xmlobj.hpp"
 #include <iostream>
@@ -127,42 +126,42 @@ void XmlObj::convert(bool &val)
 
 void XmlObj::convert(int32_t &val)
 {
-    val = boost::lexical_cast<int32_t>(_ele->GetText());
+    val = tonum<int32_t>(_ele->GetText());
 }
 
 void XmlObj::convert(uint32_t &val)
 {
-    val = boost::lexical_cast<uint32_t>(_ele->GetText());
+    val = tonum<uint32_t>(_ele->GetText());
 }
 
 void XmlObj::convert(int16_t &val)
 {
-    val = boost::lexical_cast<int16_t>(_ele->GetText());
+    val = tonum<int16_t>(_ele->GetText());
 }
 
 void XmlObj::convert(uint16_t &val)
 {
-    val = boost::lexical_cast<uint16_t>(_ele->GetText());
+    val = tonum<uint16_t>(_ele->GetText());
 }
 
 void XmlObj::convert(int64_t &val)
 {
-    val = boost::lexical_cast<int64_t>(_ele->GetText());
+    val = tonum<int64_t>(_ele->GetText());
 }
 
 void XmlObj::convert(uint64_t &val)
 {
-    val = boost::lexical_cast<uint64_t>(_ele->GetText());
+    val = tonum<uint64_t>(_ele->GetText());
 }
 
 void XmlObj::convert(double &val)
 {
-    val = boost::lexical_cast<double>(_ele->GetText());
+    val = tonum<double>(_ele->GetText());
 }
 
 void XmlObj::convert(float &val)
 {
-    val = boost::lexical_cast<float>(_ele->GetText());
+    val = tonum<float>(_ele->GetText());
 }
 
 

@@ -15,20 +15,42 @@
 */
 
 
+#include <libbson-1.0/bson.h>
 
 #include "bsonstr.hpp"
 
-namespace x2struct {
-
 using namespace std;
 
+namespace x2struct {
 
-BsonStr::BsonStr(mongo::BSONArrayBuilder* parent_array):XStr("bson"),_parent_array(parent_array)
+BsonStr::BsonStr(const std::string&name, _bson_t*parent, int type):XStr("bson")
 {
+    _parent = parent;
+    _bson = new bson_t;
+    _type = type;
+    if (0 != parent) {
+        if (type == doc) {
+            bson_append_document_begin(parent, name.c_str(), name.length(), _bson);
+        } else {
+            bson_append_array_begin(parent, name.c_str(), name.length(), _bson);
+        }
+    } else {
+        bson_init(_bson);
+    }
 }
 
 BsonStr::~BsonStr()
 {
+    if (0 != _bson) {
+        if (_type == doc) {
+            bson_append_document_end(_parent, _bson);
+        } else if (_type == array) {
+            bson_append_array_end(_parent, _bson);
+        } else {
+            bson_destroy(_bson);
+        }
+        delete _bson;
+    }
 }
 
 void BsonStr::begin(const string&root, int splen)
@@ -46,186 +68,58 @@ int BsonStr::space()
 
 string BsonStr::toStr()const 
 {
-    return "";
-}
-
-
-mongo::BSONObj BsonStr::toBson() 
-{
-    return _bobj.obj();
+    return std::string((const char*)bson_get_data(_bson), _bson->len);
 }
 
 void BsonStr::convert(const string&name, int16_t data, int splen, int index)
 {
-    _bobj<<name<<(int)data;
+    bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
 }
 
 void BsonStr::convert(const string&name, uint16_t data, int splen, int index)
 {
-    _bobj<<name<<(int)data;
+    bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
 }
 
 void BsonStr::convert(const string&name, int32_t data, int splen, int index)
 {
-    _bobj<<name<<(int)data;
+    bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
 }
 
 void BsonStr::convert(const string&name, uint32_t data, int splen, int index)
 {
-    _bobj<<name<<(int)data;
+    bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
 }
 
 void BsonStr::convert(const std::string&name, int64_t data, int splen, int index)
 {
-    _bobj<<name<<(long long)data;
+    bson_append_int64(_bson, name.c_str(), name.length(), (int64_t)data);
 }
 
 void BsonStr::convert(const std::string&name, uint64_t data, int splen, int index)
 {
-    _bobj<<name<<(long long)data;
+    bson_append_int64(_bson, name.c_str(), name.length(), (int64_t)data);
 }
 
 void BsonStr::convert(const std::string&name, float data, int splen, int index)
 {
-    _bobj<<name<<(double)data;
+    bson_append_double(_bson, name.c_str(), name.length(), (double)data);
 }
 
 void BsonStr::convert(const std::string&name, double data, int splen, int index)
 {
-    _bobj<<name<<data;
+    bson_append_double(_bson, name.c_str(), name.length(), (double)data);
 }
 
 void BsonStr::convert(const std::string&name, bool data, int splen, int index)
 {
-    _bobj<<name<<data;
+    bson_append_bool(_bson, name.c_str(), name.length(), data);
 }
 
 void BsonStr::convert(const string&name, const string& data, int splen, int index)
 {
-    _bobj<<name<<data;
+    bson_append_utf8(_bson, name.c_str(), name.length(), (const char*)data.data(), data.length());
 }
-
-
-// base type vector
-#define BUILD_ARRAY(TYPE)                                       \
-    mongo::BSONArrayBuilder array;                              \
-    for (auto iter=data.begin(); iter!=data.end(); iter++) {    \
-        array.append((TYPE)*iter);                              \
-    }                                                           \
-    do {                                                        \
-        if (!name.empty()) {                                    \
-            _bobj<<name<<array.arr();                           \
-        } else if (_parent_array!=0) {                          \
-            _parent_array->append(array.arr());                 \
-        } else {                                                \
-            /* something wrong*/                                \
-        }                                                       \
-    } while(false)
-
-void BsonStr::convert(const std::string&name, const std::vector<int16_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<uint16_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<int32_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<uint32_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<int64_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(long long);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<uint64_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(long long);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<float>& data, int splen, int index)
-{
-    BUILD_ARRAY(double);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<double>& data, int splen, int index)
-{
-    BUILD_ARRAY(double);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<bool>& data, int splen, int index)
-{
-    BUILD_ARRAY(bool);
-}
-
-void BsonStr::convert(const std::string&name, const std::vector<std::string>& data, int splen, int index)
-{
-    BUILD_ARRAY(string);
-}
-
-
-// base type set
-void BsonStr::convert(const std::string&name, const std::set<int16_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<uint16_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<int32_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<uint32_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(int);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<int64_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(long long);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<uint64_t>& data, int splen, int index)
-{
-    BUILD_ARRAY(long long);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<float>& data, int splen, int index)
-{
-    BUILD_ARRAY(double);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<double>& data, int splen, int index)
-{
-    BUILD_ARRAY(double);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<bool>& data, int splen, int index)
-{
-    BUILD_ARRAY(bool);
-}
-
-void BsonStr::convert(const std::string&name, const std::set<std::string>& data, int splen, int index)
-{
-    BUILD_ARRAY(string);
-}
-
-
-
 
 }
 

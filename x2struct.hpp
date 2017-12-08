@@ -15,9 +15,7 @@
 */
 
 
-
-#ifndef __X_TO_STRUCT_HPP
-#define __X_TO_STRUCT_HPP
+#pragma once
 
 #include <string>
 #include <set>
@@ -26,9 +24,11 @@
 #include "xmlobj.hpp"
 #include "jsonobj.hpp"
 #include "configobj.hpp"
+#include "bsonobj.hpp"
 
 #include "xmlstr.hpp"
 #include "jsoncfgstr.hpp"
+#include "bsonstr.hpp"
 
 #ifdef XTOSTRUCT_GEN_GOLANG_CODE
 #include <typeinfo>
@@ -53,6 +53,12 @@ public:
     template <typename TYPE>
     static bool loadjson(const std::string&str, TYPE&t, bool isfile=true) {
         JsonObj obj(str, isfile);
+        ((XObj*)&obj)->convert(t);
+        return true;
+    }
+    template <typename TYPE>
+    static bool loadbson(const uint8_t*data, size_t length, TYPE&t) {
+        BsonObj obj(data, length);
         t.__x_to_struct(obj);
         return true;
     }
@@ -79,6 +85,12 @@ public:
     static std::string tojson(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
         JsonCfgStr obj(true, newline, space);
         t.__struct_to_str(obj, root, 0);
+        return obj.toStr();
+    }
+    template <typename TYPE>
+    static std::string tobson(const TYPE& t) {
+        BsonStr obj;
+        t.__struct_to_str(obj,"",0);
         return obj.toStr();
     }
     template <typename TYPE>
@@ -304,5 +316,4 @@ public:                                                                     \
 
 }
 
-#endif
 

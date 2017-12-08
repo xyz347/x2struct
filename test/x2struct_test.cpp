@@ -21,27 +21,22 @@
 #include <string>
 #include <vector>
 
-#ifdef USE_BLADE
+#ifndef USE_MAKE
 #include <gtest/gtest.h>
 #include "test/blade_test_env.h"
 #else
 #include "test/gtest_stub.h"
 #endif
 
+#include <libbson-1.0/bson.h>
 #include "x2struct.hpp"
 #include "xtypes.hpp"
 
-#ifndef NO_BSON
-#include "x2struct_bson.hpp"
-
-#include <mongo/bson/bson.h> // for test
-#include <mongo/db/json.h>   // for test
-#endif
 
 using namespace std;
 using namespace x2struct;
 
-#ifdef USE_BLADE
+#ifndef USE_MAKE
   BLADE_TEST_COMMON_ENV;
 #endif
 
@@ -70,7 +65,7 @@ struct haha {
     int a;
     int b;
     int c;
-    XTOSTRUCT(M(a,b));
+    XTOSTRUCT(M(a,b), O(c));
 };
 
 struct JTest {
@@ -82,9 +77,11 @@ struct JTest {
     haha ha;
     vector<int> vi;
     vector<string> vs;
-    JTest(){start.unix_time = 0;}
-    XTOSTRUCT(A(a,"_id,me"),O(ha, start,con, b,s, vi, vs));
+    map<int, haha> m;
+    JTest(){start.unix_time = time(0);}
+    XTOSTRUCT(A(a,"_id,me"),O(ha, start,con, b,s, vi, vs, m));
 };
+const static string jstr("{\"_id\":1, \"b\":\"Hello\\\"\", \"s\":[{\"s1\":2, \"s2\":\"hahaha\"},{\"s1\":99, \"s2\":\"nani\"}]} ");
 
 TEST(config, file)
 {
@@ -104,9 +101,22 @@ TEST(config, file)
     EXPECT_EQ(j1.con.redis[0].port, 200U);
     EXPECT_EQ(j1.con.redis[1].host, "2.1.1.2");
     EXPECT_EQ(j1.con.redis[1].port, 200U);
+
+    for (std::map<int,haha>::const_iterator iter=j1.m.begin(); iter!=j1.m.end(); ++iter) {
+        cout<<iter->first<<':'<<iter->second.a<<','<<iter->second.b<<','<<iter->second.c<<endl;
+    }
 }
 
-const static string jstr("{\"_id\":1, \"b\":\"Hello\\\"\", \"s\":[{\"s1\":2, \"s2\":\"hahaha\"},{\"s1\":99, \"s2\":\"nani\"}]}");
+
+TEST(json, raw)
+{
+    vector<haha> data;
+    X::loadjson("[{\"a\":1, \"b\":2, \"c\":3}, {\"a\":11, \"b\":22, \"c\":33}]", data, false);
+    for (size_t i=0; i<data.size(); ++i) {
+        cout<<data[i].a<<','<<data[i].b<<','<<data[i].c<<endl;
+    }
+}
+
 
 TEST(json, str)
 {
@@ -125,27 +135,10 @@ TEST(json, str)
     JTest j2;
     X::loadjson("{\"_id\":9}", j2, false);
     EXPECT_EQ(j2.a, 9);
+
+    cout<<"to string"<<endl<<X::tojson(j1, "");
 }
 
-#ifndef NO_BSON
-TEST(bson, str)
-{
-    JTest j1;
-    mongo::BSONObj bobj = mongo::fromjson(jstr);
-    B::loadbson(bobj, j1);
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_TRUE(j1.xhas("a"));
-    EXPECT_TRUE(j1.xhas("b"));
-    EXPECT_TRUE(j1.xhas("s"));
-    EXPECT_EQ(j1.b, "Hello\"");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-    cout<<"BSON test done"<<endl;
-}
-#endif
 
 TEST(json, file)
 {
@@ -169,7 +162,95 @@ TEST(json, file)
     EXPECT_EQ(j1.ha.a, 13);
     EXPECT_EQ(j1.ha.b, 14);
     EXPECT_EQ(j1.vi[0], 2016);
-    cout<<"to string"<<endl<<X::tojson(j1, "");
+}
+
+TEST(bson, obj)
+{
+    JTest j1;
+    bson_error_t err;
+    memset(&err, 0, sizeof(err));
+    bson_t * bson = bson_new_from_json((const uint8_t *)jstr.data(), jstr.length(), &err);
+    X::loadbson(bson_get_data(bson), bson->len, j1);
+
+    // iter test begin ===========================
+    #if 0
+    bool iret;
+    bson_iter_t iter;
+    bson_iter_t sub;
+    bson_iter_init(&iter, bson);
+    iret = bson_iter_next(&iter);
+    cout<<"ret:"<<iret<<bson_iter_key(&iter)<<endl;
+    /*bson_iter_t sub;
+    iret = bson_iter_recurse(&iter, &sub);
+    bson_iter_next(&sub);
+    cout<<"ret:"<<iret<<':'<<bson_iter_key(&sub)<<endl;*/
+    #endif
+    // iter test end==============================
+    bson_destroy(bson);
+    #if 1
+    EXPECT_EQ(j1.a, 1);
+    EXPECT_TRUE(j1.xhas("a"));
+    EXPECT_TRUE(j1.xhas("b"));
+    EXPECT_TRUE(j1.xhas("s"));
+    EXPECT_EQ(j1.b, "Hello\"");
+    EXPECT_EQ(j1.s.size(), 2U);
+    EXPECT_EQ(j1.s[0].s1, 2);
+    EXPECT_EQ(j1.s[0].s2, "hahaha");
+    EXPECT_EQ(j1.s[1].s1, 99);
+    EXPECT_EQ(j1.s[1].s2, "nani");
+    #endif
+}
+
+struct STR_SUB {
+    int i;
+    float f;
+    string s;
+    XTOSTRUCT(O(i,f,s));
+};
+struct STR {
+    STR_SUB sub;
+    vector<vector<int> > vvs;
+    set<int> ss;
+    map<int, STR_SUB> ms;
+    XTOSTRUCT(O(sub, vvs,ss, ms));
+};
+TEST(bson, str)
+{
+    #if 1
+    STR s;
+    s.sub.i = 10;
+    s.sub.f = 3.14;
+    s.sub.s = "substring";
+    s.vvs.resize(2);
+    s.vvs[0].push_back(1);
+    s.vvs[0].push_back(2);
+    s.vvs[1].push_back(11);
+    s.vvs[1].push_back(12);
+    s.ss.insert(100);
+    s.ss.insert(101);
+    s.ms[200].i = 201;
+    s.ms[200].f = 201.11;
+    s.ms[200].s = "202";
+    s.ms[400].i = 401;
+    s.ms[400].f = 401.11;
+    s.ms[400].s = "402";
+    std::string bstr = X::tobson(s);
+    bson_t b;
+    bson_init_static(&b, (const uint8_t *)bstr.data(), bstr.length());
+
+    size_t l;
+    char *json = bson_as_json(&b, &l);
+    cout<<json<<endl;
+    bson_free(json);
+
+    float f = tonum<float>("3.14");
+    cout<<f<<endl;
+    #endif
+
+    XDate date;
+    date.from_string("2017-12-08 16:00:00");
+    cout<<"time:"<<date.unix_time<<endl;
+    cout<<date.to_string()<<endl;
 }
 
 TEST(xml, file)
@@ -192,17 +273,18 @@ TEST(xml, file)
 }
 
 
-#ifndef USE_BLADE
+#ifdef USE_MAKE
 int main(int argc, char *argv[])
 {
     #undef TEST
     #define TEST(a,b) a##_##b()
     TEST(config, file);
+	TEST(json, raw);
     TEST(json, str);
-    #ifndef NO_BSON
-    TEST(bson, str);
-    #endif
     TEST(json, file);
+    TEST(bson, obj);
+    TEST(bson, str);
     TEST(xml, file);
 }
 #endif
+

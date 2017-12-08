@@ -14,9 +14,7 @@
 * limitations under the License.
 */
 
-
-#ifndef __X_TO_STRUCT_JSON_CFG_STR_HPP
-#define __X_TO_STRUCT_JSON_CFG_STR_HPP
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -24,7 +22,6 @@
 #include <vector>
 #include <set>
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 #include "xstr.hpp"
 
@@ -144,7 +141,7 @@ public:
         }
         for (typename std::map<KEYTYPE,TYPE>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
             _sep=",";
-            std::string _k = boost::lexical_cast<std::string>(iter->first);
+            std::string _k =tostr(iter->first);
             this->convert(_k, iter->second, splen+space(), i++);
             _sep=oldsep;
         }
@@ -219,7 +216,4 @@ private:
 };
 
 }
-
-#endif
-
 

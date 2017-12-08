@@ -14,9 +14,7 @@
 * limitations under the License.
 */
 
-
-#ifndef __X_TO_STRUCT_JSON_OBJ_HPP
-#define __X_TO_STRUCT_JSON_OBJ_HPP
+#pragma once
 
 #include "xobj.hpp"
 
@@ -60,7 +58,5 @@ private:
 };
 
 }
-
-#endif
 
 

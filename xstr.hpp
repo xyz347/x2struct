@@ -15,11 +15,11 @@
 */
 
 
-#ifndef __X_TO_STRUCT_STRING_HPP
-#define __X_TO_STRUCT_STRING_HPP
+#pragma once
 
 #include <string>
-//#include <type_traits>
+#include "util.hpp"
+
 
 namespace x2struct {
 
@@ -36,7 +36,4 @@ private:
 };
 
 }
-
-#endif
-
 

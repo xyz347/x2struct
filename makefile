@@ -1,16 +1,11 @@
 CC=g++
 AR=ar
-#FLAGS=-std=c++11
 
-# remove this line if need bson support
-FLAGS=-DNO_BSON -g
-INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml  -Ithirdparty/mongo/include -Ithirdparty/config++/include
+FLAGS= -g -DUSE_MAKE
+INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml  -Ithirdparty/libbson/include -Ithirdparty/libconfig/include
 
 CPPFILES=$(wildcard *.cpp)
 
-# remove bson. bson need c++11
-BSONFILES=bsonobj.cpp bsonstr.cpp
-CPPFILES:=$(filter-out $(BSONFILES),$(CPPFILES))
 
 HPPFILES=$(wildcard *.hpp)
 OBJFILES=$(foreach n,$(CPPFILES),objs/$(n:.cpp=.o))
@@ -43,9 +38,9 @@ test/xtest:test/x2struct_test.cpp $(LIBNAME)
 	$(CC) -o $@ $^ $(FLAGS) $(INCS) \
 	thirdparty/json/lib/libjson.a \
 	thirdparty/tinyxml/lib/libtinyxml.a \
-	thirdparty/mongo/lib/libmongoclient.a \
-	thirdparty/config++/lib/libconfig++.a \
-	-lboost_date_time -lboost_thread
+	thirdparty/libconfig/lib/libconfig++.a \
+	thirdparty/libbson/lib/libbson-1.0.a \
+	-pthread -lrt
 
 
 ifneq ($(MAKECMDGOALS), clean)

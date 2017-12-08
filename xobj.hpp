@@ -14,9 +14,7 @@
 * limitations under the License.
 */
 
-
-#ifndef __X_TO_STRUCT_OBJ_HPP
-#define __X_TO_STRUCT_OBJ_HPP
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -24,7 +22,8 @@
 #include <vector>
 #include <set>
 #include <stdexcept>
-#include <boost/lexical_cast.hpp>
+
+#include "util.hpp"
 
 namespace x2struct {
 
@@ -50,7 +49,8 @@ public: // convert
 
     template <typename TYPE>
     void convert(std::vector<TYPE> &val) {
-        for (size_t i=0; i<size(); ++i) {
+        size_t s = size();
+        for (size_t i=0; i<s; ++i) {
             TYPE _t;
             this->subobj(i).convert(_t);
             val.push_back(_t);
@@ -75,7 +75,12 @@ public: // convert
         for (size_t i=0; i<fields.size(); ++i) {
             TYPE _t;
             this->subobj(fields[i]).convert(_t);
-            KEYTYPE _k = boost::lexical_cast<KEYTYPE>(fields[i]);
+            KEYTYPE _k;
+            if (fields[i][0]!='x') {
+                _k = tonum<KEYTYPE>(fields[i]);
+            } else { // libconfig不支持数字作为key，所以用x开头，比如x11
+                _k = tonum<KEYTYPE>(fields[i].substr(1));
+            }
             val[_k] = _t;
         }
     }
@@ -124,7 +129,5 @@ private:
 };
 
 }
-
-#endif
 
 

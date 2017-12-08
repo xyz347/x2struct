@@ -14,9 +14,7 @@
 * limitations under the License.
 */
 
-
-#ifndef __X_TO_STRUCT_XML_STR_HPP
-#define __X_TO_STRUCT_XML_STR_HPP
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -88,7 +86,4 @@ private:
 };
 
 }
-
-#endif
-
 

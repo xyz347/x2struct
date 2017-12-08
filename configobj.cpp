@@ -160,6 +160,15 @@ XObj& ConfigObj::subobj(const std::string&key)
     }
 }
 
+void ConfigObj::getsubfields(std::vector<std::string>& fields)
+{
+    Setting::iterator iter = _s->begin();
+    for (; iter!=_s->end(); ++iter) {
+        fields.push_back(iter->getName());
+    }
+}
+
+
 string ConfigObj::attribute(const std::string&key)
 {
     try {

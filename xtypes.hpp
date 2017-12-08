@@ -15,9 +15,7 @@
 */
 
 
-
-#ifndef __X_TO_STRUCT_TYPES_HPP
-#define __X_TO_STRUCT_TYPES_HPP
+#pragma once
 
 #include <stdint.h>
 #include "xobj.hpp"
@@ -46,6 +44,7 @@ public:
     virtual void from_string(const std::string&str) = 0;
 };
 
+// YYYY-MM-DD HH:MM:SS
 class XDate:public XType{
 public:
     int64_t unix_time;   // unix time
@@ -55,7 +54,4 @@ public:
 };
 
 }
-
-#endif
-
 

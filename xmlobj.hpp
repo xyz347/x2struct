@@ -15,10 +15,10 @@
 */
 
 
-#ifndef __X_TO_STRUCT_XML_OBJ_HPP
-#define __X_TO_STRUCT_XML_OBJ_HPP
+#pragma once
 
 #include <map>
+#include "util.hpp"
 #include "xobj.hpp"
 
 class TiXmlElement;
@@ -67,7 +67,4 @@ private:
 };
 
 }
-
-#endif
-
 

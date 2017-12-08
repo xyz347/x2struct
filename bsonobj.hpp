@@ -14,26 +14,25 @@
 * limitations under the License.
 */
 
+#pragma once
 
-
-#ifndef __X_TO_STRUCT_BSON_OBJ_HPP
-#define __X_TO_STRUCT_BSON_OBJ_HPP
-
+#include <stdint.h>
 #include "xobj.hpp"
 
-namespace mongo{
-class BSONObj;
-class BSONElement;
-}
 
 namespace x2struct {
 
-// 差点重名了，就差大小写了
+struct BsonIter;
+
 class BsonObj:public XObj {
 public:
-    BsonObj(const mongo::BSONObj&bobj);
-    BsonObj(const mongo::BSONElement&bele);
+    BsonObj(const uint8_t*data, size_t length);
+    BsonObj(void*iter); // type bson_iter_t, but bson_iter_t is unnamed struct, could not forward declare
+    BsonObj(const BsonObj&obj);
     ~BsonObj();
+public:
+    virtual bool support_next() const {return true;}
+    virtual XObj* next();
 public: // convert
     virtual void convert(std::string &val);
     virtual void convert(bool &val);
@@ -57,16 +56,14 @@ public:
     virtual std::string attribute(const std::string&key);
 private:
     size_t size(bool&isarray);
+    void init_iter(bool top);
 private:
-    const mongo::BSONObj& _v;
-    const mongo::BSONElement& _e;
-    bool  _isobj;
+    //bool  _isobj;
+    std::string _data;
+    mutable BsonIter *_iter;
     std::vector<BsonObj> _gc;   //垃圾回收
-    std::vector<mongo::BSONElement> _ec;   //垃圾回收
 };
 
 }
-
-#endif
 
 

@@ -14,10 +14,7 @@
 * limitations under the License.
 */
 
-
-
-#ifndef __X_TO_STRUCT_GOLANG_STR_HPP
-#define __X_TO_STRUCT_GOLANG_STR_HPP
+#pragma once;
 
 #include <stdint.h>
 #include <string>
@@ -25,7 +22,6 @@
 #include <vector>
 #include <set>
 #include <sstream>
-#include <boost/algorithm/string.hpp>
 
 #include <cxxabi.h>
 
@@ -138,7 +134,7 @@ private:
         }
 
         std::vector<std::string> raw_types;
-        boost::split(raw_types, str, boost::is_any_of("::")); // remove name space
+        split(raw_types, str, "::"); // remove name space
         str = raw_types[raw_types.size()-1];
 
         str[0] = std::toupper(str[0]);
@@ -156,15 +152,15 @@ private:
         if (0 != aliase_name) {
             str = aliase_name;
             std::vector<std::string> types;
-            boost::split(types, str, boost::is_any_of(" "));
+            split(types, str, ' ');
             for (size_t i=0; i<types.size(); ++i) {
                 std::vector<std::string> name_opts;
-                boost::split(name_opts, types[i], boost::is_any_of(":"));
+                split(name_opts, types[i], ':');
                 if (1 == name_opts.size()) {
                     aliases[""] = types[i];
                 } else {
                     std::vector<std::string> opts;
-                    boost::split(opts, name_opts[1], boost::is_any_of(","));
+                    split(opts, name_opts[1], ',');
                     aliases[name_opts[0]] = opts[0];
                 }
             }

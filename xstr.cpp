@@ -16,10 +16,7 @@
 
 
 #include <time.h>
-
 #include <vector>
-#include <boost/algorithm/string.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp> 
 
 #include "xstr.hpp"
 
@@ -32,10 +29,10 @@ std::string XStr::fieldName(const std::string&oname, const std::string&aname)
     string nname;
 
     vector<string> types;
-    boost::split(types, aname, boost::is_any_of(" "));
+    split(types, aname, ' ');
     for (size_t i=0; i<types.size(); ++i) {
         vector<string> tname;
-        boost::split(tname, types[i], boost::is_any_of(":"));
+        split(tname, types[i], ':');
         if (tname.size()==2 && tname[0]==_type) {
             nname = tname[1];
             break;
@@ -46,7 +43,7 @@ std::string XStr::fieldName(const std::string&oname, const std::string&aname)
 
     if (!nname.empty()) {
         vector<string> tname;
-        boost::split(tname, nname, boost::is_any_of(","));
+        split(tname, nname, ',');
         return tname[0];
     } else {
         return oname;

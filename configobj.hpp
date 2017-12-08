@@ -14,10 +14,7 @@
 * limitations under the License.
 */
 
-
-
-#ifndef __X_TO_STRUCT_LIBCONFIG_OBJ_HPP
-#define __X_TO_STRUCT_LIBCONFIG_OBJ_HPP
+#pragma once
 
 #include "xobj.hpp"
 
@@ -56,7 +53,7 @@ public:
     virtual XObj& operator[](const std::string&key);
     virtual XObj& subobj(size_t index);
     virtual XObj& subobj(const std::string&key);
-    virtual void getsubfields(std::vector<std::string>& fields) {} // config++ support this on 1.6
+    virtual void getsubfields(std::vector<std::string>& fields);// {} // config++ support this on 1.6
 public:
     virtual std::string attribute(const std::string&key);
 private:
@@ -68,7 +65,4 @@ private:
 };
 
 }
-
-#endif
-
 

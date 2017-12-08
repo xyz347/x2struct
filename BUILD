@@ -11,14 +11,14 @@ cc_library(
         'jsoncfgstr.cpp',
         'bsonstr.cpp',
         'xtypes.cpp',
+        'util.cpp',
     ],
-    deps = [ # TODO modify here to correct path
+    deps = [
         '//thirdparty/json:json',
-        '//thirdparty/mongo:mongoclient',
         '//thirdparty/tinyxml:tinyxml',
-        '//thirdparty/config++:config++',
-        '//thirdparty/boost:boost_date_time',
-        '//thirdparty/boost:boost_thread', # mongoclient need
+        '//thirdparty/libconfig:config++',
+        '//thirdparty/mongo-cxx-driver:bson-1.0',
+        '#rt',
     ],
     extra_cppflags = [
         '--std=c++11'
@@ -41,7 +41,6 @@ cc_test(
     ],
     extra_cppflags = [
         '--std=c++11',
-        '-D__FULLPATH__=`readlink -f $SOURCE`',
-        '-DUSE_BLADE',
+        '-D__FULLPATH__=`readlink -f $SOURCE`'
     ]
 )
