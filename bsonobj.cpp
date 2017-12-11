@@ -36,7 +36,7 @@ struct BsonIter {
 
 BsonObj::BsonObj(const uint8_t*data, size_t length)
     :XObj("bson")
-    ,_data((const char*)data, length)
+    ,_data((const char*)data, (length>0)?length:BSON_UINT32_TO_LE(*(int32_t*)data))
     ,_iter(0)
 {
     bson_t b; // local is ok
@@ -221,11 +221,21 @@ void BsonObj::getsubfields(std::vector<std::string>& fields)
     }
 }
 
-XObj* BsonObj::next()
+std::string BsonObj::json() const
 {
-    return 0;
-}
+    bson_t b; // local is ok
+    bson_init_static(&b, (const uint8_t*)_data.data(), _data.length());
 
+    size_t s;
+    char *jstr = bson_as_json(&b, &s);
+    if (jstr) {
+        std::string j(jstr);
+        bson_free(jstr);
+        return j;
+    } else {
+        return "";
+    }
+}
 
 }
 

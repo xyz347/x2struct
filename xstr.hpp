@@ -30,7 +30,7 @@ public:
 public:
     virtual std::string fieldName(const std::string&oname, const std::string&aname); // alias name
 public:
-    virtual void convert(const std::string&name, const std::string& data, int space, int index) = 0;
+    //virtual void convert(const std::string&name, const std::string& data, int space, int index) = 0;
 private:
     std::string _type;  // xml/json/bson/config
 };

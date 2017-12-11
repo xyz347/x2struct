@@ -31,10 +31,12 @@
 #include <libbson-1.0/bson.h>
 #include "x2struct.hpp"
 #include "xtypes.hpp"
+#include "bsonbuilder.hpp"
 
 
 using namespace std;
 using namespace x2struct;
+using namespace bb;
 
 #ifndef USE_MAKE
   BLADE_TEST_COMMON_ENV;
@@ -170,7 +172,7 @@ TEST(bson, obj)
     bson_error_t err;
     memset(&err, 0, sizeof(err));
     bson_t * bson = bson_new_from_json((const uint8_t *)jstr.data(), jstr.length(), &err);
-    X::loadbson(bson_get_data(bson), bson->len, j1);
+    X::loadbson(bson_get_data(bson), 0, j1);
 
     // iter test begin ===========================
     #if 0
@@ -199,6 +201,53 @@ TEST(bson, obj)
     EXPECT_EQ(j1.s[1].s1, 99);
     EXPECT_EQ(j1.s[1].s2, "nani");
     #endif
+}
+
+TEST(bson, objmap)
+{
+    std::string mstr("{\"1\":101, \"2\":202, \"3\":303}");
+    std::map<int, int> m;
+    bson_error_t err;
+    memset(&err, 0, sizeof(err));
+    bson_t * bson = bson_new_from_json((const uint8_t *)mstr.data(), mstr.length(), &err);
+    X::loadbson(bson_get_data(bson), 0, m);
+    for (map<int,int>::const_iterator iter = m.begin(); iter!=m.end(); ++iter) {
+        cout<<iter->first<<':'<<iter->second<<endl;
+    }
+    bson_destroy(bson);
+}
+
+TEST(bson, builder)
+{
+    #if __GXX_EXPERIMENTAL_CXX0X__  // if support c++11 build map by initializer_list
+    bb::mi m{{"$set", bb::mi{{"_id",200}, {"date",bb::dt(1512828045000)}}}};
+    #else
+    bb::mi up;
+    bb::mi m;
+    up.insert(std::make_pair<std::string, bb::intf>("_id", 200));
+    up.insert(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
+    m.insert(std::make_pair<std::string, bb::intf>("$set", up));
+    #endif
+
+    bson_t b;
+    std::string data = build(m, &b);
+    size_t len;
+    char *json = bson_as_json(&b, &len);
+    cout<<json<<endl;
+    bson_free(json);
+    bson_destroy(&b);
+}
+
+TEST(bson, convert)
+{
+    BsonStr sub = BsonStr().convert("hello", 1).convert("good.abc.1", "nice");
+    std::string str = BsonStr().convert("$set", sub).toStr();
+    bson_t b;
+    bson_init_static(&b, (const uint8_t *)str.data(), str.length());
+    size_t s;
+    char *json = bson_as_json(&b, &s);
+    cout<<"=========="<<json<<"================"<<endl;
+    bson_free(json);
 }
 
 struct STR_SUB {
@@ -276,15 +325,10 @@ TEST(xml, file)
 #ifdef USE_MAKE
 int main(int argc, char *argv[])
 {
-    #undef TEST
-    #define TEST(a,b) a##_##b()
-    TEST(config, file);
-	TEST(json, raw);
-    TEST(json, str);
-    TEST(json, file);
-    TEST(bson, obj);
-    TEST(bson, str);
-    TEST(xml, file);
+    const std::vector<test_case>& tcs = TC_CONTAINER::tcs();
+    for (size_t i=0; i<tcs.size(); ++i) {
+        tcs[i]();
+    }
 }
 #endif
 

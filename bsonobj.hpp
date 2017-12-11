@@ -27,12 +27,12 @@ struct BsonIter;
 class BsonObj:public XObj {
 public:
     BsonObj(const uint8_t*data, size_t length);
-    BsonObj(void*iter); // type bson_iter_t, but bson_iter_t is unnamed struct, could not forward declare
     BsonObj(const BsonObj&obj);
     ~BsonObj();
+private:
+    BsonObj(void*iter); // type bson_iter_t, but bson_iter_t is unnamed struct, could not forward declare
 public:
-    virtual bool support_next() const {return true;}
-    virtual XObj* next();
+    std::string json() const;
 public: // convert
     virtual void convert(std::string &val);
     virtual void convert(bool &val);

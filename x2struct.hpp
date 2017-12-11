@@ -57,9 +57,10 @@ public:
         return true;
     }
     template <typename TYPE>
-    static bool loadbson(const uint8_t*data, size_t length, TYPE&t) {
+    static bool loadbson(const uint8_t*data, size_t length, TYPE&t) { // if length==0, get len from data
         BsonObj obj(data, length);
-        t.__x_to_struct(obj);
+        //t.__x_to_struct(obj);
+        ((XObj*)&obj)->convert(t);
         return true;
     }
     template <typename TYPE>

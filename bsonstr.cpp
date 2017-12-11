@@ -39,6 +39,14 @@ BsonStr::BsonStr(const std::string&name, _bson_t*parent, int type):XStr("bson")
     }
 }
 
+BsonStr::BsonStr(const BsonStr&bs):XStr("bson")
+{
+    *this = bs;
+    bs._parent = 0;
+    bs._bson = 0;
+}
+
+
 BsonStr::~BsonStr()
 {
     if (0 != _bson) {
@@ -71,55 +79,78 @@ string BsonStr::toStr()const
     return std::string((const char*)bson_get_data(_bson), _bson->len);
 }
 
-void BsonStr::convert(const string&name, int16_t data, int splen, int index)
+BsonStr& BsonStr::convert(const string&name, int16_t data, int splen, int index)
 {
     bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const string&name, uint16_t data, int splen, int index)
+BsonStr& BsonStr::convert(const string&name, uint16_t data, int splen, int index)
 {
     bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const string&name, int32_t data, int splen, int index)
+BsonStr& BsonStr::convert(const string&name, int32_t data, int splen, int index)
 {
     bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const string&name, uint32_t data, int splen, int index)
+BsonStr& BsonStr::convert(const string&name, uint32_t data, int splen, int index)
 {
     bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const std::string&name, int64_t data, int splen, int index)
+BsonStr& BsonStr::convert(const std::string&name, int64_t data, int splen, int index)
 {
     bson_append_int64(_bson, name.c_str(), name.length(), (int64_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const std::string&name, uint64_t data, int splen, int index)
+BsonStr& BsonStr::convert(const std::string&name, uint64_t data, int splen, int index)
 {
     bson_append_int64(_bson, name.c_str(), name.length(), (int64_t)data);
+    return *this;
 }
 
-void BsonStr::convert(const std::string&name, float data, int splen, int index)
+BsonStr& BsonStr::convert(const std::string&name, float data, int splen, int index)
 {
     bson_append_double(_bson, name.c_str(), name.length(), (double)data);
+    return *this;
 }
 
-void BsonStr::convert(const std::string&name, double data, int splen, int index)
+BsonStr& BsonStr::convert(const std::string&name, double data, int splen, int index)
 {
     bson_append_double(_bson, name.c_str(), name.length(), (double)data);
+    return *this;
 }
 
-void BsonStr::convert(const std::string&name, bool data, int splen, int index)
+BsonStr& BsonStr::convert(const std::string&name, bool data, int splen, int index)
 {
     bson_append_bool(_bson, name.c_str(), name.length(), data);
+    return *this;
 }
 
-void BsonStr::convert(const string&name, const string& data, int splen, int index)
+BsonStr& BsonStr::convert(const string&name, const string& data, int splen, int index)
 {
     bson_append_utf8(_bson, name.c_str(), name.length(), (const char*)data.data(), data.length());
+    return *this;
 }
+
+BsonStr& BsonStr::convert(const string&name, const char* data, int splen, int index)
+{
+    std::string d(data);
+    return convert(name, d, splen, index);
+}
+
+BsonStr& BsonStr::convert(const std::string&name, const BsonStr& data, int space, int index)
+{
+    bson_append_document(_bson, name.c_str(), name.length(), data._bson);
+    return *this;
+}
+
 
 }
 

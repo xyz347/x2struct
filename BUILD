@@ -10,6 +10,7 @@ cc_library(
         'xmlstr.cpp',
         'jsoncfgstr.cpp',
         'bsonstr.cpp',
+        'bsonbuilder.cpp',
         'xtypes.cpp',
         'util.cpp',
     ],

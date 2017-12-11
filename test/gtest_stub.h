@@ -16,12 +16,37 @@
 
 
 
-#ifndef __GTEST_STUB_H
-#define __GTEST_STUB_H
+#pragma once
 
+#include <vector>
 #include <iostream>
 
-#define TEST(a, b) static void a##_##b()
+typedef void(*test_case)();
+
+class TC_CONTAINER {
+public:
+    static void add(test_case tc) {
+        I()._tcs.push_back(tc);
+    }
+    static const std::vector<test_case>& tcs() {
+        return I()._tcs;
+    }
+    static TC_CONTAINER& I() {
+        static TC_CONTAINER _inst;
+        return _inst;
+    }
+private:
+    std::vector<test_case> _tcs;
+};
+
+class AUTO_ADD_TC {
+public:
+    AUTO_ADD_TC(test_case tc) {
+        TC_CONTAINER::add(tc);
+    }
+};
+
+#define TEST(a, b) static void a##_##b();  static AUTO_ADD_TC __aat__##a##_##b(a##_##b); static void a##_##b()
 
 #define EXPECT_EQ(a,b) \
 do {\
@@ -37,5 +62,3 @@ do {\
     }\
 }while(false)
     
-
-#endif
