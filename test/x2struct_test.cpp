@@ -219,13 +219,17 @@ TEST(bson, objmap)
 
 TEST(bson, builder)
 {
+    std::vector<std::string> vstr;
+    vstr.push_back("s1");
+    vstr.push_back("s2");
     #if __GXX_EXPERIMENTAL_CXX0X__  // if support c++11 build map by initializer_list
-    bb::mi m{{"$set", bb::mi{{"_id",200}, {"date",bb::dt(1512828045000)}}}};
+    bb::mi m{{"$set", bb::mi{{"_id",200}, {"date",bb::dt(1512828045000)}, {"vs", vstr}}}};
     #else
     bb::mi up;
     bb::mi m;
     up.insert(std::make_pair<std::string, bb::intf>("_id", 200));
     up.insert(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
+    up.insert(std::make_pair<std::string, bb::intf>("vs", vstr));
     m.insert(std::make_pair<std::string, bb::intf>("$set", up));
     #endif
 
