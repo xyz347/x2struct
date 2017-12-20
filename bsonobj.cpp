@@ -98,27 +98,27 @@ void BsonObj::convert(std::string &val)
 
 void BsonObj::convert(bool &val)
 {
-    val = bson_iter_bool(&_iter->root);
+    val = (bool)bson_iter_as_int64(&_iter->root);
 }
 
 void BsonObj::convert(int32_t &val)
 {
-    val = bson_iter_int32(&_iter->root);
+    val = (int32_t)bson_iter_as_int64(&_iter->root);
 }
 
 void BsonObj::convert(uint32_t &val)
 {
-    val = (uint32_t)bson_iter_int32(&_iter->root);
+    val = (uint32_t)bson_iter_as_int64(&_iter->root);
 }
 
 void BsonObj::convert(int16_t &val)
 {
-    val = (int16_t)bson_iter_int32(&_iter->root);
+    val = (int16_t)bson_iter_as_int64(&_iter->root);
 }
 
 void BsonObj::convert(uint16_t &val)
 {
-    val = (uint16_t)bson_iter_int32(&_iter->root);
+    val = (uint16_t)bson_iter_as_int64(&_iter->root);
 }
 
 void BsonObj::convert(int64_t &val)
