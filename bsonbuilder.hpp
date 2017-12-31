@@ -57,7 +57,7 @@ class intf {
         t_double,
         t_vdouble,
     };
-    friend std::string build(const mi&m, _bson_t*parent, const std::string&pname, int type);
+    friend class Convert;
 public:
     intf(bool v):_type(t_bool),_i64(v){}
     intf(int32_t v):_type(t_i32),_i64(v){}
@@ -111,13 +111,14 @@ private:
 };
 
 /*
-to build a bson binary data buffer, build(m, ret) is ok
-
 if ret is nil, data will return as std::string
 if ret is not nil, data will return as bson_t* and !!!need to call bson_destroy(ret)!!!, std::string will be empty
 */
 //std::string build(const mi&m, _bson_t**ret, void*parent=0, const std::string&pname="", bool bdoc=false);
 std::string build(const mi&m, _bson_t*ret);
+
+// translate mi to json string
+std::string json(const mi&m, bool space=false);
 
 }
 

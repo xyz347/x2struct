@@ -25,13 +25,18 @@ using namespace x2struct;
 
 namespace bb {
 
-enum {
-    bb_top,
-    bb_doc,
-    bb_array
+class Convert {
+public:
+    enum {
+        bb_top,
+        bb_doc,
+        bb_array
+    };
+    static std::string build(const mi&m, _bson_t*parent, const std::string&pname, int type);
+    static void json(const mi&m, const std::string& space, std::string&root);
 };
 
-std::string build(const mi&m, _bson_t*parent, const std::string&pname, int type)
+std::string Convert::build(const mi&m, _bson_t*parent, const std::string&pname, int type)
 {
     bson_t _static;
     bson_t *root = &_static;
@@ -132,10 +137,106 @@ std::string build(const mi&m, _bson_t*parent, const std::string&pname, int type)
     return "";
 }
 
+/*
+// translate mi to json string
+std::string json(const mi&m)
+{
+    bson_t b;
+
+    build(m, &b);
+
+    size_t len;
+    char *jstr = bson_as_json(&b, &len); // I don't like the space
+    std::string ret(jstr);
+
+    bson_free(jstr);
+    bson_destroy(&b);
+    return ret;
+}
+*/
+
+void Convert::json(const mi&m, const std::string& space, std::string&root)
+{
+    root.append("{").append(space);
+
+    for (mi::const_iterator iter=m.begin(); iter!=m.end(); ++iter) {
+        if (iter != m.begin()) {
+            root.append(space).append(",").append(space);
+        }
+        if (!iter->first.empty()) {
+            root.append("\"").append(iter->first).append("\"").append(space).append(":").append(space);
+        }
+        switch (iter->second._type) {
+          case intf::t_i32:
+          case intf::t_i64:
+          case intf::t_dt:
+            root.append(tostr(iter->second._i64));
+            break;
+          case intf::t_bool:
+            root.append(iter->second._i64?"true":"false");
+            break;
+          case intf::t_double:
+            root.append(tostr(iter->second._db));
+            break;
+          case intf::t_vi32:
+          case intf::t_vi64:{
+                root.append("[").append(space);
+                for (size_t i=0; i<iter->second._vi64.size(); ++i) {
+                    if (i > 0) {
+                        root.append(space).append(",").append(space);
+                    }
+                    root.append(tostr(iter->second._vi64[i]));
+                }
+                root.append(space).append("]");
+            }
+            break;
+          case intf::t_vdouble: {
+                root.append("[").append(space);
+                for (size_t i=0; i<iter->second._vdb.size(); ++i) {
+                    if (i > 0) {
+                        root.append(space).append(",").append(space);
+                    }
+                    root.append(tostr(iter->second._vdb[i]));
+                }
+                root.append(space).append("]");
+            }
+            break;
+          case intf::t_s:
+            root.append("\"").append(iter->second._s).append("\"");
+            break;
+          case intf::t_vs: {
+                root.append("[").append(space);
+                for (size_t i=0; i<iter->second._vs.size(); ++i) {
+                    if (i > 0) {
+                        root.append(space).append(",").append(space);
+                    }
+                    root.append("\"").append(iter->second._vs[i]).append("\"");
+                }
+                root.append(space).append("]");
+            }
+            break;
+          case intf::t_mi:
+            json(iter->second._mi, space, root);
+            break;
+        }
+    }
+
+    root.append(space).append("}");
+}
+
+
 std::string build(const mi&m, _bson_t*ret)
 {
-    return build(m, ret, "", bb_top);
+    return Convert::build(m, ret, "", Convert::bb_top);
 }
+
+std::string json(const mi&m, bool space)
+{
+    std::string root;
+    Convert::json(m, space?" ":"", root);
+    return root;
+}
+
 
 
 }

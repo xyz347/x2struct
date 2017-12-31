@@ -46,7 +46,11 @@ ConfigObj::ConfigObj(const std::string& str, bool isfile, const std::string&root
     } catch (const FileIOException &e) {
         err<<"load file["<<str<<"] failed:"<<e.what();
     } catch (const ParseException &e) {
-        err<<"parse ["<<str<<"] error at ["<<e.getFile()<<":"<<e.getLine()<<" errinfo:"<<e.getError();
+        if (isfile) {
+            err<<"parse ["<<str<<"] error at ["<<e.getFile()<<":"<<e.getLine()<<" errinfo:"<<e.getError();
+        } else {
+            err<<"parse ["<<str<<"] error at line "<<e.getLine()<<" errinfo:"<<e.getError();
+        }
     } catch (...) {
         err<<"Unknow exception when load["<<str<<"]";
     }
