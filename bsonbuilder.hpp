@@ -32,10 +32,11 @@ namespace bb { // not x2struct, short namespace for easy use
 
 class intf;
 
+typedef std::pair<std::string, intf> pintf;
 typedef std::vector<int32_t> vi32;
 typedef std::vector<int64_t> vi64;
 typedef std::vector<std::string> vs;
-typedef std::map<std::string, intf> mi;
+typedef std::vector<pintf> vp;
 
 // date time
 struct dt {
@@ -72,7 +73,7 @@ public:
     intf(const vi64& v):_type(t_vi64),_vi64(v){}
     intf(const std::string& v):_type(t_s),_s(v){}
     intf(const vs& v):_type(t_vs),_vs(v){}
-    intf(const mi& v):_type(t_mi),_mi(v){}
+    intf(const vp& v):_type(t_mi),_vp(v){}
 
     // fix type
     intf(const char* v):_type(t_s),_s(v){}
@@ -107,18 +108,18 @@ private:
     double _db;
     std::vector<double> _vdb;
     vs  _vs;
-    mi  _mi;
+    vp  _vp;
 };
 
 /*
 if ret is nil, data will return as std::string
 if ret is not nil, data will return as bson_t* and !!!need to call bson_destroy(ret)!!!, std::string will be empty
 */
-//std::string build(const mi&m, _bson_t**ret, void*parent=0, const std::string&pname="", bool bdoc=false);
-std::string build(const mi&m, _bson_t*ret);
+//std::string build(const vp&m, _bson_t**ret, void*parent=0, const std::string&pname="", bool bdoc=false);
+std::string build(const vp&m, _bson_t*ret);
 
-// translate mi to json string
-std::string json(const mi&m, bool space=false);
+// translate vp to json string
+std::string json(const vp&m, bool space=false);
 
 }
 

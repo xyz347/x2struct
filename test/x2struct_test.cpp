@@ -223,14 +223,17 @@ TEST(bson, builder)
     vstr.push_back("s1");
     vstr.push_back("s2");
     #if __GXX_EXPERIMENTAL_CXX0X__  // if support c++11 build map by initializer_list
-    bb::mi m{{"$set", bb::mi{{"_id",200}, {"date",bb::dt(1512828045000)}, {"vs", vstr}}}};
+    bb::vp m{{"$set", bb::vp{{"_id",200}, {"date",bb::dt(1512828045000)}, {"vs", vstr}}}};
+    bb::vp m1{{"_id", bb::vp{{"$in", vector<string>{"a"}}}}};
+    cout<<bb::json(m1,false)<<endl;
     #else
-    bb::mi up;
-    bb::mi m;
-    up.insert(std::make_pair<std::string, bb::intf>("_id", 200));
-    up.insert(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
-    up.insert(std::make_pair<std::string, bb::intf>("vs", vstr));
-    m.insert(std::make_pair<std::string, bb::intf>("$set", up));
+    bb::vp up;
+    bb::vp m;
+    up.push_back(std::make_pair<std::string, bb::intf>("_id", 200));
+    up.push_back(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
+    up.push_back(std::make_pair<std::string, bb::intf>("vs", vstr));
+    m.push_back(std::make_pair<std::string, bb::intf>("$set", up));
+    cout<<bb::json(up, false)<<endl;
     #endif
 
     bson_t b;

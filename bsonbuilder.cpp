@@ -32,11 +32,11 @@ public:
         bb_doc,
         bb_array
     };
-    static std::string build(const mi&m, _bson_t*parent, const std::string&pname, int type);
-    static void json(const mi&m, const std::string& space, std::string&root);
+    static std::string build(const vp&m, _bson_t*parent, const std::string&pname, int type);
+    static void json(const vp&m, const std::string& space, std::string&root);
 };
 
-std::string Convert::build(const mi&m, _bson_t*parent, const std::string&pname, int type)
+std::string Convert::build(const vp&m, _bson_t*parent, const std::string&pname, int type)
 {
     bson_t _static;
     bson_t *root = &_static;
@@ -54,7 +54,7 @@ std::string Convert::build(const mi&m, _bson_t*parent, const std::string&pname, 
         bson_append_array_begin((bson_t*)parent, pname.c_str(), pname.length(), root);
     }
 
-    for (mi::const_iterator iter=m.begin(); iter!=m.end(); ++iter) {
+    for (vp::const_iterator iter=m.begin(); iter!=m.end(); ++iter) {
         switch (iter->second._type) {
           case intf::t_i32:
             bson_append_int32(root, iter->first.c_str(), iter->first.length(), iter->second._i64);
@@ -115,7 +115,7 @@ std::string Convert::build(const mi&m, _bson_t*parent, const std::string&pname, 
             }
             break;
           case intf::t_mi:
-            build(iter->second._mi, root, iter->first, bb_doc);
+            build(iter->second._vp, root, iter->first, bb_doc);
             break;
         }
     }
@@ -138,8 +138,8 @@ std::string Convert::build(const mi&m, _bson_t*parent, const std::string&pname, 
 }
 
 /*
-// translate mi to json string
-std::string json(const mi&m)
+// translate vp to json string
+std::string json(const vp&m)
 {
     bson_t b;
 
@@ -155,11 +155,11 @@ std::string json(const mi&m)
 }
 */
 
-void Convert::json(const mi&m, const std::string& space, std::string&root)
+void Convert::json(const vp&m, const std::string& space, std::string&root)
 {
     root.append("{").append(space);
 
-    for (mi::const_iterator iter=m.begin(); iter!=m.end(); ++iter) {
+    for (vp::const_iterator iter=m.begin(); iter!=m.end(); ++iter) {
         if (iter != m.begin()) {
             root.append(space).append(",").append(space);
         }
@@ -216,7 +216,7 @@ void Convert::json(const mi&m, const std::string& space, std::string&root)
             }
             break;
           case intf::t_mi:
-            json(iter->second._mi, space, root);
+            json(iter->second._vp, space, root);
             break;
         }
     }
@@ -225,12 +225,12 @@ void Convert::json(const mi&m, const std::string& space, std::string&root)
 }
 
 
-std::string build(const mi&m, _bson_t*ret)
+std::string build(const vp&m, _bson_t*ret)
 {
     return Convert::build(m, ret, "", Convert::bb_top);
 }
 
-std::string json(const mi&m, bool space)
+std::string json(const vp&m, bool space)
 {
     std::string root;
     Convert::json(m, space?" ":"", root);
