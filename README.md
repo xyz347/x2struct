@@ -1,13 +1,15 @@
-=x2struct
+x2struct
+===========
+用于解析 json/xml/libconfig/bson 到C++结构体里面，也可以反过来。
 
-        用于解析 json xml libconfig bson 到C++结构体里面，也可以反过来。
-        used for parse json xml libconfig bson to C++ struct or marshal C++ struct to json xml libconfig bson
+used for parse json/xml/libconfig/bson to C++ struct or marshal C++ struct to json/xml/libconfig/bson
 
+***
+### 范例 usage
+参考 test/x2struct_test.cpp 或者下面的代码
 
-使用方法：（范例请参考test/x2struct_test.cpp)
-定义结构体时，在结构体结尾添加XTOSTRUCT宏定义，即可使用x2struct::X里面的函数序列化反序列化结构体。
+see test/x2struct_test.cpp or code below
 
-比如
 ```C++
 #include <string>
 #include <iostream>
@@ -62,31 +64,65 @@ int main(int argc, char *argv[]) {
 }
 ```
 
-XTOSTRUCT 里面主要填struct里面各个变量的名称，需要放在下面三个字母之一里面：
-O: optional，表示可选的，在反序列化的时候，如果这个字段不存在
-   也是可以的，比如上述例子中，example.b, example.rs都是O，也
-   即json里面没有这两个字段也是可以的
-M: 与O对应，M表示必须存在对应的字段，比如range.min, range.max，
-   如果json里面没这个字段，则会抛异常
-A: 表示别名，用于X类型的key和结构体变量名不一样的情况。
-   别名可以有：
-       通用别名，对所有X类型生效，比如A(name, "_id")
-       特定别名，只针对特定类型，比如A(name, "bson:_id")
-   优先级是：特定别名>通用别名>原始名称
+### 使用方法
+在结构体定义的最后面添加一个XTOSTRUCT宏，里面包含结构体的各个变量即可。比如
 
+add XTOSTRUCT at the end of struct, and put struct members in it. 
+``` C++
+struct example {
+    int a;
+    std::string b;
+    std::vector<float> c;
+    std::vector<int> d;
+    XTOSTRUCT(A(a, "id"), O(b), M(c, d));
+};
+```
 
+变量需要放在A/M/O三个字母之一里面，A每次只能放一个变量，M/O可以放多个变量。
+
+- A: 表示别名，名用于key名称和变量名不一样的情况。比如变量名叫a，但是json里面的key是"id"，别名有<br>
+  通用别名 A(a, "_id")  _id对json/xml/bson/libconfig都生效 <br>
+  特定别名 A(a, "bson:_id")，只对bson生效，其他类型还是用的a <br>
+  可以同时有多个 A(a, "id,bson:_id") 则bson用_id，其他用id
+
+- M: M表示必须存在对应的字段，如果M(a)，那么对应的文件（比如json）必须存在a这个key，否则抛异常，M是与O对应。
+- O: optional，表示可选的，在反序列化的时候，如果这个字段不存在也是可以的。O是与M相对应的
+
+### usage
+add XTOSTRUCT at the end of struct, and put struct members in it. 
+``` C++
+struct example {
+    int a;
+    std::string b;
+    std::vector<float> c;
+    std::vector<int> d;
+    XTOSTRUCT(A(a, "id"), O(b), M(c, d));
+};
+```
+
+member need to put in one of A/M/O
+
+- A: alias name，for case struct member name not same as key name. <br>
+  A(a, "_id")  _id work for json/xml/bson/libconfig <br>
+  A(a, "bson:_id")，_id only work for bson, others use a <br>
+  A(a, "id,bson:_id") bson use _id, others use id
+
+- M: must apply，M(a), if a not exists in the bson/json/xml/libconfig, parse will throw an exception
+- O: optional，in contrast to the M
+
+***
 可以通过XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ进行条件反序列化（但是这样序列化出来的会和原来不一样)
 具体可以参考x2struct_test.cpp里面的struct condition。
-
+***
 如果想实现一些自定义类型，可以在xtypes.hpp里面添加，具体可以参考XDate，要点：
-1、继承XType
-2、实现to_string，序列化
-3、实现from_string，反序列化
+- 继承XType
+- 实现to_string，序列化
+- 实现from_string，反序列化
 
 
-【重要说明】
-1、序列化部分并没有参考任何的RFC文档，都是按实际的开发需求写的，不一定符合标准
-2、解析部分使用了下列开源代码：jsoncpp/tinyxml/mongodb.mongo/libconfig++
-3、bson的反序列化/序列化用了mongodb.mongo，这个库比较重，为了减少依赖，编译的时候
+### 重要说明
+- 序列化部分并没有参考任何的RFC文档，都是按实际的开发需求写的，不一定符合标准
+- 解析部分使用了下列开源代码：jsoncpp/tinyxml/mongodb.mongo/libconfig++
+- bson的反序列化/序列化用了mongodb.mongo，这个库比较重，为了减少依赖，编译的时候
    去掉了SSL功能，如果项目里面也用了这个库，可以修改指向。
-4、里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps
+- 里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps
