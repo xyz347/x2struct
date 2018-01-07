@@ -1,18 +1,26 @@
-x2struct is used to:
-Encoding struct to json/xml/libconfig/bson
-Decoding json/xml/libconfig/bson to struct
-Generate golang struct define
+=x2struct
 
-用于将 结构体与xml/json/libconfig/bson之间序列化与反序列化
+        用于解析 json xml libconfig bson 到C++结构体里面，也可以反过来。
+        used for parse json xml libconfig bson to C++ struct or marshal C++ struct to json xml libconfig bson
+
 
 使用方法：（范例请参考test/x2struct_test.cpp)
 定义结构体时，在结构体结尾添加XTOSTRUCT宏定义，即可使用x2struct::X里面的函数序列化反序列化结构体。
 
 比如
+```C++
+#include <string>
+#include <iostream>
+#include <vector>
+#include "x2struct.hpp"
+
+using namespace std;
+
+// struct define
 struct range {
     int min;
     int max;
-    XTOSTRUCT(M(min, max));
+    XTOSTRUCT(M(min, max)); // add line at end. include struct member is ok
 };
 
 struct example {
@@ -22,19 +30,37 @@ struct example {
     XTOSTRUCT(A(a, "_id"), O(b, rs));
 };
 
-void test() {
+
+/*
+ make # for generate libx2struct.a
+ g++ -o t test.cpp libx2struct.a thirdparty/json/lib/libjson.a 
+ ./t
+*/
+int main(int argc, char *argv[]) {
     // unmarshal
-    example st1;
-    example st2;
-    x2struct::X::loadjson("a.json", st1, true); // a.json是一个文件
-    if (st1.xhas("rs")) { // 可以通过xhas检查a.json是否有rs这个字段
-    }
-    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", st2, false);
     
-    /* marshal
-    std::string json=x2struct::X::tojson(st2, "", true, 4); // 第三个参数表示是否需要换行，第四个参数表示如果换行每行缩进几个空格
+    /* parse a json file to struct. "a.json" is a json file
+    example st1;
+    x2struct::X::loadjson("a.json", st1, true);
+    if (st1.xhas("rs")) { // check if a.json has key "rs" by xhas
+    }*/
+
+    // parse a json string to struct.
+    example st2;
+    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", st2, false);
+
+    /* marshal struct to json string. parameter 3 control linefeed. if true, json string has linefeed, or will marshal
+    to one line. parameter 4 only valid when true, control how man space add in line head.
+    std::string json=x2struct::X::tojson(st2, "", true, 4); 
     */
+    cout<<st2.a<<endl;
+    cout<<st2.b<<endl;
+    for (size_t i=0; i<st2.rs.size(); ++i) {
+        cout<<st2.rs[i].min<<':'<<st2.rs[i].max<<endl;
+    }
+    return 0;
 }
+```
 
 XTOSTRUCT 里面主要填struct里面各个变量的名称，需要放在下面三个字母之一里面：
 O: optional，表示可选的，在反序列化的时候，如果这个字段不存在
