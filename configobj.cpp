@@ -55,6 +55,8 @@ ConfigObj::ConfigObj(const std::string& str, bool isfile, const std::string&root
         err<<"Unknow exception when load["<<str<<"]";
     }
 
+    delete _c;
+    _c = 0;
     throw std::runtime_error(err.str());
 }
 

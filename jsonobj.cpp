@@ -45,6 +45,8 @@ JsonObj::JsonObj(const std::string& str, bool isfile):XObj("json"),__v(new Json:
         return;
     } while (false);
 
+    delete __v;
+    __v = 0;
     throw std::runtime_error(err);
 }
 

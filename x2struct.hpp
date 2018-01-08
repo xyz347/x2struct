@@ -47,7 +47,8 @@ public:
     template <typename TYPE>
     static bool loadxml(const std::string&str, TYPE&t, bool isfile=true) {
         XmlObj obj(str, isfile);
-        t.__x_to_struct(obj);
+        //t.__x_to_struct(obj);
+        ((XObj*)&obj)->convert(t);
         return true;
     }
     template <typename TYPE>
@@ -67,7 +68,8 @@ public:
     static bool loadconfig(const std::string&str, TYPE&t, bool isfile=true, const std::string&root="") {
         ConfigObj obj(str, isfile, root);
         try {
-            t.__x_to_struct(obj);
+            //t.__x_to_struct(obj);
+            ((XObj*)&obj)->convert(t);
             return true;
         } catch (std::exception &e) {
             obj.exception(e);
@@ -78,26 +80,33 @@ public:
     /* TO STRING */
     template <typename TYPE>
     static std::string toxml(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
+        space=newline?space:0;
         XmlStr obj(newline, space);
-        t.__struct_to_str(obj, root, 0);
+        //t.__struct_to_str(obj, root, 0);
+        obj.convert(root, t, space, 0);
         return obj.toStr();
     }
     template <typename TYPE>
     static std::string tojson(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
+        space=newline?space:0;
         JsonCfgStr obj(true, newline, space);
-        t.__struct_to_str(obj, root, 0);
+        //t.__struct_to_str(obj, root, 0);
+        obj.convert(root, t, space, 0);
         return obj.toStr();
     }
     template <typename TYPE>
     static std::string tobson(const TYPE& t) {
         BsonStr obj;
-        t.__struct_to_str(obj,"",0);
+        //t.__struct_to_str(obj,"",0);
+        obj.convert("", t, 0, 0);
         return obj.toStr();
     }
     template <typename TYPE>
     static std::string tocfg(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
+        space=newline?space:0;
         JsonCfgStr obj(false, newline, space);
-        t.__struct_to_str(obj, root, 0);
+        //t.__struct_to_str(obj, root, 0);
+        obj.convert(root, t, space, 0);
         return obj.toStr();
     }
 
