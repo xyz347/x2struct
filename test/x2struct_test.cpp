@@ -23,7 +23,7 @@
 
 #ifndef USE_MAKE
 #include <gtest/gtest.h>
-#include "test/blade_test_env.h"
+#include "app_common/utility/blade_test_env.h"
 #else
 #include "test/gtest_stub.h"
 #endif
@@ -166,148 +166,6 @@ TEST(json, file)
     EXPECT_EQ(j1.vi[0], 2016);
 }
 
-TEST(bson, obj)
-{
-    JTest j1;
-    bson_error_t err;
-    memset(&err, 0, sizeof(err));
-    bson_t * bson = bson_new_from_json((const uint8_t *)jstr.data(), jstr.length(), &err);
-    X::loadbson(bson_get_data(bson), 0, j1);
-
-    // iter test begin ===========================
-    #if 0
-    bool iret;
-    bson_iter_t iter;
-    bson_iter_t sub;
-    bson_iter_init(&iter, bson);
-    iret = bson_iter_next(&iter);
-    cout<<"ret:"<<iret<<bson_iter_key(&iter)<<endl;
-    /*bson_iter_t sub;
-    iret = bson_iter_recurse(&iter, &sub);
-    bson_iter_next(&sub);
-    cout<<"ret:"<<iret<<':'<<bson_iter_key(&sub)<<endl;*/
-    #endif
-    // iter test end==============================
-    bson_destroy(bson);
-    #if 1
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_TRUE(j1.xhas("a"));
-    EXPECT_TRUE(j1.xhas("b"));
-    EXPECT_TRUE(j1.xhas("s"));
-    EXPECT_EQ(j1.b, "Hello\"");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-    #endif
-}
-
-TEST(bson, objmap)
-{
-    std::string mstr("{\"1\":101, \"2\":202, \"3\":303}");
-    std::map<int, int> m;
-    bson_error_t err;
-    memset(&err, 0, sizeof(err));
-    bson_t * bson = bson_new_from_json((const uint8_t *)mstr.data(), mstr.length(), &err);
-    X::loadbson(bson_get_data(bson), 0, m);
-    for (map<int,int>::const_iterator iter = m.begin(); iter!=m.end(); ++iter) {
-        cout<<iter->first<<':'<<iter->second<<endl;
-    }
-    bson_destroy(bson);
-}
-
-TEST(bson, builder)
-{
-    std::vector<std::string> vstr;
-    vstr.push_back("s1");
-    vstr.push_back("s2");
-    #if __GXX_EXPERIMENTAL_CXX0X__  // if support c++11 build map by initializer_list
-    bb::vp m{{"$set", bb::vp{{"_id",200}, {"date",bb::dt(1512828045000)}, {"vs", vstr}}}};
-    bb::vp m1{{"_id", bb::vp{{"$in", vector<string>{"a"}}}}};
-    cout<<bb::json(m1,false)<<endl;
-    #else
-    bb::vp up;
-    bb::vp m;
-    up.push_back(std::make_pair<std::string, bb::intf>("_id", 200));
-    up.push_back(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
-    up.push_back(std::make_pair<std::string, bb::intf>("vs", vstr));
-    m.push_back(std::make_pair<std::string, bb::intf>("$set", up));
-    cout<<bb::json(up, false)<<endl;
-    #endif
-
-    bson_t b;
-    std::string data = build(m, &b);
-    size_t len;
-    char *json = bson_as_json(&b, &len);
-    cout<<json<<endl;
-    bson_free(json);
-    bson_destroy(&b);
-}
-
-TEST(bson, convert)
-{
-    BsonStr sub = BsonStr().convert("hello", 1).convert("good.abc.1", "nice");
-    std::string str = BsonStr().convert("$set", sub).toStr();
-    bson_t b;
-    bson_init_static(&b, (const uint8_t *)str.data(), str.length());
-    size_t s;
-    char *json = bson_as_json(&b, &s);
-    cout<<"=========="<<json<<"================"<<endl;
-    bson_free(json);
-}
-
-struct STR_SUB {
-    int i;
-    float f;
-    string s;
-    XTOSTRUCT(O(i,f,s));
-};
-struct STR {
-    STR_SUB sub;
-    vector<vector<int> > vvs;
-    set<int> ss;
-    map<int, STR_SUB> ms;
-    XTOSTRUCT(O(sub, vvs,ss, ms));
-};
-TEST(bson, str)
-{
-    #if 1
-    STR s;
-    s.sub.i = 10;
-    s.sub.f = 3.14;
-    s.sub.s = "substring";
-    s.vvs.resize(2);
-    s.vvs[0].push_back(1);
-    s.vvs[0].push_back(2);
-    s.vvs[1].push_back(11);
-    s.vvs[1].push_back(12);
-    s.ss.insert(100);
-    s.ss.insert(101);
-    s.ms[200].i = 201;
-    s.ms[200].f = 201.11;
-    s.ms[200].s = "202";
-    s.ms[400].i = 401;
-    s.ms[400].f = 401.11;
-    s.ms[400].s = "402";
-    std::string bstr = X::tobson(s);
-    bson_t b;
-    bson_init_static(&b, (const uint8_t *)bstr.data(), bstr.length());
-
-    size_t l;
-    char *json = bson_as_json(&b, &l);
-    cout<<json<<endl;
-    bson_free(json);
-
-    float f = tonum<float>("3.14");
-    cout<<f<<endl;
-    #endif
-
-    XDate date;
-    date.from_string("2017-12-08 16:00:00");
-    cout<<"time:"<<date.unix_time<<endl;
-    cout<<date.to_string()<<endl;
-}
 
 TEST(xml, file)
 {
@@ -327,6 +185,8 @@ TEST(xml, file)
     EXPECT_EQ(j1.con.redis[1].host, "2.1.1.2");
     EXPECT_EQ(j1.con.redis[1].port, 200U);
 }
+
+#include "bson_test.cpp"
 
 
 #ifdef USE_MAKE

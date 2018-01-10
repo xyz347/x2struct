@@ -80,10 +80,8 @@ public:
     /* TO STRING */
     template <typename TYPE>
     static std::string toxml(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
-        space=newline?space:0;
         XmlStr obj(newline, space);
-        //t.__struct_to_str(obj, root, 0);
-        obj.convert(root, t, space, 0);
+        t.__struct_to_str(obj, root, 0);
         return obj.toStr();
     }
     template <typename TYPE>
@@ -98,15 +96,13 @@ public:
     static std::string tobson(const TYPE& t) {
         BsonStr obj;
         //t.__struct_to_str(obj,"",0);
-        obj.convert("", t, 0, 0);
+        obj.convert("", t);
         return obj.toStr();
     }
     template <typename TYPE>
     static std::string tocfg(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
-        space=newline?space:0;
         JsonCfgStr obj(false, newline, space);
-        //t.__struct_to_str(obj, root, 0);
-        obj.convert(root, t, space, 0);
+        t.__struct_to_str(obj, root, 0);
         return obj.toStr();
     }
 

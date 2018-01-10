@@ -46,6 +46,7 @@ public:
     void end(const std::string&root, int splen);
     int  space();
     std::string toStr() const;
+    std::string json() const;
 public:
     BsonStr& convert(const std::string&name, const BsonStr& data, int space=0, int index=0);
 
@@ -82,31 +83,47 @@ public:
     }
     template<typename T>
     BsonStr& convert(const std::string&name, const std::map<std::string, T>&data, int splen=0, int index=0) {
-        BsonStr child(name, _bson, doc);
-        for (typename std::map<std::string, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-            child.convert(iter->first, iter->second, 0,0);
+        if (_type!=top || name.length()!=0) {
+            BsonStr child(name, _bson, doc);
+            for (typename std::map<std::string, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                child.convert(iter->first, iter->second, 0,0);
+            }
+        } else {
+            for (typename std::map<std::string, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                this->convert(iter->first, iter->second, 0,0);
+            }
         }
         return *this;
     }
     template <typename K, typename T>
     BsonStr& convert(const std::string&name, const std::map<K, T> &data, int splen=0, int index=0) {
-        BsonStr child(name, _bson, doc);
-        for (typename std::map<K, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-            child.convert(tostr(iter->first), iter->second, 0,0);
+        if (_type!=top || name.length()!=0) {
+            BsonStr child(name, _bson, doc);
+            for (typename std::map<K, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                child.convert(tostr(iter->first), iter->second, 0,0);
+            }
+        } else {
+            for (typename std::map<K, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                this->convert(tostr(iter->first), iter->second, 0,0);
+            }
         }
         return *this;
     }
 
     template <typename T>
     BsonStr& convert(const std::string&name, const T& data, int splen=0, int index=0) {
-        BsonStr child(name, _bson, doc);
-        data.__struct_to_str(child, "", 0);
+        if (_type!=top || name.length()!=0) {
+            BsonStr child(name, _bson, doc);
+            data.__struct_to_str(child, "", 0);
+        } else {
+            data.__struct_to_str(*this, "", 0);
+        }
         return *this;
     }
 private:
     mutable _bson_t* _parent;
     mutable _bson_t* _bson;
-    bool _type;
+    int _type;
 };
 
 }

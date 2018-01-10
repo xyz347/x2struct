@@ -79,6 +79,16 @@ string BsonStr::toStr()const
     return std::string((const char*)bson_get_data(_bson), _bson->len);
 }
 
+string BsonStr::json()const 
+{
+    size_t len;
+    char *jstr = bson_as_json(_bson, &len);
+    std::string ret(jstr);
+    bson_free(jstr);
+
+    return ret;
+}
+
 BsonStr& BsonStr::convert(const string&name, int16_t data, int splen, int index)
 {
     bson_append_int32(_bson, name.c_str(), name.length(), (int32_t)data);
