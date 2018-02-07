@@ -114,15 +114,14 @@ member need to put in one of A/M/O
 可以通过XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ进行条件反序列化（但是这样序列化出来的会和原来不一样)
 具体可以参考x2struct_test.cpp里面的struct condition。
 ***
-如果想实现一些自定义类型，可以在xtypes.hpp里面添加，具体可以参考XDate，要点：
-- 继承XType
-- 实现to_string，序列化
-- 实现from_string，反序列化
+如果想实现一些自定义类型，可以在xtypes.h里面添加，具体可以参考XDate，要点：
+- 定义一个类，实现format用于序列化，parse用于反序列化
+- 利用模板XType typedef一个类型
 
 
 ### 重要说明
-- 序列化部分并没有参考任何的RFC文档，都是按实际的开发需求写的，不一定符合标准
-- 解析部分使用了下列开源代码：jsoncpp/tinyxml/mongodb.mongo/libconfig++
-- bson的反序列化/序列化用了mongodb.mongo，这个库比较重，为了减少依赖，编译的时候
-   去掉了SSL功能，如果项目里面也用了这个库，可以修改指向。
+- json的序列化和反序列化使用的是rapidjson
+- xml的解析使用的是rapidxml
+- bson的解析用的是libbson
+- 除了json以外，其余的序列化都是自己写的，没参考RFC，可能有不符合标准的情况
 - 里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps

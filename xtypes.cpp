@@ -16,11 +16,11 @@
 
 #define _XOPEN_SOURCE
 #include <time.h>
-#include "xtypes.hpp"
+#include "xtypes.h"
 
 namespace x2struct {
 
-std::string XDate::to_string() const
+std::string _XDate::format() const
 {
     time_t tt = (time_t)unix_time;
     tm     ttm;
@@ -31,7 +31,7 @@ std::string XDate::to_string() const
     return buf;
 }
 
-void XDate::from_string(const std::string&str)
+void _XDate::parse(const std::string&str)
 {
     tm ttm;
 

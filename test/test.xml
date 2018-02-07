@@ -1,0 +1,56 @@
+<config>
+    <_id>100</_id>
+    <start>2008-08-08 20:00:00</start>
+    <tint>101</tint>
+    <tstring>hello&quot;</tstring>
+    <vint>102</vint>
+    <vstring>hello1</vstring>
+    <vstring>hello2</vstring>
+    <vsub>
+        <a>103</a>
+        <b>hello3</b>
+    </vsub>
+    <vvint>
+        <x>104</x>
+        <x>105</x>
+    </vvint>
+    <vvstring>
+        <x>hello4</x>
+    </vvstring>
+    <vvstring>
+        <x>hello5</x>
+        <x>hello6</x>
+    </vvstring>
+    <vvsub>
+        <x>
+            <a>105</a>
+            <b>hello7</b>
+        </x>
+    </vvsub>
+    <vvsub>
+        <x>
+            <a>106</a>
+            <b>hello8</b>
+        </x>
+        <x>
+            <a>107</a>
+            <b>hello9</b>
+        </x>
+    </vvsub>
+    <tmap>
+        <x108>
+            <a>111</a>
+            <b>hello10</b>
+        </x108>
+        <x109>
+            <a>111</a>
+            <b>hello11</b>
+        </x109>
+    </tmap>
+    <con myip="200" cfgip="100">
+        <url>not this</url>
+    </con>
+    <con myip="200" cfgip="200">
+        <url>hello12</url>
+    </con>
+</config>

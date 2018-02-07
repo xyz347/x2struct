@@ -23,12 +23,22 @@
 
 typedef void(*test_case)();
 
+struct text_ctx {
+    const char *group;
+    const char *name;
+    test_case tc;
+};
+
 class TC_CONTAINER {
 public:
-    static void add(test_case tc) {
-        I()._tcs.push_back(tc);
+    static void add(test_case tc, const char* g, const char*n) {
+        text_ctx tx;
+        tx.group = g;
+        tx.name = n;
+        tx.tc = tc;
+        I()._tcs.push_back(tx);
     }
-    static const std::vector<test_case>& tcs() {
+    static const std::vector<text_ctx>& tcs() {
         return I()._tcs;
     }
     static TC_CONTAINER& I() {
@@ -36,22 +46,33 @@ public:
         return _inst;
     }
 private:
-    std::vector<test_case> _tcs;
+    std::vector<text_ctx> _tcs;
 };
 
 class AUTO_ADD_TC {
 public:
-    AUTO_ADD_TC(test_case tc) {
-        TC_CONTAINER::add(tc);
+    AUTO_ADD_TC(test_case tc, const char* g, const char*n) {
+        TC_CONTAINER::add(tc, g, n);
     }
 };
 
-#define TEST(a, b) static void a##_##b();  static AUTO_ADD_TC __aat__##a##_##b(a##_##b); static void a##_##b()
+class Status {
+public:
+    static int&c() {
+        static int _c;
+        return _c;
+    }
+};
+
+#define TEST(a, b) static void a##_##b();  static AUTO_ADD_TC __aat__##a##_##b(a##_##b, #a, #b); static void a##_##b()
 
 #define EXPECT_EQ(a,b) \
 do {\
     if (!((a)==(b))) {\
-        std::cout<<std::endl<<"+++++++++++++++++++++++++++"<<__FILE__<<':'<<__LINE__<<'['<<__FUNCTION__<<']'<<"EXPECT_EQ fail."<<std::endl;\
+        std::cout<<std::endl<<"++++++++++"<<__FILE__<<':'<<__LINE__<<'['<<__FUNCTION__<<']'<<"EXPECT_EQ fail."<<std::endl;\
+        std::cout<<"expect:"<<b<<std::endl;\
+        std::cout<<"actual:"<<a<<std::endl;\
+        ++Status::c();\
     }\
 }while(false)
 
@@ -59,6 +80,7 @@ do {\
 do {\
     if (!(a)) {\
         std::cout<<std::endl<<"+++++++++++++++++++++++++++"<<__FILE__<<':'<<__LINE__<<'['<<__FUNCTION__<<']'<<"EXPECT_TRUE fail."<<std::endl;\
+        ++Status::c();\
     }\
 }while(false)
     

@@ -2,7 +2,7 @@ CC=g++
 AR=ar
 
 FLAGS= -g -DUSE_MAKE
-INCS=-I. -Ithirdparty/json -Ithirdparty/tinyxml  -Ithirdparty/libbson/include -Ithirdparty/libconfig/include
+INCS=-I. -Ithirdparty  -Ithirdparty/libbson/include -Ithirdparty/libconfig/include
 
 CPPFILES=$(wildcard *.cpp)
 
@@ -36,8 +36,6 @@ test:test/xtest
 
 test/xtest:test/x2struct_test.cpp $(LIBNAME)
 	$(CC) -o $@ $^ $(FLAGS) $(INCS) \
-	thirdparty/json/lib/libjson.a \
-	thirdparty/tinyxml/lib/libtinyxml.a \
 	thirdparty/libconfig/lib/libconfig++.a \
 	thirdparty/libbson/lib/libbson-1.0.a \
 	-pthread -lrt

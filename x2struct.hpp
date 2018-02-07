@@ -20,19 +20,26 @@
 #include <string>
 #include <set>
 #include <stdexcept>
-#include "xobj.hpp"
-#include "xmlobj.hpp"
-#include "jsonobj.hpp"
-#include "configobj.hpp"
-#include "bsonobj.hpp"
 
-#include "xmlstr.hpp"
-#include "jsoncfgstr.hpp"
-#include "bsonstr.hpp"
+#include "util.h"
+#include "xreader.h"
+
+#include "json_reader.h"
+#include "json_writer.h"
+
+#include "bson_reader.h"
+#include "bson_writer.h"
+
+#include "config_reader.h"
+#include "config_writer.h"
+
+#include "xml_reader.h"
+#include "xml_writer.h"
+
 
 #ifdef XTOSTRUCT_GEN_GOLANG_CODE
 #include <typeinfo>
-#include "gostr.hpp"
+#include "go_writer.h"
 #endif
 //#include <iostream>
 //using namespace std;
@@ -46,64 +53,64 @@ public:
     /* TO STRUCT */
     template <typename TYPE>
     static bool loadxml(const std::string&str, TYPE&t, bool isfile=true) {
-        XmlObj obj(str, isfile);
-        //t.__x_to_struct(obj);
-        ((XObj*)&obj)->convert(t);
+        XmlReader reader(str, isfile);
+        reader.convert(t);
         return true;
     }
     template <typename TYPE>
     static bool loadjson(const std::string&str, TYPE&t, bool isfile=true) {
-        JsonObj obj(str, isfile);
-        ((XObj*)&obj)->convert(t);
+        JsonReader reader(str, isfile);
+        reader.convert(t);
         return true;
     }
     template <typename TYPE>
-    static bool loadbson(const uint8_t*data, size_t length, TYPE&t) { // if length==0, get len from data
-        BsonObj obj(data, length);
-        //t.__x_to_struct(obj);
-        ((XObj*)&obj)->convert(t);
+    static bool loadbson(const uint8_t*data, size_t length, TYPE&t, bool copy=true) { // if length==0, get len from data
+        BsonReader reader(data, length, copy);
+        reader.convert(t);
+        return true;
+    }
+    template <typename TYPE>
+    static bool loadbson(const std::string&data, TYPE&t, bool copy=true) { // if length==0, get len from data
+        BsonReader reader(data, copy);
+        reader.convert(t);
         return true;
     }
     template <typename TYPE>
     static bool loadconfig(const std::string&str, TYPE&t, bool isfile=true, const std::string&root="") {
-        ConfigObj obj(str, isfile, root);
+        ConfigReader reader(str, isfile, root);
         try {
-            //t.__x_to_struct(obj);
-            ((XObj*)&obj)->convert(t);
+            reader.convert(t);
             return true;
         } catch (std::exception &e) {
-            obj.exception(e);
+            reader.exception(e);
         }
         return false;
     }
 
-    /* TO STRING */
+    /* TO stream */
     template <typename TYPE>
-    static std::string toxml(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
-        XmlStr obj(newline, space);
-        t.__struct_to_str(obj, root, 0);
-        return obj.toStr();
+    static std::string toxml(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
+        XmlWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), t);
+        return writer.toStr();
     }
     template <typename TYPE>
-    static std::string tojson(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
-        space=newline?space:0;
-        JsonCfgStr obj(true, newline, space);
-        //t.__struct_to_str(obj, root, 0);
-        obj.convert(root, t, space, 0);
-        return obj.toStr();
+    static std::string tojson(const TYPE&t, const std::string&root="", int indentCount=-1, char indentChar=' ') {
+        JsonWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), t);
+        return writer.toStr();
     }
     template <typename TYPE>
     static std::string tobson(const TYPE& t) {
-        BsonStr obj;
-        //t.__struct_to_str(obj,"",0);
-        obj.convert("", t);
-        return obj.toStr();
+        BsonWriter writer;
+        writer.convert("", t);
+        return writer.toStr();
     }
     template <typename TYPE>
-    static std::string tocfg(const TYPE&t, const std::string&root, bool newline=true, int space=4) {
-        JsonCfgStr obj(false, newline, space);
-        t.__struct_to_str(obj, root, 0);
-        return obj.toStr();
+    static std::string tocfg(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
+        ConfigWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), t);
+        return writer.toStr();
     }
 
     /* gen golang code*/
@@ -124,11 +131,13 @@ public:                                                                     \
     bool xhas(const std::string& name) const {                              \
         return __x_has_string.find(name)!=__x_has_string.end();             \
     }                                                                       \
-    bool __x_condition(x2struct::XObj& obj, const std::string&name) {       \
+    template<typename DOC>                                                  \
+    bool __x_condition(DOC& obj, const std::string&name) {                  \
         (void)obj;(void)name;                                               \
         return true;                                                        \
     }                                                                       \
-    void __x_to_struct(x2struct::XObj& obj) {
+    template<typename DOC>                                                  \
+    void __x_to_struct(DOC& obj) {
 
 #define X_STRUCT_ACT_TOX_O(M)                                               \
         if (obj.has(#M)) {                                                  \
@@ -148,12 +157,13 @@ public:                                                                     \
 #define X_STRUCT_ACT_TOX_A(M, A_NAME)                                       \
     {                                                                       \
         bool me = false;                                                    \
-        std::string __alias__name__ = obj.hasa(#M, A_NAME, me);             \
-        if (!__alias__name__.empty()) {                                     \
-            obj[__alias__name__].convert(M);                                \
+        std::string __alias__name__ = obj.hasa(#M, A_NAME, &me);            \
+        const char*__an = __alias__name__.c_str();                          \
+        if (obj.has(__an)) {                                                \
+            obj[__an].convert(M);                                           \
             __x_has_string.insert(#M);                                      \
         } else if (me) {                                                    \
-            obj.me_exception(#M);                                           \
+            obj.me_exception(__an);                                         \
         }                                                                   \
     }
 
@@ -163,18 +173,15 @@ public:                                                                     \
 // struct to string
 #define X_STRUCT_FUNC_TOS_BEGIN                                                     \
     template <class CLASS>                                                          \
-    void __struct_to_str(CLASS& obj, const std::string&root, int splen) const {     \
-        int index = 0;                                                              \
-        obj.begin(root, splen);
+    void __struct_to_str(CLASS& obj, const char *root) const {
 
 #define X_STRUCT_ACT_TOS_O(M)                                                       \
-        obj.convert(#M, M, splen+obj.space(), index++);
+        obj.convert(#M, M);
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
-        obj.convert(obj.fieldName(#M,A_NAME), M, splen+obj.space(), index++);
+        obj.convert(alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
 
 #define X_STRUCT_FUNC_TOS_END                                                       \
-        obj.end(root,splen);                                                        \
     }
 
     
@@ -314,9 +321,10 @@ public:                                                                     \
 #endif
 
 
-#define XTOSTRUCT_CONDITION()   bool __x_condition(x2struct::XObj& obj, const char* name)
+#define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj, const char* name)
 #define XTOSTRUCT_CONDITION_EQ(attr1, attr2)                    \
-    bool __x_condition(x2struct::XObj& obj, const char* name) { \
+    template<typename DOC>                                      \
+    bool __x_condition(DOC& obj, const char* name) {            \
         return obj.attribute(attr1)==obj.attribute(attr2);      \
     }
 

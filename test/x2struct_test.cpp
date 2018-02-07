@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -30,171 +31,287 @@
 
 #include <libbson-1.0/bson.h>
 #include "x2struct.hpp"
-#include "xtypes.hpp"
-#include "bsonbuilder.hpp"
+#include "xtypes.h"
+#include "bson_builder.h"
 
 
 using namespace std;
 using namespace x2struct;
-using namespace bb;
+//using namespace bb;
 
 #ifndef USE_MAKE
   BLADE_TEST_COMMON_ENV;
 #endif
 
-struct sub {
-    int s1;
-    string s2;
-    int s3;
-    XTOSTRUCT(M(s1,s2),O(s3));
-};
-
-struct server {
-    string host;
-    uint16_t port;
-    XTOSTRUCT(M(host,port));
-};
-
 struct condition {
-    vector<server> redis;
-    XTOSTRUCT(M(redis));
+    string url;
+    XTOSTRUCT(M(url));
     XTOSTRUCT_CONDITION() {
         return obj.attribute("myip")==obj.attribute("cfgip");
     }
 };
 
-struct haha {
-    int a;
-    int b;
-    int c;
-    XTOSTRUCT(M(a,b), O(c));
-};
-
-struct JTest {
-    XDate start;
-    int a;
+struct sub {
+    int    a;
     string b;
-    vector<sub> s;
-    condition con;
-    haha ha;
-    vector<int> vi;
-    vector<string> vs;
-    map<int, haha> m;
-    JTest(){start.unix_time = time(0);}
-    XTOSTRUCT(A(a,"_id,me"),O(ha, start,con, b,s, vi, vs, m));
+    XTOSTRUCT(M(a), O(b));
 };
-const static string jstr("{\"_id\":1, \"b\":\"Hello\\\"\", \"s\":[{\"s1\":2, \"s2\":\"hahaha\"},{\"s1\":99, \"s2\":\"nani\"}]} ");
 
-TEST(config, file)
+struct xstruct {
+    int    id;
+    XDate  start;
+    int    tint;
+    string tstring;
+    vector<int> vint;
+    vector<string> vstring;
+    vector<sub> vsub;
+    vector<vector<int> > vvint;
+    vector<vector<string> > vvstring;
+    vector<vector<sub> > vvsub;
+    map<int, sub> tmap;
+    condition con;
+    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vsub, vvint, vvstring, vvsub, tmap, con));
+};
+
+static void base_check(xstruct&x)
 {
-    JTest j1;
-    JTest j2;
-    X::loadconfig("test1.cfg", j1, true);
-    EXPECT_EQ(j1.start.unix_time, 1488528000);
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_EQ(j1.b, "Hello");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-    EXPECT_EQ(j1.con.redis.size(), 2U);
-    EXPECT_EQ(j1.con.redis[0].host, "2.1.1.1");
-    EXPECT_EQ(j1.con.redis[0].port, 200U);
-    EXPECT_EQ(j1.con.redis[1].host, "2.1.1.2");
-    EXPECT_EQ(j1.con.redis[1].port, 200U);
+    EXPECT_EQ(x.id, 100);
 
-    for (std::map<int,haha>::const_iterator iter=j1.m.begin(); iter!=j1.m.end(); ++iter) {
-        cout<<iter->first<<':'<<iter->second.a<<','<<iter->second.b<<','<<iter->second.c<<endl;
+    EXPECT_EQ(x.start->unix_time, 1218196800);
+
+    EXPECT_EQ(x.tint, 101);
+
+    EXPECT_EQ(x.tstring, "hello\"");
+
+    EXPECT_EQ(x.vint.size(), 1U);
+    EXPECT_EQ(x.vint[0], 102);
+
+    EXPECT_EQ(x.vstring.size(), 2U);
+    EXPECT_EQ(x.vstring[0], "hello1");
+    EXPECT_EQ(x.vstring[1], "hello2");
+
+    EXPECT_EQ(x.vsub.size(), 1U);
+    EXPECT_EQ(x.vsub[0].a, 103);
+    EXPECT_EQ(x.vsub[0].b, "hello3");
+
+    EXPECT_EQ(x.vvint.size(), 1U);
+    EXPECT_EQ(x.vvint[0].size(), 2U);
+    EXPECT_EQ(x.vvint[0][0], 104);
+    EXPECT_EQ(x.vvint[0][1], 105);
+
+    EXPECT_EQ(x.vvstring.size(), 2U);
+    EXPECT_EQ(x.vvstring[0].size(), 1U);
+    EXPECT_EQ(x.vvstring[1].size(), 2U);
+    EXPECT_EQ(x.vvstring[0][0], "hello4");
+    EXPECT_EQ(x.vvstring[1][0], "hello5");
+    EXPECT_EQ(x.vvstring[1][1], "hello6");
+
+    EXPECT_EQ(x.vvsub.size(), 2U);
+    EXPECT_EQ(x.vvsub[0].size(), 1U);
+    EXPECT_EQ(x.vvsub[1].size(), 2U);
+    EXPECT_EQ(x.vvsub[0][0].a, 105);
+    EXPECT_EQ(x.vvsub[0][0].b, "hello7");
+    EXPECT_EQ(x.vvsub[1][0].a, 106);
+    EXPECT_EQ(x.vvsub[1][0].b, "hello8");
+    EXPECT_EQ(x.vvsub[1][1].a, 107);
+    EXPECT_EQ(x.vvsub[1][1].b, "hello9");
+
+    EXPECT_EQ(x.tmap.size(), 2U);
+    EXPECT_EQ(x.tmap[108].b, "hello10");
+    EXPECT_EQ(x.tmap[109].b, "hello11");
+
+    EXPECT_EQ(x.con.url, "hello12");
+}
+
+TEST(json, unmarshal)
+{
+    xstruct x;
+    X::loadjson("test.json", x, true);
+    base_check(x);
+}
+
+TEST(json, map)
+{
+    string jstr("{\"a\":1, \"b\":2}");
+    map<string, int> m;
+    X::loadjson(jstr, m, false);
+    EXPECT_EQ(m.size(), 2U);
+    EXPECT_EQ(m["a"], 1);
+    EXPECT_EQ(m["b"], 2);
+}
+
+TEST(json, marshal)
+{
+    string exp("{\"_id\":100,\"start\":\"2008-08-08 20:00:00\",\"tint\":101,\"tstring\":\"hello\\\"\",\"vint\":[102],\"vstring\":[\"hello1\",\"hello2\"],\"vsub\":[{\"a\":103,\"b\":\"hello3\"}],\"vvint\":[[104,105]],\"vvstring\":[[\"hello4\"],[\"hello5\",\"hello6\"]],\"vvsub\":[[{\"a\":105,\"b\":\"hello7\"}],[{\"a\":106,\"b\":\"hello8\"},{\"a\":107,\"b\":\"hello9\"}]],\"tmap\":{\"108\":{\"a\":111,\"b\":\"hello10\"},\"109\":{\"a\":111,\"b\":\"hello11\"}},\"con\":{\"url\":\"hello12\"}}");
+
+    xstruct x;
+    X::loadjson("test.json", x, true);
+    string n = X::tojson(x, "");
+    EXPECT_EQ(n, exp);
+}
+
+
+TEST(config, unmarshal)
+{
+    xstruct x;
+    X::loadconfig("test.cfg", x, true);
+    base_check(x);
+}
+
+TEST(config, marshal)
+{
+    xstruct x;
+    X::loadconfig("test.cfg", x, true);
+    string n = X::tocfg(x, "root", 1, '\t');
+
+    xstruct y;
+    X::loadconfig(n, y, false);
+    base_check(y);
+}
+
+TEST(xml, unmarshal)
+{
+    xstruct x;
+    X::loadxml("test.xml", x, true);
+    base_check(x);
+}
+
+
+TEST(xml, marshal)
+{
+    xstruct x;
+    X::loadxml("test.xml", x, true);
+    string n = X::toxml(x, "xmlroot");
+
+    cout<<n<<endl;
+    xstruct y;
+    X::loadxml(n, y, false);
+    base_check(y);
+}
+
+TEST(bson, unmarshal)
+{
+    bson_error_t err;
+    memset(&err, 0, sizeof(err));
+    std::ifstream fs("test.json", std::ifstream::binary);
+    std::string json((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
+    bson_t * bson = bson_new_from_json((const uint8_t *)json.data(), json.length(), &err);
+    xstruct x;
+    X::loadbson(bson_get_data(bson), 0, x);
+    bson_destroy(bson);
+
+    base_check(x);
+}
+
+TEST(bson, marshal)
+{
+    bson_error_t err;
+    memset(&err, 0, sizeof(err));
+    std::ifstream fs("test.json", std::ifstream::binary);
+    std::string json((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
+    bson_t * bson = bson_new_from_json((const uint8_t *)json.data(), json.length(), &err);
+    xstruct x;
+    X::loadbson(bson_get_data(bson), 0, x);
+    bson_destroy(bson);
+
+    std::string n = X::tobson(x);
+    xstruct y;
+    X::loadbson(n, y, false);
+    base_check(y);
+}
+
+
+TEST(bson, builder)
+{
+    std::vector<std::string> vstr;
+    vstr.push_back("s1");
+    vstr.push_back("s2");
+    #if __GXX_EXPERIMENTAL_CXX0X__  // if support c++11 build map by initializer_list
+    bb::vp m{{"$set", bb::vp{{"_id",200}, {"date",bb::dt(1512828045000)}, {"vs", vstr}}}};
+    bb::vp m1{{"_id", bb::vp{{"$in", vector<string>{"a"}}}}};
+    //EXPECT_EQ(bb::json(m1,false), "{\"_id\":{\"$in\":[\"a\"]}}");
+    #else
+    bb::vp m;
+    bb::vp up;
+    up.push_back(std::make_pair<std::string, bb::intf>("_id", 200));
+    up.push_back(std::make_pair<std::string, bb::intf>("date", bb::dt(1512828045000)));
+    up.push_back(std::make_pair<std::string, bb::intf>("vs", vstr));
+    m.push_back(std::make_pair<std::string, bb::intf>("$set", up));
+    cout<<bb::json(up, false)<<endl;
+    #endif
+
+    EXPECT_EQ(bb::json(m, false), "{\"$set\":{\"_id\":200,\"date\":1512828045000,\"vs\":[\"s1\",\"s2\"]}}");
+}
+
+TEST(bson, writer)
+{
+    BsonWriter sub = BsonWriter().convert("hello", 1).convert("good.abc.1", "nice");
+    std::string str = BsonWriter().convert("$set", sub).json();
+    EXPECT_EQ(str, "{ \"$set\" : { \"hello\" : 1, \"good.abc.1\" : \"nice\" } }");
+}
+
+TEST(bson, raw)
+{
+    map<string, int> m;
+    m["hello"] = 1;
+    m["good"] = 2;
+    string bson = x2struct::X::tobson(m);
+
+    map<string, int> n;
+    x2struct::X::loadbson((uint8_t*)bson.data(), bson.length(), n);
+    EXPECT_EQ(n["hello"], 1);
+    EXPECT_EQ(n["good"], 2);
+}
+
+namespace {
+
+string m_array;
+JsonReader *m_obj;
+TEST(performance, build_str)
+{
+    m_array.reserve(10240);
+    m_array.append("[1");
+    for (int i=2; i<=1024; ++i) {
+        m_array.append(",");
+        m_array.append(tostr(i));
     }
+    m_array.append("]");
 }
 
-
-TEST(json, raw)
+TEST(performance, parse)
 {
-    vector<haha> data;
-    X::loadjson("[{\"a\":1, \"b\":2, \"c\":3}, {\"a\":11, \"b\":22, \"c\":33}]", data, false);
-    for (size_t i=0; i<data.size(); ++i) {
-        cout<<data[i].a<<','<<data[i].b<<','<<data[i].c<<endl;
-    }
+    m_obj = new JsonReader(m_array, false);
 }
 
-
-TEST(json, str)
+TEST(performance, convert)
 {
-    JTest j1;
-    X::loadjson(jstr, j1, false);
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_TRUE(j1.xhas("a"));
-    EXPECT_TRUE(j1.xhas("b"));
-    EXPECT_EQ(j1.b, "Hello\"");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-
-    JTest j2;
-    X::loadjson("{\"_id\":9}", j2, false);
-    EXPECT_EQ(j2.a, 9);
-
-    cout<<"to string"<<endl<<X::tojson(j1, "");
+    vector<int> m_v;
+    m_obj->convert(m_v);
+    EXPECT_EQ(m_v.size(), 1024U);
 }
 
-
-TEST(json, file)
+TEST(performance, clear)
 {
-    JTest j1;
-    JTest j2;
-    X::loadjson("test1.json", j1, true);
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_EQ(j1.b, "Hello\"");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[0].s3, 20);
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-    EXPECT_EQ(j1.s[1].s3, 30);
-    EXPECT_EQ(j1.con.redis.size(), 2U);
-    EXPECT_EQ(j1.con.redis[0].host, "2.1.1.1");
-    EXPECT_EQ(j1.con.redis[0].port, 200U);
-    EXPECT_EQ(j1.con.redis[1].host, "2.1.1.2");
-    EXPECT_EQ(j1.con.redis[1].port, 200U);
-    EXPECT_EQ(j1.ha.a, 13);
-    EXPECT_EQ(j1.ha.b, 14);
-    EXPECT_EQ(j1.vi[0], 2016);
+    delete m_obj;
 }
 
-
-TEST(xml, file)
-{
-    JTest j1;
-    JTest j2;
-    X::loadxml("test1.xml", j1, true);
-    EXPECT_EQ(j1.a, 1);
-    EXPECT_EQ(j1.b, "Hello");
-    EXPECT_EQ(j1.s.size(), 2U);
-    EXPECT_EQ(j1.s[0].s1, 2);
-    EXPECT_EQ(j1.s[0].s2, "hahaha");
-    EXPECT_EQ(j1.s[1].s1, 99);
-    EXPECT_EQ(j1.s[1].s2, "nani");
-    EXPECT_EQ(j1.con.redis.size(), 2U);
-    EXPECT_EQ(j1.con.redis[0].host, "2.1.1.1");
-    EXPECT_EQ(j1.con.redis[0].port, 200U);
-    EXPECT_EQ(j1.con.redis[1].host, "2.1.1.2");
-    EXPECT_EQ(j1.con.redis[1].port, 200U);
 }
-
-#include "bson_test.cpp"
 
 
 #ifdef USE_MAKE
 int main(int argc, char *argv[])
 {
-    const std::vector<test_case>& tcs = TC_CONTAINER::tcs();
+    const std::vector<text_ctx>& tcs = TC_CONTAINER::tcs();
     for (size_t i=0; i<tcs.size(); ++i) {
-        tcs[i]();
+        Status::c() = 0;
+        cout<<tcs[i].group<<" "<<tcs[i].name<<" start --->"<<endl;
+        tcs[i].tc();
+        if (Status::c() == 0) {
+            cout<<tcs[i].group<<" "<<tcs[i].name<<" passed.";
+        } else {
+            cout<<tcs[i].group<<" "<<tcs[i].name<<" fail!!!!!!";
+        }
+        cout<<"<---"<<endl;
     }
 }
 #endif

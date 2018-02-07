@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-#include "util.hpp"
+#include "util.h"
 #include <iostream>
 
 using namespace std;
@@ -82,6 +82,46 @@ size_t split(std::vector<std::string>&slice, const std::string&str, const std::s
 
     slice.push_back(str.substr(last));
     return slice.size();
+}
+
+std::string alias_parse(const std::string&key, const std::string&alias, const std::string&type, bool *me)
+{
+    vector<string> type_all(2);
+
+    vector<string> types;
+    split(types, alias, ' ');
+    for (size_t i=0; i<types.size(); ++i) {
+        vector<string> type_nameopt;
+        split(type_nameopt, types[i], ':');
+        if (type_nameopt.size()==2 && type_nameopt[0]==type) {
+            type_all[0] = type_nameopt[1];
+            type_all.resize(1);
+            break;
+        } else if (type_nameopt.size()==1) {
+            type_all[1] = types[i];
+        }
+    }
+
+    for (size_t i=0; i<type_all.size(); ++i) {
+        if (type_all[i].empty()) {
+            continue;
+        }
+
+        vector<string> name_opt;
+        split(name_opt, type_all[i], ',');
+        if (0 != me) {
+            for (size_t i=1; i<name_opt.size(); ++i) {
+                if (name_opt[i]=="me") {
+                    *me = true;
+                    break;
+                }
+            }
+        }
+
+        return name_opt[0];
+    }
+
+    return key;
 }
 
 }
