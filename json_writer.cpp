@@ -56,7 +56,7 @@ JsonWriter::~JsonWriter()
 
 JsonWriter& JsonWriter::convert(const char*key, const std::string& val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->String(val);
     } else {
@@ -67,7 +67,7 @@ JsonWriter& JsonWriter::convert(const char*key, const std::string& val)
 
 JsonWriter& JsonWriter::convert(const char*key, bool val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Bool(val);
     } else {
@@ -78,7 +78,7 @@ JsonWriter& JsonWriter::convert(const char*key, bool val)
 
 JsonWriter& JsonWriter::convert(const char*key, int16_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Int(val);
     } else {
@@ -89,7 +89,7 @@ JsonWriter& JsonWriter::convert(const char*key, int16_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, uint16_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Uint(val);
     } else {
@@ -100,7 +100,7 @@ JsonWriter& JsonWriter::convert(const char*key, uint16_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, int32_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Int(val);
     } else {
@@ -111,7 +111,7 @@ JsonWriter& JsonWriter::convert(const char*key, int32_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, uint32_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Uint(val);
     } else {
@@ -122,7 +122,7 @@ JsonWriter& JsonWriter::convert(const char*key, uint32_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, int64_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Int64(val);
     } else {
@@ -133,7 +133,7 @@ JsonWriter& JsonWriter::convert(const char*key, int64_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, uint64_t val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Uint64(val);
     } else {
@@ -144,7 +144,7 @@ JsonWriter& JsonWriter::convert(const char*key, uint64_t val)
 
 JsonWriter& JsonWriter::convert(const char*key, double val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Double(val);
     } else {
@@ -155,7 +155,7 @@ JsonWriter& JsonWriter::convert(const char*key, double val)
 
 JsonWriter& JsonWriter::convert(const char*key, float val)
 {
-    set_key(key);
+    x2struct_set_key(key);
     if (0 != _writer) {
         _writer->Double(val);
     } else {
@@ -169,7 +169,7 @@ std::string JsonWriter::toStr()
     return _buf->GetString();
 }
 
-void JsonWriter::set_key(const char*key)
+void JsonWriter::x2struct_set_key(const char*key)
 {
     if (0!=key && key[0]!='\0') {
         if (0 != _writer) {

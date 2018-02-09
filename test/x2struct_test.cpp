@@ -146,8 +146,22 @@ TEST(json, marshal)
 
     xstruct x;
     X::loadjson("test.json", x, true);
-    string n = X::tojson(x, "");
+    string n = X::tojson(x);
     EXPECT_EQ(n, exp);
+}
+
+TEST(json, invalid)
+{
+    string data("hello");
+    map<string,string> m;
+
+    bool excpt = false;
+    try {
+        X::loadjson(data, m, false);
+    } catch (...) {
+        excpt = true;
+    }
+    EXPECT_TRUE(excpt);
 }
 
 

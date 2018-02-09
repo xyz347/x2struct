@@ -30,8 +30,8 @@ struct BsonValue;
 class BsonReader:public XReader<BsonReader> {
 public:
     using xdoc_type::convert;
-    BsonReader(const uint8_t*data, size_t length, bool copy);
-    BsonReader(const std::string&data, bool copy);
+    BsonReader(const uint8_t*data, size_t length, bool copy=true);
+    BsonReader(const std::string&data, bool copy=true);
     ~BsonReader();
 
     std::string json() const;

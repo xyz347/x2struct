@@ -39,7 +39,7 @@ public:
 public:
     std::string toStr();
 
-    void set_key(const char*key);
+    void x2struct_set_key(const char*key); // openssl defined set_key macro ...
     void array_begin();
     void array_end();
     void object_begin();
@@ -59,7 +59,7 @@ public:
 
     template<typename T>
     JsonWriter& convert(const char*key, const std::vector<T>&data) {
-        set_key(key);
+        x2struct_set_key(key);
         this->array_begin();
         for (size_t i=0; i<data.size(); ++i) {
             this->convert("", data[i]);
@@ -70,7 +70,7 @@ public:
 
     template<typename T>
     JsonWriter& convert(const char*key, const std::set<T>&data) {
-        set_key(key);
+        x2struct_set_key(key);
         this->array_begin();
         for (typename std::set<T>::const_iterator it=data.begin(); it!=data.end(); ++it) {
             this->convert("", *it);
@@ -81,17 +81,17 @@ public:
 
     template <typename T>
     void convert(const char*key, const std::map<std::string, T> &data) {
-        set_key(key);
+        x2struct_set_key(key);
         this->object_begin();
         for (typename std::map<std::string,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-            this->convert(iter->first, iter->second);
+            this->convert(iter->first.c_str(), iter->second);
         }
         this->object_end();
     }
 
     template <typename KEY, typename T>
     void convert(const char*key, const std::map<KEY, T> &data) {
-        set_key(key);
+        x2struct_set_key(key);
         this->object_begin();
         for (typename std::map<KEY,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
             std::string _k =tostr(iter->first);
@@ -102,7 +102,7 @@ public:
 
     template <typename T>
     void convert(const char*key, const T& data) {
-        set_key(key);
+        x2struct_set_key(key);
         this->object_begin();
         data.__struct_to_str(*this, key);
         this->object_end();

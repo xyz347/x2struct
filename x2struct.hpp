@@ -88,6 +88,10 @@ public:
     }
 
     /* TO stream */
+    /*
+      indentCount 表示缩进的数目，<0表示不换行不缩进，0表示换行但是不缩进
+      indentChar  表示缩进用的字符，要么是' '要么是'\t'
+    */
     template <typename TYPE>
     static std::string toxml(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
         XmlWriter writer(indentCount, indentChar);
@@ -179,7 +183,7 @@ public:                                                                     \
         obj.convert(#M, M);
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
-        obj.convert(alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
+        obj.convert(x2struct::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
 
 #define X_STRUCT_FUNC_TOS_END                                                       \
     }
