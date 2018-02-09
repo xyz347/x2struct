@@ -166,6 +166,9 @@ public:                                                                     \
         if (obj.has(__an)) {                                                \
             obj[__an].convert(M);                                           \
             __x_has_string.insert(#M);                                      \
+        } else if (obj.has(#M)) {                                           \
+            obj[#M].convert(M);                                             \
+            __x_has_string.insert(#M);                                      \
         } else if (me) {                                                    \
             obj.me_exception(__an);                                         \
         }                                                                   \

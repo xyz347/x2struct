@@ -64,13 +64,14 @@ struct xstruct {
     string tstring;
     vector<int> vint;
     vector<string> vstring;
+    vector<int64_t> vlong;
     vector<sub> vsub;
     vector<vector<int> > vvint;
     vector<vector<string> > vvstring;
     vector<vector<sub> > vvsub;
     map<int, sub> tmap;
     condition con;
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vsub, vvint, vvstring, vvsub, tmap, con));
+    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 };
 
 static void base_check(xstruct&x)
@@ -89,6 +90,10 @@ static void base_check(xstruct&x)
     EXPECT_EQ(x.vstring.size(), 2U);
     EXPECT_EQ(x.vstring[0], "hello1");
     EXPECT_EQ(x.vstring[1], "hello2");
+
+    EXPECT_EQ(x.vlong.size(), 2U);
+    EXPECT_EQ(x.vlong[0], 666);
+    EXPECT_EQ(x.vlong[1], 999);
 
     EXPECT_EQ(x.vsub.size(), 1U);
     EXPECT_EQ(x.vsub[0].a, 103);
@@ -142,12 +147,13 @@ TEST(json, map)
 
 TEST(json, marshal)
 {
-    string exp("{\"_id\":100,\"start\":\"2008-08-08 20:00:00\",\"tint\":101,\"tstring\":\"hello\\\"\",\"vint\":[102],\"vstring\":[\"hello1\",\"hello2\"],\"vsub\":[{\"a\":103,\"b\":\"hello3\"}],\"vvint\":[[104,105]],\"vvstring\":[[\"hello4\"],[\"hello5\",\"hello6\"]],\"vvsub\":[[{\"a\":105,\"b\":\"hello7\"}],[{\"a\":106,\"b\":\"hello8\"},{\"a\":107,\"b\":\"hello9\"}]],\"tmap\":{\"108\":{\"a\":111,\"b\":\"hello10\"},\"109\":{\"a\":111,\"b\":\"hello11\"}},\"con\":{\"url\":\"hello12\"}}");
-
     xstruct x;
     X::loadjson("test.json", x, true);
     string n = X::tojson(x);
-    EXPECT_EQ(n, exp);
+
+    xstruct y;
+    X::loadjson(n, y, false);
+    base_check(y);
 }
 
 TEST(json, invalid)
@@ -197,7 +203,6 @@ TEST(xml, marshal)
     X::loadxml("test.xml", x, true);
     string n = X::toxml(x, "xmlroot");
 
-    cout<<n<<endl;
     xstruct y;
     X::loadxml(n, y, false);
     base_check(y);

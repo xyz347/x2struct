@@ -6,6 +6,8 @@
     <vint>102</vint>
     <vstring>hello1</vstring>
     <vstring>hello2</vstring>
+    <vlong>666</vlong>
+    <vlong>999</vlong>
     <vsub>
         <a>103</a>
         <b>hello3</b>

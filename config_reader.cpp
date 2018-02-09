@@ -122,12 +122,12 @@ void ConfigReader::convert(uint16_t &val)
 
 void ConfigReader::convert(int64_t &val)
 {
-    val = (int16_t)(int)(*_val);
+    val = *_val;
 }
 
 void ConfigReader::convert(uint64_t &val)
 {
-    val = (int16_t)(int)(*_val);
+    val = *_val;
 }
 
 void ConfigReader::convert(double &val)
