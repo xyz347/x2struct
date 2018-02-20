@@ -120,8 +120,8 @@ member need to put in one of A/M/O
 
 
 ### 重要说明
-- json的序列化和反序列化使用的是rapidjson
-- xml的解析使用的是rapidxml
-- bson的解析用的是libbson
+- json的序列化和反序列化使用的是[rapidjson](https://github.com/Tencent/rapidjson)
+- xml的解析使用的是[rapidxml](http://rapidxml.sourceforge.net)
+- bson的解析用的是[libbson](https://github.com/mongodb/libbson/tree/1.0.0)
 - 除了json以外，其余的序列化都是自己写的，没参考RFC，可能有不符合标准的情况
 - 里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps
