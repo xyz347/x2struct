@@ -1,6 +1,7 @@
 x2struct
 ===========
-用于解析 json/xml/libconfig/bson 到C++结构体里面，也可以反过来。
+- 用于解析 json/xml/libconfig/bson 到C++结构体里面，也可以反过来。
+- 可用于根据C++结构体生成golang的结构体
 
 used for parse json/xml/libconfig/bson to C++ struct or marshal C++ struct to json/xml/libconfig/bson
 
@@ -122,6 +123,7 @@ member need to put in one of A/M/O
 ### 重要说明
 - json的序列化和反序列化使用的是[rapidjson](https://github.com/Tencent/rapidjson)
 - xml的解析使用的是[rapidxml](http://rapidxml.sourceforge.net)
-- bson的解析用的是[libbson](https://github.com/mongodb/libbson/tree/1.0.0)
+- bson的解析使用的是[libbson](https://github.com/mongodb/libbson/tree/1.0.0)
+- libconfig解析使用的是[libconfig](https://github.com/hyperrealm/libconfig)
 - 除了json以外，其余的序列化都是自己写的，没参考RFC，可能有不符合标准的情况
 - 里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps
