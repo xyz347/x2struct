@@ -15,7 +15,6 @@
 */
 
 #include <string.h>
-#include <libconfig.h++>
 #include <iostream>
 
 #include "util.h"

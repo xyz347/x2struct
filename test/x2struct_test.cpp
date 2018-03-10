@@ -29,10 +29,13 @@
 #include "test/gtest_stub.h"
 #endif
 
+#ifndef WIN
 #include <libbson-1.0/bson.h>
+#include "bson_builder.h"
+#endif
+
 #include "x2struct.hpp"
 #include "xtypes.h"
-#include "bson_builder.h"
 
 
 using namespace std;
@@ -170,7 +173,7 @@ TEST(json, invalid)
     EXPECT_TRUE(excpt);
 }
 
-
+#ifndef WIN
 TEST(config, unmarshal)
 {
     xstruct x;
@@ -188,6 +191,7 @@ TEST(config, marshal)
     X::loadconfig(n, y, false);
     base_check(y);
 }
+#endif
 
 TEST(xml, unmarshal)
 {
@@ -208,6 +212,7 @@ TEST(xml, marshal)
     base_check(y);
 }
 
+#ifndef WIN
 TEST(bson, unmarshal)
 {
     bson_error_t err;
@@ -281,6 +286,7 @@ TEST(bson, raw)
     EXPECT_EQ(n["hello"], 1);
     EXPECT_EQ(n["good"], 2);
 }
+#endif
 
 namespace {
 

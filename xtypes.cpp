@@ -25,7 +25,11 @@ std::string _XDate::format() const
     time_t tt = (time_t)unix_time;
     tm     ttm;
 
+    #ifndef WIN
     localtime_r(&tt, &ttm);
+    #else
+    localtime_s(&ttm, &tt);
+    #endif
     char buf[64];
     strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ttm);
     return buf;
@@ -33,6 +37,7 @@ std::string _XDate::format() const
 
 void _XDate::parse(const std::string&str)
 {
+    #ifndef WIN
     tm ttm;
 
     if (0 != strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &ttm)) {
@@ -42,6 +47,9 @@ void _XDate::parse(const std::string&str)
         err.append(str).append("]. use format YYYY-mm-dd H:M:S. ");
         throw std::runtime_error(err);
     }
+    #else
+    unix_time = 1218196800; // TODO for test only
+    #endif
 }
 
 }
