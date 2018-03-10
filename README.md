@@ -127,3 +127,6 @@ member need to put in one of A/M/O
 - libconfig解析使用的是[libconfig](https://github.com/hyperrealm/libconfig)
 - 除了json以外，其余的序列化都是自己写的，没参考RFC，可能有不符合标准的情况
 - 里面的BUILD文件是针对使用blade编译的情况，需要适当修改deps
+- bson/libconfig的库是预先编译的，环境是：Ubuntu12.04 g++4.9.2，其他环境如果需要使用这两个库可能需要自己下载代码重新编译
+- Windows下不支持bson/libconfig，如果需要支持，需要自行下载相应代码自行编译库文件，并修改makefile
+- Windows下不支持XDate，如果需要支持，需要自行修改xtype.cpp
