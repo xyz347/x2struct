@@ -185,7 +185,7 @@ TEST(config, marshal)
 {
     xstruct x;
     X::loadconfig("test.cfg", x, true);
-    string n = X::tocfg(x, "root", 1, '\t');
+    string n = X::toconfig(x, "root", 1, '\t');
 
     xstruct y;
     X::loadconfig(n, y, false);
@@ -298,7 +298,7 @@ TEST(performance, build_str)
     m_array.append("[1");
     for (int i=2; i<=1024; ++i) {
         m_array.append(",");
-        m_array.append(tostr(i));
+        m_array.append(Util::tostr(i));
     }
     m_array.append("]");
 }

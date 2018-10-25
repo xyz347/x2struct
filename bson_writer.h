@@ -15,7 +15,9 @@
 */
 
 
-#pragma once
+#ifndef __X_BSON_WRITER_H
+#define __X_BSON_WRITER_H
+
 
 #include <stdint.h>
 #include <string>
@@ -64,7 +66,7 @@ public:
     BsonWriter& convert(const char*key, const std::vector<T>&data) {
         BsonWriter child(key, _bson, array);
         for (size_t i=0; i<data.size(); ++i) {
-            child.convert(tostr(i).c_str(), data[i]);
+            child.convert(Util::tostr(i).c_str(), data[i]);
         }
         return *this;
     }
@@ -73,7 +75,7 @@ public:
         BsonWriter child(key, _bson, array);
         size_t i = 0;
         for (typename std::set<T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter,++i) {
-            child.convert(tostr(i).c_str(), *iter);
+            child.convert(Util::tostr(i).c_str(), *iter);
         }
         return *this;
     }
@@ -96,11 +98,11 @@ public:
         if (_type!=top || key[0]!='\0') {
             BsonWriter child(key, _bson, doc);
             for (typename std::map<K, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-                child.convert(tostr(iter->first).c_str(), iter->second);
+                child.convert(Util::tostr(iter->first).c_str(), iter->second);
             }
         } else {
             for (typename std::map<K, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-                this->convert(tostr(iter->first).c_str(), iter->second);
+                this->convert(Util::tostr(iter->first).c_str(), iter->second);
             }
         }
         return *this;
@@ -129,3 +131,4 @@ private:
 
 }
 
+#endif

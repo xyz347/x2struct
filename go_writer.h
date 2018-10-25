@@ -14,7 +14,9 @@
 * limitations under the License.
 */
 
-#pragma once;
+#ifndef __X_GO_WRITER_H
+#define __X_GO_WRITER_H
+
 
 #include <stdint.h>
 #include <string>
@@ -24,6 +26,8 @@
 #include <sstream>
 
 #include <cxxabi.h>
+
+#include "util.h"
 
 namespace x2struct {
 
@@ -134,7 +138,7 @@ private:
         }
 
         std::vector<std::string> raw_types;
-        split(raw_types, str, "::"); // remove name space
+        Util::split(raw_types, str, "::"); // remove name space
         str = raw_types[raw_types.size()-1];
 
         str[0] = std::toupper(str[0]);
@@ -152,15 +156,15 @@ private:
         if (0 != aliase_name) {
             str = aliase_name;
             std::vector<std::string> types;
-            split(types, str, ' ');
+            Util::split(types, str, ' ');
             for (size_t i=0; i<types.size(); ++i) {
                 std::vector<std::string> name_opts;
-                split(name_opts, types[i], ':');
+                Util::split(name_opts, types[i], ':');
                 if (1 == name_opts.size()) {
                     aliases[""] = types[i];
                 } else {
                     std::vector<std::string> opts;
-                    split(opts, name_opts[1], ',');
+                    Util::split(opts, name_opts[1], ',');
                     aliases[name_opts[0]] = opts[0];
                 }
             }

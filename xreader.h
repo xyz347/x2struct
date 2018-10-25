@@ -14,7 +14,10 @@
 * limitations under the License.
 */
 
-#pragma once
+
+#ifndef __X_READER_H
+#define __X_READER_H
+
 
 #include <stdint.h>
 #include <string>
@@ -81,9 +84,9 @@ public:
             KEYTYPE _k;
             std::string key = d.key();
             if (key[0]!='x') {
-                _k = tonum<KEYTYPE>(key);
+                _k = Util::tonum<KEYTYPE>(key);
             } else { // libconfig/xml不支持数字作为key，所以用x开头，比如x11
-                _k = tonum<KEYTYPE>(key.substr(1));
+                _k = Util::tonum<KEYTYPE>(key.substr(1));
             }
             val[_k] = _t;
         }
@@ -115,7 +118,7 @@ public:
         if (0 != _key) {
             return _key;
         } else {
-            return tostr(_index);
+            return Util::tostr(_index);
         }
     }
 
@@ -128,7 +131,7 @@ public:
     }
 
     std::string hasa(const std::string&key, const std::string&alias, bool *me) {
-        return alias_parse(key, alias, static_cast<doc_type*>(this)->type(), me);
+        return Util::alias_parse(key, alias, static_cast<doc_type*>(this)->type(), me);
     }
     std::string path() {
         std::vector<std::string> nodes;
@@ -142,7 +145,7 @@ public:
                 }
                 k.append(tmp->_key);
             } else {
-                k.append("[").append(tostr(tmp->_index)).append("]");
+                k.append("[").append(Util::tostr(tmp->_index)).append("]");
             }
             nodes.push_back(k);
             tmp = tmp->_parent;
@@ -173,4 +176,4 @@ protected:
 
 }
 
-
+#endif

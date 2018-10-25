@@ -110,7 +110,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, int16_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 
@@ -118,7 +118,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, uint16_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 
@@ -126,7 +126,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, int32_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 
@@ -134,7 +134,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, uint32_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 
@@ -142,7 +142,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, int64_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val).append("L"));
+    append(Util::tostr(val).append("L"));
     return *this;
 }
 
@@ -150,7 +150,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, uint64_t val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val).append("L"));
+    append(Util::tostr(val).append("L"));
     return *this;
 }
 
@@ -158,7 +158,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, double val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 
@@ -166,7 +166,7 @@ ConfigWriter& ConfigWriter::convert(const char*key, float val)
 {
     indent();
     x2struct_set_key(key);
-    append(tostr(val));
+    append(Util::tostr(val));
     return *this;
 }
 

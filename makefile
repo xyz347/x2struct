@@ -1,7 +1,7 @@
 CC=g++
 AR=ar
 
-FLAGS= -g -DUSE_MAKE
+FLAGS= -g -DUSE_MAKE -DXTOSTRUCT_BSON -DXTOSTRUCT_LIBCONFIG
 INCS=-I. -Ithirdparty
 
 CPPFILES=$(wildcard *.cpp)

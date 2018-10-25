@@ -5,7 +5,13 @@
 ------
 
 - Decode json/xml/libconfig/bson to C++ struct or encode C++ struct to json/xml/libconfig/bson
-- Convert C++ struct define to Golang struct define
+- Convert C++ struct define to Golang struct define(need c++11 or later)
+
+------
+- json/xml is header file only
+- bson/libconfig need build libx2struct.a 
+- bson need to define macro XTOSTRUCT_BSON
+- libconfig need to define macro XTOSTRUCT_LIBCONFIG
 
 ***
 ### EXAMPLE
@@ -37,8 +43,7 @@ struct example {
 
 
 /*
- make # call make first to generate libx2struct.a
- g++ -o t test.cpp libx2struct.a 
+ g++ -o t test.cpp
  ./t
 */
 int main(int argc, char *argv[]) {

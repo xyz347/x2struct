@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 
-#pragma once
+#ifndef __X_CONFIG_READER_H
+#define __X_CONFIG_READER_H
 
 #include "xreader.h"
 
@@ -67,4 +68,4 @@ private:
 
 }
 
-
+#endif

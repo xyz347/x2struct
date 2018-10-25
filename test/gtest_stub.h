@@ -16,7 +16,8 @@
 
 
 
-#pragma once
+#ifndef __X_GTEST_STUB_H
+#define __X_GTEST_STUB_H
 
 #include <vector>
 #include <iostream>
@@ -83,4 +84,7 @@ do {\
         ++Status::c();\
     }\
 }while(false)
-    
+
+
+#endif
+

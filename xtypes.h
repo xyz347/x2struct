@@ -14,14 +14,22 @@
 * limitations under the License.
 */
 
+#ifndef __X_TYPES_H
+#define __X_TYPES_H
 
-#pragma once
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE
+#define __X_DEF_XOPEN
+#endif
 
+#include <time.h>
 #include <stdint.h>
 #include <string>
 #include <stdexcept>
 
-//#include "xobj.hpp"
+#ifdef __X_DEF_XOPEN
+#undef _XOPEN_SOURCE
+#endif
 
 namespace x2struct {
 
@@ -57,10 +65,38 @@ class _XDate {
 public:
     int64_t unix_time;   // unix time
 public:
-    std::string format() const;
-    void parse(const std::string&str);
+    std::string format() const {
+        time_t tt = (time_t)unix_time;
+        tm     ttm;
+
+        #ifndef WIN
+        localtime_r(&tt, &ttm);
+        #else
+        localtime_s(&ttm, &tt);
+        #endif
+        char buf[64];
+        strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &ttm);
+        return buf;
+    }
+    void parse(const std::string&str) {
+        #ifndef WIN
+        tm ttm;
+
+        if (0 != strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &ttm)) {
+            unix_time = mktime(&ttm);
+        } else {
+            std::string err("invalid time string[");
+            err.append(str).append("]. use format YYYY-mm-dd H:M:S. ");
+            throw std::runtime_error(err);
+        }
+        #else
+        unix_time = 1218196800; // TODO for test only
+        #endif
+    }
 };
+
 typedef XType<_XDate> XDate;
 
 }
 
+#endif

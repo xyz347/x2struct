@@ -15,7 +15,8 @@
 */
 
 
-#pragma once
+#ifndef __X_TO_STRUCT_HPP
+#define __X_TO_STRUCT_HPP
 
 #include <string>
 #include <set>
@@ -27,17 +28,20 @@
 #include "json_reader.h"
 #include "json_writer.h"
 
-#include "bson_reader.h"
-#include "bson_writer.h"
-
-#include "config_reader.h"
-#include "config_writer.h"
-
 #include "xml_reader.h"
 #include "xml_writer.h"
 
+#ifdef XTOSTRUCT_BSON
+#include "bson_reader.h"
+#include "bson_writer.h"
+#endif
 
-#ifdef XTOSTRUCT_GEN_GOLANG_CODE
+#ifdef XTOSTRUCT_LIBCONFIG
+#include "config_reader.h"
+#include "config_writer.h"
+#endif
+
+#ifdef XTOSTRUCT_GOCODE
 #include <typeinfo>
 #include "go_writer.h"
 #endif
@@ -50,7 +54,25 @@ namespace x2struct {
 
 class X {
 public:
-    /* TO STRUCT */
+    // string to struct
+    template <typename TYPE>
+    static bool loadjson(const std::string&str, TYPE&t, bool isfile=true) {
+        JsonReader reader(str, isfile);
+        reader.convert(t);
+        return true;
+    }
+    /* struct to string */
+    /*
+      indentCount 表示缩进的数目，<0表示不换行不缩进，0表示换行但是不缩进
+      indentChar  表示缩进用的字符，要么是' '要么是'\t'
+    */
+    template <typename TYPE>
+    static std::string tojson(const TYPE&t, const std::string&root="", int indentCount=-1, char indentChar=' ') {
+        JsonWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), t);
+        return writer.toStr();
+    }
+
     template <typename TYPE>
     static bool loadxml(const std::string&str, TYPE&t, bool isfile=true) {
         XmlReader reader(str, isfile);
@@ -58,11 +80,14 @@ public:
         return true;
     }
     template <typename TYPE>
-    static bool loadjson(const std::string&str, TYPE&t, bool isfile=true) {
-        JsonReader reader(str, isfile);
-        reader.convert(t);
-        return true;
+    static std::string toxml(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
+        XmlWriter writer(indentCount, indentChar);
+        writer.convert(root.c_str(), t);
+        return writer.toStr();
     }
+
+    // bson
+    #ifdef XTOSTRUCT_BSON
     template <typename TYPE>
     static bool loadbson(const uint8_t*data, size_t length, TYPE&t, bool copy=true) { // if length==0, get len from data
         BsonReader reader(data, length, copy);
@@ -76,6 +101,16 @@ public:
         return true;
     }
     template <typename TYPE>
+    static std::string tobson(const TYPE& t) {
+        BsonWriter writer;
+        writer.convert("", t);
+        return writer.toStr();
+    }
+    #endif
+
+    // libconfig
+    #ifdef XTOSTRUCT_LIBCONFIG
+    template <typename TYPE>
     static bool loadconfig(const std::string&str, TYPE&t, bool isfile=true, const std::string&root="") {
         ConfigReader reader(str, isfile, root);
         try {
@@ -86,39 +121,16 @@ public:
         }
         return false;
     }
-
-    /* TO stream */
-    /*
-      indentCount 表示缩进的数目，<0表示不换行不缩进，0表示换行但是不缩进
-      indentChar  表示缩进用的字符，要么是' '要么是'\t'
-    */
     template <typename TYPE>
-    static std::string toxml(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
-        XmlWriter writer(indentCount, indentChar);
-        writer.convert(root.c_str(), t);
-        return writer.toStr();
-    }
-    template <typename TYPE>
-    static std::string tojson(const TYPE&t, const std::string&root="", int indentCount=-1, char indentChar=' ') {
-        JsonWriter writer(indentCount, indentChar);
-        writer.convert(root.c_str(), t);
-        return writer.toStr();
-    }
-    template <typename TYPE>
-    static std::string tobson(const TYPE& t) {
-        BsonWriter writer;
-        writer.convert("", t);
-        return writer.toStr();
-    }
-    template <typename TYPE>
-    static std::string tocfg(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
+    static std::string toconfig(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
         ConfigWriter writer(indentCount, indentChar);
         writer.convert(root.c_str(), t);
         return writer.toStr();
     }
+    #endif
 
     /* gen golang code*/
-#ifdef XTOSTRUCT_GEN_GOLANG_CODE
+#ifdef XTOSTRUCT_GOCODE
     template <typename TYPE>
     static std::string togocode(const TYPE&t, bool json, bool bson, bool xml) {
         std::set<std::string> alls;
@@ -186,7 +198,7 @@ public:                                                                     \
         obj.convert(#M, M);
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
-        obj.convert(x2struct::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
+        obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
 
 #define X_STRUCT_FUNC_TOS_END                                                       \
     }
@@ -316,7 +328,7 @@ public:                                                                     \
 #define X_STRUCT_L1_TOG_A(M,A)  X_STRUCT_ACT_TOG_A(M,A)
 
 
-#ifdef XTOSTRUCT_GEN_GOLANG_CODE
+#ifdef XTOSTRUCT_GOCODE
 #define XTOSTRUCT(...)  \
     X_STRUCT_FUNC_TOX_BEGIN  X_STRUCT_WRAP_L1(TOX_, X_DEC_LIST, __VA_ARGS__) X_STRUCT_FUNC_TOX_END  \
     X_STRUCT_FUNC_TOS_BEGIN  X_STRUCT_WRAP_L1(TOS_, X_DEC_LIST, __VA_ARGS__) X_STRUCT_FUNC_TOS_END  \
@@ -337,4 +349,5 @@ public:                                                                     \
 
 }
 
+#endif
 

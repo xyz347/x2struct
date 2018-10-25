@@ -75,7 +75,7 @@ std::string Convert::build(const vp&m, _bson_t*parent, const std::string&pname, 
                 bson_t child;
                 bson_append_array_begin(root, iter->first.c_str(), iter->first.length(), &child);
                 for (size_t i=0; i<iter->second._vi64.size(); ++i) {
-                    std::string index = tostr(i);
+                    std::string index = Util::tostr(i);
                     bson_append_int32(&child, index.c_str(), index.length(), iter->second._vi64[i]);
                 }
                 bson_append_array_end(root, &child);
@@ -85,7 +85,7 @@ std::string Convert::build(const vp&m, _bson_t*parent, const std::string&pname, 
                 bson_t child;
                 bson_append_array_begin(root, iter->first.c_str(), iter->first.length(), &child);
                 for (size_t i=0; i<iter->second._vi64.size(); ++i) {
-                    std::string index = tostr(i);
+                    std::string index = Util::tostr(i);
                     bson_append_int64(&child, index.c_str(), index.length(), iter->second._vi64[i]);
                 }
                 bson_append_array_end(root, &child);
@@ -95,7 +95,7 @@ std::string Convert::build(const vp&m, _bson_t*parent, const std::string&pname, 
                 bson_t child;
                 bson_append_array_begin(root, iter->first.c_str(), iter->first.length(), &child);
                 for (size_t i=0; i<iter->second._vdb.size(); ++i) {
-                    std::string index = tostr(i);
+                    std::string index = Util::tostr(i);
                     bson_append_double(&child, index.c_str(), index.length(), iter->second._vdb[i]);
                 }
                 bson_append_array_end(root, &child);
@@ -108,7 +108,7 @@ std::string Convert::build(const vp&m, _bson_t*parent, const std::string&pname, 
                 bson_t child;
                 bson_append_array_begin(root, iter->first.c_str(), iter->first.length(), &child);
                 for (size_t i=0; i<iter->second._vs.size(); ++i) {
-                    std::string index = tostr(i);
+                    std::string index = Util::tostr(i);
                     bson_append_utf8(&child, index.c_str(), index.length(), iter->second._vs[i].c_str(), iter->second._vs[i].length());
                 }
                 bson_append_array_end(root, &child);
@@ -170,13 +170,13 @@ void Convert::json(const vp&m, const std::string& space, std::string&root)
           case intf::t_i32:
           case intf::t_i64:
           case intf::t_dt:
-            root.append(tostr(iter->second._i64));
+            root.append(Util::tostr(iter->second._i64));
             break;
           case intf::t_bool:
             root.append(iter->second._i64?"true":"false");
             break;
           case intf::t_double:
-            root.append(tostr(iter->second._db));
+            root.append(Util::tostr(iter->second._db));
             break;
           case intf::t_vi32:
           case intf::t_vi64:{
@@ -185,7 +185,7 @@ void Convert::json(const vp&m, const std::string& space, std::string&root)
                     if (i > 0) {
                         root.append(space).append(",").append(space);
                     }
-                    root.append(tostr(iter->second._vi64[i]));
+                    root.append(Util::tostr(iter->second._vi64[i]));
                 }
                 root.append(space).append("]");
             }
@@ -196,7 +196,7 @@ void Convert::json(const vp&m, const std::string& space, std::string&root)
                     if (i > 0) {
                         root.append(space).append(",").append(space);
                     }
-                    root.append(tostr(iter->second._vdb[i]));
+                    root.append(Util::tostr(iter->second._vdb[i]));
                 }
                 root.append(space).append("]");
             }

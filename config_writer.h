@@ -14,7 +14,9 @@
 * limitations under the License.
 */
 
-#pragma once
+#ifndef __X_CONFIG_WRITER_H
+#define __X_CONFIG_WRITER_H
+
 
 #include <string>
 #include <vector>
@@ -92,7 +94,7 @@ public:
         this->object_begin();
         for (typename std::map<KEY,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
             std::string _k("x");
-            _k.append(tostr(iter->first));
+            _k.append(Util::tostr(iter->first));
             this->convert(_k.c_str(), iter->second);
         }
         this->object_end();
@@ -127,4 +129,4 @@ private:
 
 }
 
-
+#endif

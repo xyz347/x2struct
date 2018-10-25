@@ -15,7 +15,8 @@
 */
 
 
-#pragma once
+#ifndef __X_BSON_BUILDER_H
+#define __X_BSON_BUILDER_H
 
 #include <stdint.h>
 #include <string>
@@ -122,3 +123,4 @@ std::string json(const vp&m, bool space=false);
 
 }
 
+#endif

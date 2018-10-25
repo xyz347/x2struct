@@ -14,7 +14,8 @@
 * limitations under the License.
 */
 
-#pragma once
+#ifndef __X_BSON_READER_H
+#define __X_BSON_READER_H
 
 #include <map>
 #include <vector>
@@ -69,4 +70,4 @@ private:
 
 }
 
-
+#endif

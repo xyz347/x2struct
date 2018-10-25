@@ -14,48 +14,185 @@
 * limitations under the License.
 */
 
-#pragma once
+#ifndef __X_JSON_WRITER_H
+#define __X_JSON_WRITER_H
 
 #include <string>
 #include <vector>
 #include <set>
 #include <map>
 
-#include "xtypes.h"
+#include "thirdparty/rapidjson/prettywriter.h"
+#include "thirdparty/rapidjson/stringbuffer.h"
 
-// typedef 不好 forward declare
-#ifndef JSON_WRITER_BUFFER
-#define JSON_WRITER_BUFFER void
-#define JSON_WRITER_WRITER void
-#define JSON_WRITER_PRETTY void
-#endif
+#include "xtypes.h"
 
 namespace x2struct {
 
 class JsonWriter {
+    typedef rapidjson::StringBuffer JSON_WRITER_BUFFER;
+    typedef rapidjson::Writer<rapidjson::StringBuffer> JSON_WRITER_WRITER;
+    typedef rapidjson::PrettyWriter<rapidjson::StringBuffer> JSON_WRITER_PRETTY;
 public:
-    JsonWriter(int identCount=0, char identChar=' ');
-    ~JsonWriter();
+    JsonWriter(int indentCount=0, char indentChar=' ') {
+        _buf = new JSON_WRITER_BUFFER;
+        if (indentCount < 0) {
+            _writer = new JSON_WRITER_WRITER(*_buf);
+            _pretty = 0;
+        } else {
+            _pretty = new JSON_WRITER_PRETTY(*_buf);
+            _pretty->SetIndent(indentChar, indentCount);
+            _writer = 0;
+        }
+    }
+    ~JsonWriter() {
+        if (0 != _buf) {
+            delete _buf;
+        }
+        if (0 != _writer) {
+            delete _writer;
+        }
+        if (0 != _pretty) {
+            delete _pretty;
+        }
+    }
 public:
-    std::string toStr();
+    std::string toStr() {
+        return _buf->GetString();
+    }
 
-    void x2struct_set_key(const char*key); // openssl defined set_key macro ...
-    void array_begin();
-    void array_end();
-    void object_begin();
-    void object_end();
-    const std::string&type();
+    void x2struct_set_key(const char*key) { // openssl defined set_key macro, so we named it x2struct_set_key ...
+        if (0!=key && key[0]!='\0') {
+            if (0 != _writer) {
+                _writer->Key(key);
+            } else {
+                _pretty->Key(key);
+            }
+        }
+    }
+    void array_begin() {
+        if (0 != _writer) {
+            _writer->StartArray();
+        } else {
+            _pretty->StartArray();
+        }
+    }
+    void array_end() {
+        if (0 != _writer) {
+            _writer->EndArray();
+        } else {
+            _pretty->EndArray();
+        }
+    }
+    void object_begin() {
+        if (0 != _writer) {
+            _writer->StartObject();
+        } else {
+            _pretty->StartObject();
+        }
+    }
+    void object_end() {
+        if (0 != _writer) {
+            _writer->EndObject();
+        } else {
+            _pretty->EndObject();
+        }
+    }
+    const std::string&type() {
+        static string t("json");
+        return t;
+    }
 
-    JsonWriter& convert(const char*key, const std::string &val);
-    JsonWriter& convert(const char*key, bool val);
-    JsonWriter& convert(const char*key, int16_t val);
-    JsonWriter& convert(const char*key, uint16_t val);
-    JsonWriter& convert(const char*key, int32_t val);
-    JsonWriter& convert(const char*key, uint32_t val);
-    JsonWriter& convert(const char*key, int64_t val);
-    JsonWriter& convert(const char*key, uint64_t val);
-    JsonWriter& convert(const char*key, double val);
-    JsonWriter& convert(const char*key, float val);
+    JsonWriter& convert(const char*key, const std::string &val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->String(val);
+        } else {
+            _pretty->String(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, bool val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Bool(val);
+        } else {
+            _pretty->Bool(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, int16_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Int(val);
+        } else {
+            _pretty->Int(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, uint16_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Uint(val);
+        } else {
+            _pretty->Uint(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, int32_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Int(val);
+        } else {
+            _pretty->Int(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, uint32_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Uint(val);
+        } else {
+            _pretty->Uint(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, int64_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Int64(val);
+        } else {
+            _pretty->Int64(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, uint64_t val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Uint64(val);
+        } else {
+            _pretty->Uint64(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, double val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Double(val);
+        } else {
+            _pretty->Double(val);
+        }
+        return *this;
+    }
+    JsonWriter& convert(const char*key, float val) {
+        x2struct_set_key(key);
+        if (0 != _writer) {
+            _writer->Double(val);
+        } else {
+            _pretty->Double(val);
+        }
+        return *this;
+    }
 
     template<typename T>
     JsonWriter& convert(const char*key, const std::vector<T>&data) {
@@ -94,7 +231,7 @@ public:
         x2struct_set_key(key);
         this->object_begin();
         for (typename std::map<KEY,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-            std::string _k =tostr(iter->first);
+            std::string _k =Util::tostr(iter->first);
             this->convert(_k.c_str(), iter->second);
         }
         this->object_end();
@@ -121,4 +258,4 @@ private:
 
 }
 
-
+#endif
