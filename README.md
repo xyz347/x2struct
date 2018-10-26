@@ -15,7 +15,7 @@
 - to generate Golang code, need to define macro XTOSTRUCT_GOCODE
 
 ------
-- support vecotr/set/map
+- support vector/set/map
 - support structure nesting
 
 ***
