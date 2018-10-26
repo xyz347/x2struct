@@ -26,11 +26,11 @@
 #include <gtest/gtest.h>
 #include "app_common/utility/blade_test_env.h"
 #else
-#include "test/gtest_stub.h"
+#include "gtest_stub.h"
 #endif
 
-#ifndef WIN
-#include <libbson-1.0/bson.h>
+#ifndef WINNT
+#include "thirdparty/libbson/include/libbson-1.0/bson.h"
 #include "bson_builder.h"
 #endif
 
@@ -74,7 +74,11 @@ struct xstruct {
     vector<vector<sub> > vvsub;
     map<int, sub> tmap;
     condition con;
+#ifndef XTOSTRUCT_GOCODE
     XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
+#else
+    XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
+#endif
 };
 
 static void base_check(xstruct&x)
@@ -173,7 +177,7 @@ TEST(json, invalid)
     EXPECT_TRUE(excpt);
 }
 
-#ifndef WIN
+#ifndef WINNT
 TEST(config, unmarshal)
 {
     xstruct x;
@@ -212,7 +216,7 @@ TEST(xml, marshal)
     base_check(y);
 }
 
-#ifndef WIN
+#ifndef WINNT
 TEST(bson, unmarshal)
 {
     bson_error_t err;
@@ -322,12 +326,25 @@ TEST(performance, clear)
 
 }
 
+#ifdef XTOSTRUCT_GOCODE
+TEST(gocode, test)
+{
+    xstruct x;
+    cout<<x2struct::X::togocode(x, true, true, true)<<endl;
+}
+#endif
+
 
 #ifdef USE_MAKE
 int main(int argc, char *argv[])
 {
     const std::vector<text_ctx>& tcs = TC_CONTAINER::tcs();
     for (size_t i=0; i<tcs.size(); ++i) {
+        #ifdef XTOSTRUCT_GOCODE
+        if (tcs[i].group != "gocode") {
+            continue;
+        }
+        #endif
         Status::c() = 0;
         cout<<tcs[i].group<<" "<<tcs[i].name<<" start --->"<<endl;
         tcs[i].tc();

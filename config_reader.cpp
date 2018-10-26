@@ -20,7 +20,8 @@
 
 #include <stdexcept>
 #include <sstream>
-#include <libconfig.h++>
+
+#include "thirdparty/libconfig/include/libconfig.h++"
 
 #include "config_reader.h"
 

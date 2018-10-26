@@ -15,7 +15,7 @@
 */
 
 #include <string.h>
-#include <libbson-1.0/bson.h>
+#include "thirdparty/libbson/include/libbson-1.0/bson.h"
 #include "bson_writer.h"
 
 using namespace std;

@@ -18,11 +18,12 @@
 #include <map>
 #include <vector>
 #include <list>
-#include <libbson-1.0/bson.h>
+
+#include "thirdparty/libbson/include/libbson-1.0/bson.h"
 
 #include "util.h"
 #include "bson_reader.h"
-#include <iostream>
+//#include <iostream>
 
 using namespace ::std;
 

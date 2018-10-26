@@ -15,7 +15,7 @@
 */
 
 
-#include <libbson-1.0/bson.h>
+#include "thirdparty/libbson/include/libbson-1.0/bson.h"
 
 #include "util.h"
 #include "bson_builder.h"

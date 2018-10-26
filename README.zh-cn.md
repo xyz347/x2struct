@@ -1,13 +1,18 @@
 x2struct
 ===========
 - 用于将json/xml/libconfig/bson转为C++结构体，也可以反过来将结构体转成相应字符串
-- 可用于将C++结构体生成golang的结构体
+- 可用于将C++结构体生成golang的结构体(不完备，仅用于测试)
 
 ------
 - json/xml 只有头文件，包含即可用
 - bson/libconfig 有源文件，需要make生成libx2struct.a 
 - 如果需要用bson功能，需要定义宏XTOSTRUCT_BSON
 - 如果需要用libconfig功能，需要定义宏XTOSTRUCT_LIBCONFIG
+- 如果需要生成golang代码，需要定义宏XTOSTRUCT_GOCODE
+
+------
+- 支持vector/set/map
+- 支持结构体嵌套
 
 ***
 ### 范例

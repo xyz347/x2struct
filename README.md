@@ -5,13 +5,18 @@
 ------
 
 - Decode json/xml/libconfig/bson to C++ struct or encode C++ struct to json/xml/libconfig/bson
-- Convert C++ struct define to Golang struct define(need c++11 or later)
+- Convert C++ struct define to Golang struct define(Incomplete, only for testing)
 
 ------
 - json/xml is header file only
 - bson/libconfig need build libx2struct.a 
 - bson need to define macro XTOSTRUCT_BSON
 - libconfig need to define macro XTOSTRUCT_LIBCONFIG
+- to generate Golang code, need to define macro XTOSTRUCT_GOCODE
+
+------
+- support vecotr/set/map
+- support structure nesting
 
 ***
 ### EXAMPLE

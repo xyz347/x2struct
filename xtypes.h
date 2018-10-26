@@ -69,7 +69,7 @@ public:
         time_t tt = (time_t)unix_time;
         tm     ttm;
 
-        #ifndef WIN
+        #ifndef WINNT
         localtime_r(&tt, &ttm);
         #else
         localtime_s(&ttm, &tt);
@@ -79,7 +79,7 @@ public:
         return buf;
     }
     void parse(const std::string&str) {
-        #ifndef WIN
+        #ifndef WINNT
         tm ttm;
 
         if (0 != strptime(str.c_str(), "%Y-%m-%d %H:%M:%S", &ttm)) {

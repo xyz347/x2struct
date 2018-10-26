@@ -74,7 +74,7 @@ public:
 
         code.append("type ").append(_name).append(" struct {\n");
         for (size_t i=0; i<_var_names.size(); ++i) {
-            code.append("    ").append(_var_names[i]).append(std::string(max_var_len-_var_names[i].length(), ' '));
+            code.append("\t").append(_var_names[i]).append(std::string(max_var_len-_var_names[i].length(), ' '));
             code.append(_var_types[i]).append(std::string(max_type_len-_var_types[i].length(), ' '));
             code.append(_marshal_string[i]).append("\n");
         }
@@ -109,6 +109,12 @@ private:
         }
         return tname;
     }
+    template <typename KEY, typename VALUE>
+    std::string type_name(const std::map<KEY, VALUE>& m) {
+        KEY k;
+        VALUE v;
+        return std::string("map[").append(type_name(k)).append("]").append(type_name(v));
+    }
 
     #define GOLANG_BASE_TYPE_NAME(type)         \
     std::string type_name(const type##_t & v) { \
@@ -128,7 +134,7 @@ private:
     }
 private:
     std::string raw_name(const std::string& type_id_name) {
-        auto raw = abi::__cxa_demangle(type_id_name.c_str(), 0, 0, 0);
+        char* raw = abi::__cxa_demangle(type_id_name.c_str(), 0, 0, 0);
         std::string str;
         if (0 == raw) {
             str = std::string(type_id_name);
@@ -174,7 +180,7 @@ private:
 
         str = "`";
         for (size_t i=0; i<_types.size(); ++i) {
-            auto iter = aliases.find(_types[i]);
+            std::map<std::string,std::string>::const_iterator iter = aliases.find(_types[i]);
             std::string aname;
             if (aliases.end() == iter) {
                 iter = aliases.find("");

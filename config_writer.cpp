@@ -15,8 +15,9 @@
 */
 
 #include <string.h>
-#include <libconfig.h++>
-#include <iostream>
+//#include <iostream>
+
+#include "thirdparty/libconfig/include/libconfig.h++"
 
 #include "util.h"
 #include "config_writer.h"

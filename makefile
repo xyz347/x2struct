@@ -1,8 +1,8 @@
 CC=g++
 AR=ar
 
-FLAGS= -g -DUSE_MAKE -DXTOSTRUCT_BSON -DXTOSTRUCT_LIBCONFIG
-INCS=-I. -Ithirdparty
+FLAGS= -g -DUSE_MAKE
+INCS=-I.
 
 CPPFILES=$(wildcard *.cpp)
 HPPFILES=$(wildcard *.h)
@@ -11,14 +11,14 @@ HPPFILES+=$(wildcard *.hpp)
 
 # windows remove bson and libconfig that lib is prebuilt
 ifeq ($(OS),Windows_NT)
-FLAGS+=-DWIN
 CPPFILES:=$(filter-out bson%,$(CPPFILES))
 CPPFILES:=$(filter-out config%,$(CPPFILES))
 HPPFILES:=$(filter-out bson%,$(HPPFILES))
 HPPFILES:=$(filter-out config%,$(HPPFILES))
+EXE=.exe
 else
+FLAGS+=-DXTOSTRUCT_BSON -DXTOSTRUCT_LIBCONFIG 
 LDFLAGS=thirdparty/libconfig/lib/libconfig++.a thirdparty/libbson/lib/libbson-1.0.a -pthread -lrt 
-INCS+=-Ithirdparty/libbson/include -Ithirdparty/libconfig/include
 endif
 
 OBJFILES=$(foreach n,$(CPPFILES),objs/$(n:.cpp=.o))
@@ -42,13 +42,16 @@ objs:
 	@mkdir $@
 
 clean:
-	-rm -rf $(LIBNAME) objs/* test/xtest*
+	-rm -rf $(LIBNAME) objs/* test/xtest* gocode*
 
-test:test/xtest
+test:test/xtest$(EXE)
 
-test/xtest:test/x2struct_test.cpp $(LIBNAME)
+test/xtest$(EXE):test/x2struct_test.cpp $(LIBNAME)
 	$(CC) -o $@ $^ $(FLAGS) $(INCS) $(LDFLAGS)
 
+gocode:test/x2struct_test.cpp  $(LIBNAME)
+	$(CC) -o $@$(EXE) $^ $(FLAGS) $(INCS)  $(LDFLAGS) -DXTOSTRUCT_GOCODE
+	
 
 ifneq ($(MAKECMDGOALS), clean)
 -include $(DEPFILES)
