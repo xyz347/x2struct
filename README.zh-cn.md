@@ -16,7 +16,7 @@ x2struct
 
 ***
 ### 范例
-参考 test/x2struct_test.cpp 或者下面的代码
+参考 test/example_xxx.cpp 或者下面的代码
 
 ```C++
 // test.cpp
@@ -48,20 +48,13 @@ struct example {
  ./t
 */
 int main(int argc, char *argv[]) {
-    example st2;
-    // example这结构体加了XTOSTRUCT，可以直接调用x2struct::X::loadjson将json转成结构体
-    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", st2, false);
-    cout<<st2.a<<endl;
-    cout<<st2.b<<endl;
-    for (size_t i=0; i<st2.rs.size(); ++i) {
-        cout<<st2.rs[i].min<<':'<<st2.rs[i].max<<endl;
-    }
+    example x;
+    
+    // json string to struct
+    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", x, false);
 
-    /*
-     也可以通过调用x2struct::X::tojson将一个结构体转成字符串。tojson包含四个参数，后面三个属于
-     缺省参数，可以控制换行和缩进，缺省参数情况下不换行不缩进
-    */
-    cout<<x2struct::X::tojson(st2)<<endl;
+    // struct to json string
+    cout<<x2struct::X::tojson(x)<<endl;
     
     // xml/bson/libconfig可以调用类似接口进行转换
     return 0;

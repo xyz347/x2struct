@@ -20,7 +20,7 @@
 
 ***
 ### EXAMPLE
-Take a look at test/x2struct_test.cpp or code below
+Take a look at test/example_xxx.cpp or code below
 
 ```C++
 // test.cpp
@@ -52,19 +52,13 @@ struct example {
  ./t
 */
 int main(int argc, char *argv[]) {
-    example st2;
-    // call x2struct::X::loadjson to decode json to C++ struct
-    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", st2, false);
-    cout<<st2.a<<endl;
-    cout<<st2.b<<endl;
-    for (size_t i=0; i<st2.rs.size(); ++i) {
-        cout<<st2.rs[i].min<<':'<<st2.rs[i].max<<endl;
-    }
+    example x;
+    
+    // json string to struct
+    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", x, false);
 
-    /*
-     call x2struct::X::tojson to encode C++ struct to json string。
-    */
-    cout<<x2struct::X::tojson(st2)<<endl;
+    // struct to json string
+    cout<<x2struct::X::tojson(x)<<endl;
     
     // xml/bson/libconfig is similar
     return 0;
