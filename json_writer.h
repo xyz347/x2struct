@@ -99,7 +99,7 @@ public:
         }
     }
     const std::string&type() {
-        static string t("json");
+        static std::string t("json");
         return t;
     }
 

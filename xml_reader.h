@@ -40,7 +40,7 @@ class XmlReader:public XReader<XmlReader> {
 public:
     using xdoc_type::convert;
     XmlReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new XML_READER_DOCUMENT),_val(0),_siblings(0) {
-        string err;
+        std::string err;
         _xml_data = 0;
 
         do {
@@ -62,9 +62,9 @@ public:
                 }
                 _doc->parse<0>(_xml_data);
             } catch (const rapidxml::parse_error&e) {
-                err = string("parse error[")+e.what()+"] "+string(e.where<char>()).substr(0, 32);
+                err = std::string("parse error[")+e.what()+"] "+std::string(e.where<char>()).substr(0, 32);
             } catch (const std::exception&e) {
-                err = string("unknow exception[")+e.what()+"]";
+                err = std::string("unknow exception[")+e.what()+"]";
             }
 
             if (!err.empty()) {
@@ -170,7 +170,7 @@ public: // convert
         if (has(key)) {
             return XmlReader(&_childs[_child_index[key]], this, key);
         } else {
-            throw std::runtime_error(string("Did not have ")+key);
+            throw std::runtime_error(std::string("Did not have ")+key);
         }
         return XmlReader(0, 0, "");
     }

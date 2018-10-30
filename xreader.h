@@ -26,7 +26,6 @@
 #include <set>
 #include <stdexcept>
 #include <iostream>
-using namespace std;
 
 #include "util.h"
 

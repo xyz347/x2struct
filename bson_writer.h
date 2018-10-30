@@ -25,6 +25,8 @@
 #include <vector>
 #include <set>
 
+#include "thirdparty/libbson/include/libbson-1.0/bson.h"
+
 #include "util.h"
 #include "xtypes.h"
 
@@ -39,28 +41,104 @@ class BsonWriter {
         array
     };
 public:
-    BsonWriter(const char*name="", _bson_t*parent=0, int type=top);
-    BsonWriter(const BsonWriter&bs);
-    ~BsonWriter();
+    BsonWriter(const char*key="", _bson_t*parent=0, int type=top) {
+        _parent = parent;
+        _bson = new bson_t;
+        _type = type;
+        if (0 != parent) {
+            if (type == doc) {
+                bson_append_document_begin(parent, key, strlen(key), _bson);
+            } else {
+                bson_append_array_begin(parent, key, strlen(key), _bson);
+            }
+        } else {
+            bson_init(_bson);
+        }
+    }
+    BsonWriter(const BsonWriter&bs) {
+        *this = bs;
+        bs._parent = 0;
+        bs._bson = 0;
+    }
+    ~BsonWriter() {
+        if (0 != _bson) {
+            if (_type == doc) {
+                bson_append_document_end(_parent, _bson);
+            } else if (_type == array) {
+                bson_append_array_end(_parent, _bson);
+            } else {
+                bson_destroy(_bson);
+            }
+            delete _bson;
+        }
+    }
 
 public:
-    std::string toStr() const;
-    std::string json() const;
+    std::string toStr() const {
+        return std::string((const char*)bson_get_data(_bson), _bson->len);
+    }
+    std::string json() const {
+        size_t len;
+        char *jstr = bson_as_json(_bson, &len);
+        std::string ret(jstr);
+        bson_free(jstr);
 
-    const std::string&type();
+        return ret;
+    }
 
-    BsonWriter& convert(const char*key, const BsonWriter& data);
-    BsonWriter& convert(const char*key, const char* data);
-    BsonWriter& convert(const char*key, const std::string& data);
-    BsonWriter& convert(const char*key, int16_t data);
-    BsonWriter& convert(const char*key, uint16_t data);
-    BsonWriter& convert(const char*key, int32_t data);
-    BsonWriter& convert(const char*key, uint32_t data);
-    BsonWriter& convert(const char*key, int64_t data);
-    BsonWriter& convert(const char*key, uint64_t data);
-    BsonWriter& convert(const char*key, float data);
-    BsonWriter& convert(const char*key, double data);
-    BsonWriter& convert(const char*key, bool data);
+    const std::string&type() {
+        static std::string t("bson");
+        return t;
+    }
+
+    BsonWriter& convert(const char*key, const BsonWriter& data){
+        bson_append_document(_bson, key, strlen(key), data._bson);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, const char* data) {
+        std::string d(data);
+        return convert(key, d);
+    }
+    BsonWriter& convert(const char*key, const std::string& data) {
+        bson_append_utf8(_bson, key, strlen(key), (const char*)data.data(), data.length());
+        return *this;
+    }
+    BsonWriter& convert(const char*key, int16_t data) {
+        bson_append_int32(_bson, key, strlen(key), (int32_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, uint16_t data) {
+        bson_append_int32(_bson, key, strlen(key), (int32_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, int32_t data) {
+        bson_append_int32(_bson, key, strlen(key), (int32_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, uint32_t data) {
+        bson_append_int32(_bson, key, strlen(key), (int32_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, int64_t data) {
+        bson_append_int64(_bson, key, strlen(key), (int64_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, uint64_t data) {
+        bson_append_int64(_bson, key, strlen(key), (int64_t)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, float data) {
+        bson_append_double(_bson, key, strlen(key), (double)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, double data) {
+        bson_append_double(_bson, key, strlen(key), (double)data);
+        return *this;
+    }
+    BsonWriter& convert(const char*key, bool data) {
+        bson_append_bool(_bson, key, strlen(key), data);
+        return *this;
+    }
 
     template<typename T>
     BsonWriter& convert(const char*key, const std::vector<T>&data) {

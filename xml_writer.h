@@ -74,7 +74,7 @@ public:
     XmlWriter(int indentCount=0, char indentChar=' '):_indentCount(indentCount),_indentChar(indentChar) {
         if (_indentCount > 0) {
             if (_indentChar!=' ' && _indentChar!='\t') {
-                throw runtime_error("indentChar must be space or tab");
+                throw std::runtime_error("indentChar must be space or tab");
             }
         }
         _buffer.resize(1);
@@ -111,7 +111,7 @@ public:
         _state.pop_back();
     }
     const std::string&type() {
-        static string t("xml");
+        static std::string t("xml");
         return t;
     }
 
@@ -266,7 +266,7 @@ private:
         if (len+_cur->length() <= X2STRUCT_BUFFER_SIZE) {
             _cur->append(str, len);
         } else {
-            _buffer.push_back(string());
+            _buffer.push_back(std::string());
             _cur = &_buffer[_buffer.size()-1];
             _cur->reserve(X2STRUCT_BUFFER_SIZE);
             _cur->append(str, len);
@@ -289,7 +289,7 @@ private:
             --depth;
         }
         if (_indentCount>0 && depth>0) {
-            append(string(_indentCount*depth, _indentChar));
+            append(std::string(_indentCount*depth, _indentChar));
         }
     }
     bool in_array() {

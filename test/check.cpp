@@ -22,64 +22,16 @@
 #include <string>
 #include <vector>
 
-#ifndef USE_MAKE
-#include <gtest/gtest.h>
-#include "app_common/utility/blade_test_env.h"
-#else
+
 #include "gtest_stub.h"
-#endif
 
 #ifndef WINNT
-#include "thirdparty/libbson/include/libbson-1.0/bson.h"
+#define XTOSTRUCT_LIBCONFIG
+#define XTOSTRUCT_BSON
 #include "bson_builder.h"
 #endif
 
-#include "x2struct.hpp"
-#include "xtypes.h"
-
-
-using namespace std;
-using namespace x2struct;
-//using namespace bb;
-
-#ifndef USE_MAKE
-  BLADE_TEST_COMMON_ENV;
-#endif
-
-struct condition {
-    string url;
-    XTOSTRUCT(M(url));
-    XTOSTRUCT_CONDITION() {
-        return obj.attribute("myip")==obj.attribute("cfgip");
-    }
-};
-
-struct sub {
-    int    a;
-    string b;
-    XTOSTRUCT(M(a), O(b));
-};
-
-struct xstruct {
-    int    id;
-    XDate  start;
-    int    tint;
-    string tstring;
-    vector<int> vint;
-    vector<string> vstring;
-    vector<int64_t> vlong;
-    vector<sub> vsub;
-    vector<vector<int> > vvint;
-    vector<vector<string> > vvstring;
-    vector<vector<sub> > vvsub;
-    map<int, sub> tmap;
-    condition con;
-#ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
-#else
-    XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
-#endif
-};
+#include "example.h"
 
 static void base_check(xstruct&x)
 {
@@ -177,7 +129,7 @@ TEST(json, invalid)
     EXPECT_TRUE(excpt);
 }
 
-#ifndef WINNT
+#ifdef XTOSTRUCT_LIBCONFIG
 TEST(config, unmarshal)
 {
     xstruct x;
@@ -216,7 +168,7 @@ TEST(xml, marshal)
     base_check(y);
 }
 
-#ifndef WINNT
+#ifndef XTOSTRUCT_BSON
 TEST(bson, unmarshal)
 {
     bson_error_t err;
@@ -335,7 +287,6 @@ TEST(gocode, test)
 #endif
 
 
-#ifdef USE_MAKE
 int main(int argc, char *argv[])
 {
     const std::vector<text_ctx>& tcs = TC_CONTAINER::tcs();
@@ -356,5 +307,4 @@ int main(int argc, char *argv[])
         cout<<"<---"<<endl;
     }
 }
-#endif
 

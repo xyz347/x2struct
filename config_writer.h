@@ -22,35 +22,188 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <string.h>
 
+#include "thirdparty/libconfig/include/libconfig.h++"
+
+#include "util.h"
 #include "xtypes.h"
+
+#define LIBCONFIG_BUFFER_SIZE 1024
+#define LIBCONFIG_TYPE_OBJECT 0
+#define LIBCONFIG_TYPE_ARRAY  1
 
 namespace x2struct {
 
 class ConfigWriter {
 public:
-    ConfigWriter(int identCount=0, char identChar=' ');
-    ~ConfigWriter();
+    ConfigWriter(int indentCount=0, char indentChar=' '):_indentCount(indentCount),_indentChar(indentChar) {
+        if (_indentCount > 0) {
+            if (_indentChar!=' ' && _indentChar!='\t') {
+                throw std::runtime_error("indentChar must be space or tab");
+            }
+        }
+        _buffer.resize(1);
+        _buffer.reserve(LIBCONFIG_BUFFER_SIZE);
+        _cur = &_buffer[0];
+        _need_sep = false;
+    }
+    ~ConfigWriter() {
+    }
 public:
-    std::string toStr();
+    std::string toStr() {
+        size_t total_len = 0;
+        for (size_t i=0; i<_buffer.size(); ++i) {
+            total_len += _buffer[i].length();
+        }
+        std::string buf;
+        buf.reserve(total_len);
+        for (size_t i=0; i<_buffer.size(); ++i) {
+            buf.append(_buffer[i]);
+        }
+        return buf;
+    }
 
-    void x2struct_set_key(const char*key); // openssl defined set_key macro ...
-    void array_begin();
-    void array_end();
-    void object_begin();
-    void object_end();
-    const std::string&type();
+    void x2struct_set_key(const char*key){ // openssl defined set_key macro ...
+        if (0!=key && key[0]!='\0') {
+            append(key, -1);
+            if (_indentCount <= 0) {
+                append("=", 1);
+            } else {
+                append(" = ", 3);
+            }
+        }
+    }
+    void array_begin() {
+        _need_sep = false;
+        append("(", 1);
+        _state.push_back(LIBCONFIG_TYPE_ARRAY);
+    }
+    void array_end() {
+        _need_sep = false;
+        _state.pop_back();
+        indent();
+        append(");", 1);
+    }
+    void object_begin() {
+        _need_sep = false;
+        append("{", 1);
+        _state.push_back(LIBCONFIG_TYPE_OBJECT);
+    }
+    void object_end() {
+        _need_sep = false;
+        _state.pop_back();
+        indent();
+        append("};", 1);
+    }
+    const std::string&type() {
+        static std::string t("config");
+        return t;
+    }
 
-    ConfigWriter& convert(const char*key, const std::string &val);
-    ConfigWriter& convert(const char*key, bool val);
-    ConfigWriter& convert(const char*key, int16_t val);
-    ConfigWriter& convert(const char*key, uint16_t val);
-    ConfigWriter& convert(const char*key, int32_t val);
-    ConfigWriter& convert(const char*key, uint32_t val);
-    ConfigWriter& convert(const char*key, int64_t val);
-    ConfigWriter& convert(const char*key, uint64_t val);
-    ConfigWriter& convert(const char*key, double val);
-    ConfigWriter& convert(const char*key, float val);
+    ConfigWriter& convert(const char*key, const std::string &val) {
+        indent();
+        x2struct_set_key(key);
+
+        append("\"", 1);
+        for (size_t i=0; i<val.length(); ++i) {
+            int c = (int)(val[i]) & 0xFF;
+            switch (c) {
+              case '\"':
+              case '\\':
+                append("\\", 1);
+                append(val[i]);
+                break;
+
+              case '\n':
+                append("\\n", 2);
+                break;
+
+              case '\r':
+                append("\\r", 2);
+                break;
+
+              case '\f':
+                append("\\f", 2);
+                break;
+
+              case '\t':
+                append("\\t", 2);
+                break;
+
+              default:
+                if(c >= ' ') {
+                    append(val[i]);
+                } else {
+                    char tmp[16];
+                    int l = sprintf(tmp, "\\x%02X", c);
+                    append(tmp, l);
+                }
+            }
+        }
+
+        append("\"", 1);
+
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, bool val) {
+        indent();
+        x2struct_set_key(key);
+        if (val) {
+            append("true", 4);
+        } else {
+            append("false", 5);
+        }
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, int16_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, uint16_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, int32_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, uint32_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, int64_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val).append("L"));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, uint64_t val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val).append("L"));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, double val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
+    ConfigWriter& convert(const char*key, float val) {
+        indent();
+        x2struct_set_key(key);
+        append(Util::tostr(val));
+        return *this;
+    }
 
     template<typename T>
     ConfigWriter& convert(const char*key, const std::vector<T>&data) {
@@ -115,10 +268,43 @@ public:
     }
 
 private:
-    void append(const char* str, int len);
-    void append(const std::string&str);
-    void append(char ch);
-    void indent();
+    void append(const char* str, int len) {
+        if (len < 0) {
+            len = strlen(str);
+        }
+        if (len+_cur->length() <= LIBCONFIG_BUFFER_SIZE) {
+            _cur->append(str, len);
+        } else {
+            _buffer.push_back(std::string());
+            _cur = &_buffer[_buffer.size()-1];
+            _cur->reserve(LIBCONFIG_BUFFER_SIZE);
+            _cur->append(str, len);
+        }
+    }
+    void append(const std::string&str) {
+        append(str.c_str(), str.length());
+    }
+    void append(char ch) {
+        char buf[1] = {ch};
+        append(buf, 1);
+    }
+    void indent() {
+        if (_need_sep) {
+            if (_state.size()==0 || _state[_state.size()-1]==LIBCONFIG_TYPE_OBJECT) {
+                append(";", 1);
+            } else {
+                append(",", 1);
+            }
+        }
+        _need_sep = true;
+        if (_indentCount>=0 && _state.size()>0) {
+            append("\n", 1);
+        }
+        if (_indentCount>0) {
+            append(std::string(_indentCount*_state.size(), _indentChar));
+        }
+    }
+
     int  _indentCount;
     char _indentChar;
     bool _need_sep;             // 是否需要分隔符

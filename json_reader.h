@@ -31,8 +31,8 @@ public:
     using xdoc_type::convert;
 
     JsonReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new rapidjson::Document),_val(_doc) {
-        string err;
-        string data;
+        std::string err;
+        std::string data;
 
         do {
             if (isfile) {
@@ -51,11 +51,11 @@ public:
             if (_doc->HasParseError()) {
                 size_t offset = _doc->GetErrorOffset();
                 if  (isfile) {
-                    string err_info = data.substr(offset, offset+32);
+                    std::string err_info = data.substr(offset, offset+32);
                     err = "Parse json file ["+str+"] fail. "+err_info;
                     break;
                 } else {
-                    string err_info = str.substr(offset, offset+32);
+                    std::string err_info = str.substr(offset, offset+32);
                     err = "Parse json string ["+str+"] fail. "+err_info;
                     break;
                 }
@@ -129,7 +129,7 @@ public: // convert
         if (_val->HasMember(key)) {
             return JsonReader(&(*_val)[key], this, key);
         } else {
-            throw std::runtime_error(string("Did not have ")+key);
+            throw std::runtime_error(std::string("Did not have ")+key);
         }
         return JsonReader(0, 0, "");
     }
