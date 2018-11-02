@@ -1,0 +1,16 @@
+INC=-I ../
+
+json.exe:
+	cl -o $@ /EHsc example_json.cpp $(INC)
+	$@
+	@-rm *.exe *.obj
+
+xml.exe:
+	cl -o $@ /EHsc example_xml.cpp $(INC)
+	$@
+	@-rm *.exe *.obj
+
+check.exe:
+	cl -o $@ /EHsc check.cpp $(INC) -DWINDOWS
+	./$@
+	@-rm *.exe *.obj

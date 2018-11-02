@@ -25,7 +25,7 @@
 
 #include "gtest_stub.h"
 
-#ifndef WINNT
+#ifndef WINDOWS
 #define XTOSTRUCT_LIBCONFIG
 #define XTOSTRUCT_BSON
 #include "bson_builder.h"
@@ -168,7 +168,7 @@ TEST(xml, marshal)
     base_check(y);
 }
 
-#ifndef XTOSTRUCT_BSON
+#ifdef XTOSTRUCT_BSON
 TEST(bson, unmarshal)
 {
     bson_error_t err;

@@ -28,7 +28,7 @@
 namespace x2struct {
 
 struct cmp_str {
-   bool operator()(char const *a, char const *b)
+   bool operator()(char const *a, char const *b) const
    {
       return strcmp(a, b) < 0;
    }
@@ -47,7 +47,11 @@ public:
         if (sizeof(data) <= 4) {
             sprintf(buf, "%d", (int)data);
         } else {
+            #ifndef _MSC_VER
             sprintf(buf, "%ld", (int64_t)data);
+            #else
+            sprintf(buf, "%lld", (int64_t)data);
+            #endif
         }
         return buf;
     }
@@ -146,7 +150,11 @@ private:
             t = (T)tmp;
         } else {
             int64_t tmp;
+            #ifndef _MSC_VER
             sscanf(str.c_str(), "%ld", &tmp);
+            #else
+            sscanf(str.c_str(), "%lld", &tmp);
+            #endif
             t = (T)tmp;
         }
         return t;
