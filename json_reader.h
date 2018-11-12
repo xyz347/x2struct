@@ -83,9 +83,7 @@ public:
     }
 public: // convert
     void convert(std::string &val) {
-        if (!_val->IsNull()) {
-            val = _val->GetString();
-        }
+        val = _val->GetString();
     }
     void convert(bool &val) {
         val = _val->GetBool();
