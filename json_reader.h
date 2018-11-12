@@ -120,7 +120,11 @@ public: // convert
         return t;
     }
     bool has(const char*key) {
-        return _val->HasMember(key);
+        if (_val->HasMember(key)) {
+            return !(*_val)[key].IsNull();
+        } else {
+            return false;
+        }
     }
     size_t size(bool to_vec=true) {
         if (_val->IsArray()) {
