@@ -22,6 +22,7 @@
 #include <set>
 #include <map>
 
+#include "rapidjson_custom.h"
 #include "thirdparty/rapidjson/prettywriter.h"
 #include "thirdparty/rapidjson/stringbuffer.h"
 

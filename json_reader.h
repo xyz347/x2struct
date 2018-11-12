@@ -19,6 +19,8 @@
 
 #include <stdexcept>
 #include <fstream>
+
+#include "rapidjson_custom.h"
 #include "thirdparty/rapidjson/document.h"
 
 #include "xreader.h"
@@ -81,7 +83,9 @@ public:
     }
 public: // convert
     void convert(std::string &val) {
-        val = _val->GetString();
+        if (!_val->IsNull()) {
+            val = _val->GetString();
+        }
     }
     void convert(bool &val) {
         val = _val->GetBool();
