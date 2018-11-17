@@ -31,3 +31,6 @@ check:
 	g++ -o $@ check.cpp $(INC) $(LIBCONFIG) $(LIBBSON)
 	./$@
 	@-rm $@
+
+expand:
+	g++ -E -DXTOSTRUCT_MACRO_TEST expand.cpp

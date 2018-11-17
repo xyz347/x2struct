@@ -103,7 +103,6 @@ If you want to implement some custom types, you can add them in xtypes.h. For de
 - Decode bson is use [libbson](https://github.com/mongodb/libbson/tree/1.0.0)
 - Decode libconfig is use [libconfig](https://github.com/hyperrealm/libconfig)
 - Encode of xml/bson is written by myself. Without reference to the RFC, there may be cases where the standard is not met.
-- The BUILD file inside is for the use of blade compilation, you need to modify the deps appropriately.
 - The library of bson/libconfig is precompiled. The environment is: Ubuntu12.04 g++4.9.2. Other environments may need to download the code and recompile if you need to use these two libraries.
 - bson/libconfig is not supported under Windows. If you need support, you have to download the code and compile to generate library file and modify the makefile.
 - XDate is not supported under Windows. If you need support, you need to modify xtype.cpp yourself.
