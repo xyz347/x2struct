@@ -254,9 +254,10 @@ public:                                                                     \
     --> X_STRUCT_L1_2(X_STRUCT_L1_TOX, A(a, "_id"), O(b,c))
     --> X_STRUCT_L1_TOX(A(a, "_id")) X_STRUCT_L1_TOX(O(b,c))
     --> X_STRUCT_L1_TOX_A(a, "_id") X_STRUCT_L1_TOX_O(b,c)
-    --> X_STRUCT_ACT_TOX_A(a, "_id") X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_O, b, c) // https://gcc.gnu.org/onlinedocs/cpp/Self-Referential-Macros.html  so we need define X_STRUCT_N2. if use X_STRUCT_N preprocessor will treat is as self Self-Referential-Macros
+    --> X_STRUCT_ACT_TOX_A(a, "_id") X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_O, b, c) // https://gcc.gnu.org/onlinedocs/cpp/Self-Referential-Macros.html  so we need define X_STRUCT_N2. if use X_STRUCT_N preprocessor will treat is as Self-Referential-Macros
     --> X_STRUCT_ACT_TOX_A(a, "_id") X_STRUCT_L2_2(X_STRUCT_ACT_TOX_O, b, c)
-    --> X_STRUCT_ACT_TOX_A(a, "_id") X_STRUCT_ACT_TOX_O(b, c) X_STRUCT_ACT_TOX_O(c)
+    --> X_STRUCT_ACT_TOX_A(a, "_id") X_STRUCT_ACT_TOX_O(b) X_STRUCT_ACT_TOX_O(c)
+    --> // expand to convert code
 */
 
 #define X_STRUCT_L1_TOX(x) X_STRUCT_L1_TOX_##x

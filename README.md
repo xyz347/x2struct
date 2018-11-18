@@ -8,11 +8,11 @@
 - Convert C++ struct define to Golang struct define(Incomplete, only for testing)
 
 ------
-- json/xml is header file only
-- bson/libconfig need build libx2struct.a 
-- bson need to define macro XTOSTRUCT_BSON
-- libconfig need to define macro XTOSTRUCT_LIBCONFIG
-- to generate Golang code, need to define macro XTOSTRUCT_GOCODE
+- Header file only
+- bson/libconfig depend on lib file 
+- bson need to define macro XTOSTRUCT_BSON (modify config.h)
+- libconfig need to define macro XTOSTRUCT_LIBCONFIG (modify config.h)
+- to generate Golang code, need to define macro XTOSTRUCT_GOCODE (modify config.h)
 
 ------
 - support vector/set/map
