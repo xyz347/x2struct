@@ -9,10 +9,12 @@
 
 ------
 - Header file only
-- bson/libconfig depend on lib file 
-- bson need to define macro XTOSTRUCT_BSON (modify config.h)
-- libconfig need to define macro XTOSTRUCT_LIBCONFIG (modify config.h)
-- to generate Golang code, need to define macro XTOSTRUCT_GOCODE (modify config.h)
+- bson/libconfig depend on lib file
+- json is enabled by default, modify config.h to enable other:
+    - xml need to define macro XTOSTRUCT_XML
+    - bson need to define macro XTOSTRUCT_BSON
+    - libconfig need to define macro XTOSTRUCT_LIBCONFIG
+    - to generate Golang code, need to define macro XTOSTRUCT_GOCODE
 
 ------
 - support vector/set/map
@@ -104,5 +106,4 @@ If you want to implement some custom types, you can add them in xtypes.h. For de
 - Decode libconfig is use [libconfig](https://github.com/hyperrealm/libconfig)
 - Encode of xml/bson is written by myself. Without reference to the RFC, there may be cases where the standard is not met.
 - The library of bson/libconfig is precompiled. The environment is: Ubuntu12.04 g++4.9.2. Other environments may need to download the code and recompile if you need to use these two libraries.
-- bson/libconfig is not supported under Windows. If you need support, you have to download the code and compile to generate library file and modify the makefile.
-- XDate is not supported under Windows. If you need support, you need to modify xtype.cpp yourself.
+- bson/libconfig is not supported under Windows. If you need support, you have to download the code and compile to generate library file.

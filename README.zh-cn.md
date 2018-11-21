@@ -6,7 +6,8 @@ x2struct
 ------
 - 只有头文件，包含即可用
 - bson/libconfig 依赖于库文件
-- 缺省开启了json和xml功能，如果需要开启其他功能：
+- 缺省开启了json功能，如果需要开启其他功能，请修改config.h：
+    - 如果需要用xml功能，需要定义宏XTOSTRUCT_XML
     - 如果需要用bson功能，需要定义宏XTOSTRUCT_BSON
     - 如果需要用libconfig功能，需要定义宏XTOSTRUCT_LIBCONFIG
     - 如果需要生成golang代码，需要定义宏XTOSTRUCT_GOCODE
@@ -100,5 +101,4 @@ struct example {
 - libconfig解析使用的是[libconfig](https://github.com/hyperrealm/libconfig)
 - 除了json以外，其余的序列化都是自己写的，没参考RFC，可能有不符合标准的情况
 - bson/libconfig的库是预先编译的，环境是：Ubuntu12.04 g++4.9.2，其他环境如果需要使用这两个库可能需要自己下载代码重新编译
-- Windows下不支持bson/libconfig，如果需要支持，需要自行下载相应代码自行编译库文件，并修改makefile
-- Windows下不支持XDate，如果需要支持，需要自行修改xtype.cpp
+- Windows下不支持bson/libconfig，如果需要支持，需要自行下载相应代码自行编译库文件

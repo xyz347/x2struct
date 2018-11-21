@@ -22,9 +22,10 @@
 #include <string>
 #include <vector>
 
-
+#include <config.h>
 #include "gtest_stub.h"
 
+#define XTOSTRUCT_XML
 #ifndef WINDOWS
 #define XTOSTRUCT_LIBCONFIG
 #define XTOSTRUCT_BSON

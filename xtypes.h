@@ -90,7 +90,24 @@ public:
             throw std::runtime_error(err);
         }
         #else
-        unix_time = 1218196800; // TODO for test only
+        //unix_time = 1218196800;
+        // just parse. not check exception
+        static int days[]={31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 32};
+        struct tm ttm={0};
+        sscanf(str.c_str(), "%d-%d-%d %d:%d:%d", &ttm.tm_year, &ttm.tm_mon, &ttm.tm_mday, &ttm.tm_hour, &ttm.tm_min, &ttm.tm_sec);
+        ttm.tm_mon-=1; // mon[0-11]
+        if (ttm.tm_mon<0 || ttm.tm_mon>11
+         || ttm.tm_mday<1 || ttm.tm_mday>days[ttm.tm_mon]
+         || ttm.tm_hour<0 || ttm.tm_hour>23
+         || ttm.tm_min<0 || ttm.tm_min>59
+         || ttm.tm_sec<0 || ttm.tm_sec>61 // leap seconds
+         || (ttm.tm_mon==1 && ttm.tm_mday==29 && (ttm.tm_year%4!=0 || ((ttm.tm_year%100==0 && ttm.tm_year%400!=0))))) {
+            std::string err("invalid time string[");
+            err.append(str).append("]. use format YYYY-mm-dd H:M:S. ");
+            throw std::runtime_error(err);
+        }
+        ttm.tm_year-=1900; // since 1900
+        unix_time = mktime(&ttm);
         #endif
     }
 };

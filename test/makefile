@@ -1,6 +1,8 @@
 INC=-I ../
+ifneq ($(OS),Windows_NT)
 LIBCONFIG=../thirdparty/libconfig/lib/libconfig++.a
 LIBBSON=../thirdparty/libbson/lib/libbson-1.0.a -pthread -lrt
+endif
 
 json:
 	g++ -o $@ example_json.cpp $(INC)
@@ -34,3 +36,6 @@ check:
 
 expand:
 	g++ -E -DXTOSTRUCT_MACRO_TEST expand.cpp
+
+os:
+	echo $(OS)
