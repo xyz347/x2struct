@@ -150,6 +150,7 @@ TEST(config, marshal)
 }
 #endif
 
+#ifdef XTOSTRUCT_XML
 TEST(xml, unmarshal)
 {
     xstruct x;
@@ -168,6 +169,7 @@ TEST(xml, marshal)
     X::loadxml(n, y, false);
     base_check(y);
 }
+#endif
 
 #ifdef XTOSTRUCT_BSON
 TEST(bson, unmarshal)
@@ -268,7 +270,7 @@ TEST(performance, parse)
 TEST(performance, convert)
 {
     vector<int> m_v;
-    m_obj->convert(m_v);
+    m_obj->convert(NULL, m_v);
     EXPECT_EQ(m_v.size(), 1024U);
 }
 

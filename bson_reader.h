@@ -75,6 +75,7 @@ struct BsonDoc {
 
 class BsonReader:public XReader<BsonReader> {
 public:
+    friend xdoc_type;
     using xdoc_type::convert;
     BsonReader(const uint8_t*data, size_t length, bool copy=true):xdoc_type(0, ""),_doc(new BsonDoc) {
         init(data, length, copy);
@@ -107,39 +108,51 @@ public:
         }
     }
 public:
-    void convert(std::string &val) {
+    #define XTOSTRUCT_BSON_GETVAL(rtype, f)         \
+        const BsonValue *v = get_val(key);          \
+        if (NULL != v) {                            \
+            val = (rtype) f(&v->root);              \
+            return true;                            \
+        } else return false
+    bool convert(const char *key, std::string &val) {
+        const BsonValue *v = get_val(key);
+        if (NULL == v) {
+            return false;
+        }
+
         uint32_t length;
-        const char* data = bson_iter_utf8(&_val->root, &length);
+        const char* data = bson_iter_utf8(&v->root, &length);
         if (0 != data) {
             val = std::string(data, length);
         }
+        return true;
     }
-    void convert(bool &val) {
-        val = (bool)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, bool &val) {
+        XTOSTRUCT_BSON_GETVAL(bool, bson_iter_as_int64);
     }
-    void convert(int16_t &val) {
-        val = (int16_t)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, int16_t &val) {
+        XTOSTRUCT_BSON_GETVAL(int16_t, bson_iter_as_int64);
     }
-    void convert(uint16_t &val) {
-        val = (uint16_t)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, uint16_t &val) {
+        XTOSTRUCT_BSON_GETVAL(uint16_t, bson_iter_as_int64);
     }
-    void convert(int32_t &val) {
-        val = (int32_t)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, int32_t &val) {
+        XTOSTRUCT_BSON_GETVAL(int32_t, bson_iter_as_int64);
     }
-    void convert(uint32_t &val) {
-        val = (uint32_t)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, uint32_t &val) {
+        XTOSTRUCT_BSON_GETVAL(uint32_t, bson_iter_as_int64);
     }
-    void convert(int64_t &val) {
-        val = bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, int64_t &val) {
+        XTOSTRUCT_BSON_GETVAL(int64_t, bson_iter_as_int64);
     }
-    void convert(uint64_t &val) {
-        val = (uint64_t)bson_iter_as_int64(&_val->root);
+    bool convert(const char *key, uint64_t &val) {
+        XTOSTRUCT_BSON_GETVAL(uint64_t, bson_iter_as_int64);
     }
-    void convert(double &val) {
-        val = bson_iter_double(&_val->root);
+    bool convert(const char *key, double &val) {
+        XTOSTRUCT_BSON_GETVAL(double, bson_iter_double);
     }
-    void convert(float &val) {
-        val = (float)bson_iter_double(&_val->root);
+    bool convert(const char *key, float &val) {
+        XTOSTRUCT_BSON_GETVAL(float, bson_iter_double);
     }
 
     const std::string& type() {
@@ -217,6 +230,9 @@ private:
         bson_iter_init(&root, &b);
         _val = _doc->Get(&root, true);
     }
+
+    BsonReader():xdoc_type(0, ""),_data(0), _doc(0),_val(0) {
+    }
     BsonReader(BsonValue* val, const BsonReader*parent, const char*key):xdoc_type(parent, key),_val(val) {
         _doc = 0;
         _data = 0;
@@ -224,6 +240,33 @@ private:
     BsonReader(BsonValue* val, const BsonReader*parent, size_t index):xdoc_type(parent, index),_val(val) {
         _doc = 0;
         _data = 0;
+    }
+
+    BsonReader* child(const char*key, BsonReader*tmp) {
+        bson_objs_type::iterator iter;
+        if (NULL!=_val && _val->objs.end()!=(iter=_val->objs.find(key))) {
+            tmp->_key = key;
+            tmp->_parent = this;
+            tmp->_val = _val->doc->Get(&iter->second);
+            return tmp;
+        } else {
+            return NULL;
+        }
+    }
+
+    const BsonValue* get_val(const char *key) {
+        if (NULL == key) {
+            return _val;
+        } else if (NULL != _val) {
+            bson_objs_type::iterator iter = _val->objs.find(key);
+            if (iter != _val->objs.end()) {
+                return _val->doc->Get(&iter->second);
+            } else {
+                return NULL;
+            }
+        } else {
+            return NULL;
+        }
     }
 
     const uint8_t* _data;

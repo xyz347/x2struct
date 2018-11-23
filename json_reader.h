@@ -30,6 +30,7 @@ namespace x2struct {
 
 class JsonReader:public XReader<JsonReader> {
 public:
+    friend xdoc_type;
     using xdoc_type::convert;
 
     JsonReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new rapidjson::Document),_val(_doc) {
@@ -45,9 +46,9 @@ public:
                 }
                 std::string _tmp((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
                 data.swap(_tmp);
-                _doc->Parse(data);
+                _doc->Parse(data); //Insitu((char *)_raw.c_str());
             } else  {
-                _doc->Parse(str);
+                _doc->Parse(str); //Insitu((char *)_raw.c_str());
             }
 
             if (_doc->HasParseError()) {
@@ -82,35 +83,42 @@ public:
         }
     }
 public: // convert
-    void convert(std::string &val) {
-        val = _val->GetString();
+    #define XTOSTRUCT_JSON_GETVAL(f, ...)           \
+        const rapidjson::Value *v = get_val(key);   \
+        if (NULL != v) {                            \
+            val = __VA_ARGS__ v->f();               \
+            return true;                            \
+        } else return false
+
+    bool convert(const char*key, std::string &val) {
+        XTOSTRUCT_JSON_GETVAL(GetString);
     }
-    void convert(bool &val) {
-        val = _val->GetBool();
+    bool convert(const char*key, bool &val) {
+        XTOSTRUCT_JSON_GETVAL(GetBool);
     }
-    void convert(int16_t &val) {
-        val = (int16_t)_val->GetInt();
+    bool convert(const char*key, int16_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt, (int16_t));
     }
-    void convert(uint16_t &val) {
-        val = (uint16_t)_val->GetUint();
+    bool convert(const char*key, uint16_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt, (uint16_t));
     }
-    void convert(int32_t &val) {
-        val = _val->GetInt();
+    bool convert(const char*key, int32_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt);
     }
-    void convert(uint32_t &val) {
-        val = _val->GetUint();
+    bool convert(const char*key, uint32_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetUint);
     }
-    void convert(int64_t &val) {
-        val = _val->GetInt64();
+    bool convert(const char*key, int64_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt64);
     }
-    void convert(uint64_t &val) {
-        val = _val->GetUint64();
+    bool convert(const char*key, uint64_t &val) {
+       XTOSTRUCT_JSON_GETVAL(GetUint64);
     }
-    void convert(double &val) {
-        val = _val->GetDouble();
+    bool convert(const char*key, double &val) {
+        XTOSTRUCT_JSON_GETVAL(GetDouble);
     }
-    void convert(float &val) {
-        val = _val->GetFloat();
+    bool convert(const char*key, float &val) {
+        XTOSTRUCT_JSON_GETVAL(GetFloat);
     }
 
     const std::string& type() {
@@ -178,6 +186,9 @@ public: // convert
     }
 
 private:
+    JsonReader():xdoc_type(0, ""),_doc(0),_val(0) {
+        init();
+    }
     JsonReader(const rapidjson::Value* val, const JsonReader*parent, const char*key):xdoc_type(parent, key),_doc(0),_val(val) {
         init();
     }
@@ -187,7 +198,35 @@ private:
     void init() {
         _iter = 0;
     }
+    
+    JsonReader* child(const char*key, JsonReader*tmp) {
+        rapidjson::Value::ConstMemberIterator iter;
+        if (NULL!=_val && _val->MemberEnd()!=(iter=_val->FindMember(key))) {
+            tmp->_key = key;
+            tmp->_parent = this;
+            tmp->_val = &iter->value;
+            return tmp;
+        } else {
+            return NULL;
+        }
+    }
 
+    const rapidjson::Value* get_val(const char *key) {
+        if (NULL == key) {
+            return _val;
+        } else if (NULL != _val) {
+            rapidjson::Value::ConstMemberIterator iter = _val->FindMember(key);
+            if (iter != _val->MemberEnd()) {
+                return &iter->value;
+            } else {
+                return NULL;
+            }
+        } else {
+            return NULL;
+        }
+    }
+
+    //std::string _raw;
     rapidjson::Document* _doc;
     const rapidjson::Value* _val;
     mutable rapidjson::Value::ConstMemberIterator* _iter;

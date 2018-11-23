@@ -66,9 +66,11 @@ public:
 
     #ifdef XTOSTRUCT_JSON
     template <typename TYPE>
-    static bool loadjson(const std::string&str, TYPE&t, bool isfile=true) {
+    // if set_has is true. can use t.xhas(xxx) to check if json has the key of xxx. but it will slow down
+    static bool loadjson(const std::string&str, TYPE&t, bool isfile=true, bool set_has=false) {
         JsonReader reader(str, isfile);
-        reader.convert(t);
+        reader.set_has(set_has);
+        reader.convert(NULL, t);
         return true;
     }
     /* struct to string */
@@ -86,9 +88,10 @@ public:
 
     #ifdef XTOSTRUCT_XML
     template <typename TYPE>
-    static bool loadxml(const std::string&str, TYPE&t, bool isfile=true) {
+    static bool loadxml(const std::string&str, TYPE&t, bool isfile=true, bool set_has=false) {
         XmlReader reader(str, isfile);
-        reader.convert(t);
+        reader.set_has(set_has);
+        reader.convert(NULL, t);
         return true;
     }
     template <typename TYPE>
@@ -102,15 +105,17 @@ public:
     // bson
     #ifdef XTOSTRUCT_BSON
     template <typename TYPE>
-    static bool loadbson(const uint8_t*data, size_t length, TYPE&t, bool copy=true) { // if length==0, get len from data
+    static bool loadbson(const uint8_t*data, size_t length, TYPE&t, bool copy=true, bool set_has=false) { // if length==0, get len from data
         BsonReader reader(data, length, copy);
-        reader.convert(t);
+        reader.set_has(set_has);
+        reader.convert(NULL, t);
         return true;
     }
     template <typename TYPE>
-    static bool loadbson(const std::string&data, TYPE&t, bool copy=true) { // if length==0, get len from data
+    static bool loadbson(const std::string&data, TYPE&t, bool copy=true, bool set_has=false) { // if length==0, get len from data
         BsonReader reader(data, copy);
-        reader.convert(t);
+        reader.set_has(set_has);
+        reader.convert(NULL, t);
         return true;
     }
     template <typename TYPE>
@@ -124,10 +129,11 @@ public:
     // libconfig
     #ifdef XTOSTRUCT_LIBCONFIG
     template <typename TYPE>
-    static bool loadconfig(const std::string&str, TYPE&t, bool isfile=true, const std::string&root="") {
+    static bool loadconfig(const std::string&str, TYPE&t, bool isfile=true, const std::string&root="", bool set_has=false) {
         ConfigReader reader(str, isfile, root);
+        reader.set_has(set_has);
         try {
-            reader.convert(t);
+            reader.convert(NULL, t);
             return true;
         } catch (std::exception &e) {
             reader.exception(e);
@@ -172,15 +178,13 @@ public:                                                                     \
     void __x_to_struct(DOC& obj) {
 
 #define X_STRUCT_ACT_TOX_O(M)                                               \
-        if (obj.has(#M)) {                                                  \
-            obj[#M].convert(M);                                             \
+        if (obj.convert(#M, M) && obj.set_has()) {                          \
             __x_has_string.insert(#M);                                      \
         }
 
 #define X_STRUCT_ACT_TOX_M(M)                                               \
-        if (obj.has(#M)) {                                                  \
-            obj[#M].convert(M);                                             \
-            __x_has_string.insert(#M);                                      \
+        if (obj.convert(#M, M)) {                                           \
+            if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else {                                                            \
             obj.me_exception(#M);                                           \
         }
@@ -191,12 +195,10 @@ public:                                                                     \
         bool me = false;                                                    \
         std::string __alias__name__ = obj.hasa(#M, A_NAME, &me);            \
         const char*__an = __alias__name__.c_str();                          \
-        if (obj.has(__an)) {                                                \
-            obj[__an].convert(M);                                           \
-            __x_has_string.insert(#M);                                      \
-        } else if (obj.has(#M)) {                                           \
-            obj[#M].convert(M);                                             \
-            __x_has_string.insert(#M);                                      \
+        if (obj.convert(__an, M)) {                                         \
+            if (obj.set_has()) __x_has_string.insert(#M);                   \
+        } else if (obj.convert(#M, M)) {                                    \
+            if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else if (me) {                                                    \
             obj.me_exception(__an);                                         \
         }                                                                   \

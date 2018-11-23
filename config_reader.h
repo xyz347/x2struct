@@ -31,6 +31,7 @@ class ConfigReader:public XReader<ConfigReader> {
     typedef libconfig::Setting CONFIG_READER_VALUE;
     typedef libconfig::SettingConstIterator CONFIG_READER_ITERATOR;
 public:
+    friend xdoc_type;
     using xdoc_type::convert;
 
     ConfigReader(const std::string& str, bool isfile=false, const std::string&root=""):xdoc_type(0, ""),_doc(new CONFIG_READER_DOCUMENT),_val(0) {
@@ -76,35 +77,47 @@ public:
         }
     }
 public: // convert
-    void convert(std::string &val) {
-        val = _val->c_str();
+    #define XTOSTRUCT_CONFIG_GETVAL(...)                \
+        const CONFIG_READER_VALUE *v = get_val(key);    \
+        if (NULL != v) {                                \
+            val = __VA_ARGS__(*v);                      \
+            return true;                                \
+        } else return false
+    bool convert(const char *key, std::string &val) {
+        const CONFIG_READER_VALUE *v = get_val(key);
+        if (NULL != v) {
+            val = v->c_str();
+            return true;
+        } else {
+            return false;
+        }
     }
-    void convert(bool &val) {
-        val = *_val;
+    bool convert(const char *key, bool &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(int16_t &val) {
-        val = (int16_t)(int)(*_val);
+    bool convert(const char *key, int16_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL((int16_t)(int));
     }
-    void convert(uint16_t &val) {
-        val = (uint16_t)(int)(*_val);
+    bool convert(const char *key, uint16_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL((uint16_t)(int));
     }
-    void convert(int32_t &val) {
-        val = *_val;
+    bool convert(const char *key, int32_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(uint32_t &val) {
-        val = *_val;
+    bool convert(const char *key, uint32_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(int64_t &val) {
-        val = *_val;
+    bool convert(const char *key, int64_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(uint64_t &val) {
-        val = *_val;
+    bool convert(const char *key, uint64_t &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(double &val) {
-        val = *_val;
+    bool convert(const char *key, double &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
-    void convert(float &val) {
-        val = *_val;
+    bool convert(const char *key, float &val) {
+        XTOSTRUCT_CONFIG_GETVAL();
     }
 
     const std::string& type() {
@@ -189,6 +202,9 @@ public: // convert
     }
 
 private:
+    ConfigReader():xdoc_type(0, ""),_doc(0),_val(0) {
+        init();
+    }
     ConfigReader(const CONFIG_READER_VALUE* val, const ConfigReader*parent, const char*key):xdoc_type(parent, key),_doc(0),_val(val) {
         init();
     }
@@ -197,6 +213,27 @@ private:
     }
     void init() {
         _iter = 0;
+    }
+
+    ConfigReader* child(const char*key, ConfigReader*tmp) {
+        if (NULL!=_val && _val->exists(key)) {
+            tmp->_key = key;
+            tmp->_parent = this;
+            tmp->_val = &(*_val)[key];
+            return tmp;
+        } else {
+            return NULL;
+        }
+    }
+
+    const CONFIG_READER_VALUE* get_val(const char *key) {
+        if (NULL == key) {
+            return _val;
+        } else if (NULL != _val &&  _val->exists(key)) {
+            return &(*_val)[key];
+        } else {
+            return NULL;
+        }
     }
 
     CONFIG_READER_DOCUMENT* _doc;

@@ -38,6 +38,7 @@ class XmlReader:public XReader<XmlReader> {
     typedef rapidxml::xml_document<> XML_READER_DOCUMENT;
     typedef rapidxml::xml_node<> XML_READER_NODE;  
 public:
+    friend xdoc_type;
     using xdoc_type::convert;
     XmlReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new XML_READER_DOCUMENT),_val(0),_siblings(0) {
         std::string err;
@@ -91,61 +92,93 @@ public:
         }
     }
 public: // convert
-    void convert(std::string &val) {
-        if (_val && _val->value()) {
-            val = _val->value();
+    #define XTOSTRUCT_XML_GETVAL()              \
+        const XML_READER_NODE* v = get_val(key);\
+        if (NULL!=v && v->value())
+    bool convert(const char *key, std::string &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = v->value();
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(bool &val) {
-        if (_val && _val->value()) {
-            std::string tmp=_val->value();
+    bool convert(const char *key, bool &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            std::string tmp=v->value();
             if (tmp=="1" || tmp=="true" || tmp=="TRUE" || tmp=="True") {
                 val = true;
             } else {
                 val = false;
             }
+            return true;
         } else {
             val = false;
+            return false;
         }
     }
-    void convert(int16_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<int16_t>(_val->value());
+    bool convert(const char *key, int16_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<int16_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(uint16_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<uint16_t>(_val->value());
+    bool convert(const char *key, uint16_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<uint16_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(int32_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<int32_t>(_val->value());
+    bool convert(const char *key, int32_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<int32_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(uint32_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<uint32_t>(_val->value());
+    bool convert(const char *key, uint32_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<uint32_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(int64_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<int64_t>(_val->value());
+    bool convert(const char *key, int64_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<int64_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(uint64_t &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<uint64_t>(_val->value());
+    bool convert(const char *key, uint64_t &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<uint64_t>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(double &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<double>(_val->value());
+    bool convert(const char *key, double &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<double>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
-    void convert(float &val) {
-        if (_val && _val->value()) {
-            val = Util::tonum<float>(_val->value());
+    bool convert(const char *key, float &val) {
+        XTOSTRUCT_XML_GETVAL() {
+            val = Util::tonum<float>(v->value());
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -222,8 +255,10 @@ private:
     typedef std::vector<XML_READER_NODE*> sibling_type;
     typedef std::vector<sibling_type> child_type;
     typedef std::map<const char*, size_t, cmp_str> child_index_type;
-    
 
+    XmlReader():xdoc_type(0, ""),_doc(0),_val(0),_siblings(0) {
+        init();
+    }
     XmlReader(const sibling_type* val, const XmlReader*parent, const char*key):xdoc_type(parent, key),_doc(0),_val(0),_siblings(val) {
         init();
     }
@@ -249,6 +284,32 @@ private:
                     _childs.push_back(_v);
                     _child_index[tmp->name()] = _childs.size()-1;
                 }
+            }
+        }
+    }
+    
+    XmlReader* child(const char*key, XmlReader*tmp) {
+        child_index_type::iterator iter;
+        if (_child_index.end()!=(iter=_child_index.find(key))) {
+            tmp->_key = key;
+            tmp->_parent = this;
+            tmp->_siblings = &_childs[iter->second];
+            tmp->init();
+            return tmp;
+        } else {
+            return NULL;
+        }
+    }
+
+    const XML_READER_NODE* get_val(const char *key) {
+        if (NULL == key) {
+            return _val;
+        } else {
+            child_index_type::iterator iter;
+            if (_child_index.end()!=(iter=_child_index.find(key))) {
+                return _childs[iter->second][0];
+            } else {
+                return NULL;
             }
         }
     }

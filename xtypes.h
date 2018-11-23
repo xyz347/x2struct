@@ -39,7 +39,7 @@ public:
     template<class DOC>
     void __x_to_struct(DOC& obj) {
         std::string str;
-        obj.convert(str);
+        obj.convert(NULL, str);
         _t.parse(str);
     }
     template<class DOC>

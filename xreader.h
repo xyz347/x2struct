@@ -43,43 +43,70 @@ protected:
     typedef XReader<DOC> xdoc_type;
 public:
     // only c++0x support reference initialize, so use pointer
-    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1){}
-    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)){}
+    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false){}
+    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
     ~XReader(){}
 public:
     template <typename TYPE>
-    void convert(std::vector<TYPE> &val) {
-        size_t s = static_cast<doc_type*>(this)->size();                // [implement] size_t size(bool to_vec=true)
+    bool convert(const char*key, std::vector<TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        size_t s = obj->size();                // [implement] size_t size(bool to_vec=true)
         val.resize(s);
         for (size_t i=0; i<s; ++i) {
-            (*static_cast<doc_type*>(this))[i].convert(val[i]);         // [implement] doc_type operator[](size_t)
+            (*obj)[i].convert(NULL, val[i]);   // [implement] doc_type operator[](size_t)
         }
+        return true;
     }
 
     template <typename TYPE>
-    void convert(std::set<TYPE> &val) {
-        size_t s = static_cast<doc_type*>(this)->size();
+    bool convert(const char*key, std::set<TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        size_t s = obj->size();
         for (size_t i=0; i<s; ++i) {
             TYPE _t;
-            (*static_cast<doc_type*>(this))[i].convert(_t);
+            (*obj)[i].convert(NULL, _t);
             val.insert(_t);
         }
+        return true;
     }
 
     template <typename TYPE>
-    void convert(std::map<std::string,TYPE> &val) {
-        for (doc_type d=static_cast<doc_type*>(this)->begin(); d; d=d.next()) { // [implement] doc_type begin(); doc_type next(); operator bool() const;
+    bool convert(const char*key, std::map<std::string,TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        for (doc_type d=obj->begin(); d; d=d.next()) { // [implement] doc_type begin(); doc_type next(); operator bool() const;
             TYPE _t;
-            d.convert(_t);
+            d.convert(NULL, _t);
             val[d.key()] = _t;
         }
+        return true;
     }
 
     template <typename KEYTYPE, typename TYPE>
-    void convert(std::map<KEYTYPE, TYPE> &val) {
-        for (doc_type d=static_cast<doc_type*>(this)->begin(); d; d=d.next()) {
+    bool convert(const char*key, std::map<KEYTYPE, TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        for (doc_type d=obj->begin(); d; d=d.next()) {
             TYPE _t;
-            d.convert(_t);
+            d.convert(NULL, _t);
             KEYTYPE _k;
             std::string key = d.key();
             if (key[0]!='x') {
@@ -89,27 +116,35 @@ public:
             }
             val[_k] = _t;
         }
+        return true;
     }
 
     template <typename TYPE>
-    void convert(TYPE& val) {
-        size_t len = (static_cast<doc_type*>(this))->size(false);
+    bool convert(const char*key, TYPE& val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        size_t len = obj->size(false);
         if (0==len) {
-            val.__x_to_struct(*(static_cast<doc_type*>(this)));
+            val.__x_to_struct(*obj);
         } else {
             for (size_t i=0; i<len; ++i) {
-                doc_type sub = (*static_cast<doc_type*>(this))[i];
+                doc_type sub = (*obj)[i];
                 if (val.__x_condition(sub, this->key_char())) {
                     val.__x_to_struct(sub);
                     break;
                 }
             }
         }
+        return true;
     }
 
     std::string attribute(const char* key) {
         std::string val;
-        (*static_cast<doc_type*>(this))[key].convert(val);
+        (static_cast<doc_type*>(this))->convert(key, val);
         return val;
     }
 
@@ -167,10 +202,25 @@ public:
         err.append(key);
         throw std::runtime_error(err);
     }
+
+    bool set_has() const {
+        return _set_has;
+    }
+    void set_has(bool set) {
+        _set_has = set;
+    }
 protected:
+    doc_type* get_obj(const char *key, doc_type *tmp) {
+        doc_type *obj = static_cast<doc_type*>(this);
+        if (NULL != key) {
+            obj = obj->child(key, tmp);   // [implement] doc_type* child(const char*, doc_type*)
+        }
+        return obj;
+    }
     const doc_type* _parent;
     const char* _key;
     int _index;
+    bool _set_has;
 };
 
 }
