@@ -100,6 +100,7 @@ If you want to implement some custom types, you can add them in xtypes.h. For de
 
 
 ### IMPORTANT
+- NOT support local class now
 - Encode/decode json is use [rapidjson](https://github.com/Tencent/rapidjson)
 - Decode xml is use [rapidxml](http://rapidxml.sourceforge.net)
 - Decode bson is use [libbson](https://github.com/mongodb/libbson/tree/1.0.0)

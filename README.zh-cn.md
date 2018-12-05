@@ -95,6 +95,7 @@ struct example {
 
 
 ### 重要说明
+- 还不支持局部类(函数内部定义的类、结构体)
 - json的序列化和反序列化使用的是[rapidjson](https://github.com/Tencent/rapidjson)
 - xml的解析使用的是[rapidxml](http://rapidxml.sourceforge.net)
 - bson的解析使用的是[libbson](https://github.com/mongodb/libbson/tree/1.0.0)
