@@ -34,6 +34,11 @@ check:
 	./$@
 	@-rm $@
 
+nt:
+	g++ -o $@ check.cpp $(INC) $(LIBCONFIG) $(LIBBSON) -std=c++11 -DXNT
+	./$@
+	@-rm $@
+
 expand:
 	g++ -E -DXTOSTRUCT_MACRO_TEST expand.cpp
 

@@ -130,6 +130,42 @@ TEST(json, invalid)
     EXPECT_TRUE(excpt);
 }
 
+#ifdef XNT
+TEST(notemplate, json_xml)
+{
+    struct LocalClass {
+        int a;
+        int b;
+        int c;
+        int d;
+        XTOSTRUCT_NT(Json, Xml)(O(a,b), M(c,d));
+    };
+
+    LocalClass a;
+    LocalClass b;
+    LocalClass c;
+
+    a.a = 1;b.a=0;c.a=0;
+    a.b = 2;b.b=0;c.b=0;
+    a.c = 3;b.c=0;c.c=0;
+    a.d = 4;b.d=0;c.d=0;
+
+    string s = x2struct::X::tojson(a);
+    x2struct::X::loadjson(s, b, false);
+    EXPECT_EQ(b.a, 1);
+    EXPECT_EQ(b.b, 2);
+    EXPECT_EQ(b.c, 3);
+    EXPECT_EQ(b.d, 4);
+
+    s = x2struct::X::toxml(a, "config");
+    x2struct::X::loadxml(s, c, false);
+    EXPECT_EQ(b.a, 1);
+    EXPECT_EQ(b.b, 2);
+    EXPECT_EQ(b.c, 3);
+    EXPECT_EQ(b.d, 4);
+}
+#endif
+
 #ifdef XTOSTRUCT_LIBCONFIG
 TEST(config, unmarshal)
 {

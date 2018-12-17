@@ -162,13 +162,15 @@ public:
 } // namespace
 #endif // XTOSTRUCT_MACRO_TEST
 
-#define X_STRUCT_FUNC_TOX_BEGIN                                             \
+#define X_STRUCT_FUNC_COMMON                                                \
 private:                                                                    \
     std::set<std::string> __x_has_string;                                   \
 public:                                                                     \
     bool xhas(const std::string& name) const {                              \
         return __x_has_string.find(name)!=__x_has_string.end();             \
-    }                                                                       \
+    }
+
+#define X_STRUCT_FUNC_TOX_BEGIN                                             \
     template<typename DOC>                                                  \
     bool __x_condition(DOC& obj, const std::string&name) const {            \
         (void)obj;(void)name;                                               \
@@ -240,6 +242,7 @@ public:                                                                     \
 
 // expand macro depend on parameters number
 #define X_STRUCT_COUNT(LEVEL, ACTION, _32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1,N,...) LEVEL##N
+#define X_STRUCT_EXPAND(...) __VA_ARGS__
 
 /*
     work with X_STRUCT_N to expand macro
@@ -355,90 +358,125 @@ public:                                                                     \
 #else
 // thx https://stackoverflow.com/questions/5134523/msvc-doesnt-expand-va-args-correctly
 // in MSVC's preprocessor, __VA_ARGS__ is treat as a normal parameter, so it will expand at last, and in gcc, it's expand at first. so we need expand it first
-#define X_MSVC_EXPAND(...) __VA_ARGS__
-#define X_STRUCT_N(LEVEL, ACTION, ...)  X_MSVC_EXPAND(X_STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1)) X_MSVC_EXPAND((ACTION, __VA_ARGS__))
-#define X_STRUCT_N2(LEVEL, ACTION, ...) X_MSVC_EXPAND(X_STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1)) X_MSVC_EXPAND((ACTION, __VA_ARGS__))
+#define X_STRUCT_N(LEVEL, ACTION, ...)  X_STRUCT_EXPAND(X_STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1)) X_STRUCT_EXPAND((ACTION, __VA_ARGS__))
+#define X_STRUCT_N2(LEVEL, ACTION, ...) X_STRUCT_EXPAND(X_STRUCT_COUNT(LEVEL, ACTION, __VA_ARGS__,_32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1)) X_STRUCT_EXPAND((ACTION, __VA_ARGS__))
 
 #define X_STRUCT_L1_DEF(ACT, M)      ACT(M) // here will expand to ACT(O(xxx)), ACT(A(a,x)), ACT(M(xxx))
 #define X_STRUCT_L1_1(ACT, M)        X_STRUCT_L1_DEF(ACT, M)
-#define X_STRUCT_L1_2(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_1 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_3(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_2 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_4(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_3 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_5(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_4 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_6(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_5 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_7(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_6 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_8(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_7 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_9(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_8 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_10(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_9 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_11(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_10 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_12(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_11 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_13(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_12 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_14(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_13 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_15(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_14 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_16(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_15 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_17(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_16 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_18(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_17 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_19(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_18 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_20(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_19 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_21(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_20 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_22(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_21 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_23(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_22 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_24(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_23 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_25(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_24 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_26(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_25 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_27(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_26 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_28(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_27 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_29(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_28 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_30(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_29 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_31(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_30 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L1_32(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_31 X_MSVC_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_2(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_1 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_3(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_2 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_4(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_3 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_5(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_4 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_6(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_5 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_7(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_6 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_8(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_7 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_9(ACT, M,...)    X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_8 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_10(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_9 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_11(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_10 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_12(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_11 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_13(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_12 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_14(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_13 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_15(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_14 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_16(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_15 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_17(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_16 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_18(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_17 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_19(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_18 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_20(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_19 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_21(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_20 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_22(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_21 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_23(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_22 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_24(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_23 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_25(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_24 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_26(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_25 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_27(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_26 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_28(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_27 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_29(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_28 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_30(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_29 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_31(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_30 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L1_32(ACT, M,...)   X_STRUCT_L1_DEF(ACT, M)      X_STRUCT_L1_31 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
 
 #define X_STRUCT_L2_DEF(ACT, M)     ACT(M)
 #define X_STRUCT_L2_1(ACT, M)       X_STRUCT_L2_DEF(ACT, M)
-#define X_STRUCT_L2_2(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_1 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_3(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_2 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_4(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_3 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_5(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_4 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_6(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_5 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_7(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_6 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_8(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_7 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_9(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_8 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_10(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_9 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_11(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_10 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_12(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_11 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_13(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_12 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_14(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_13 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_15(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_14 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_16(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_15 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_17(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_16 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_18(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_17 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_19(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_18 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_20(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_19 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_21(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_20 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_22(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_21 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_23(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_22 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_24(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_23 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_25(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_24 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_26(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_25 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_27(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_26 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_28(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_27 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_29(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_28 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_30(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_29 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_31(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_30 X_MSVC_EXPAND((ACT, __VA_ARGS__))
-#define X_STRUCT_L2_32(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_31 X_MSVC_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_2(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_1 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_3(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_2 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_4(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_3 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_5(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_4 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_6(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_5 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_7(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_6 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_8(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_7 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_9(ACT, M,...)   X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_8 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_10(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_9 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_11(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_10 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_12(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_11 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_13(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_12 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_14(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_13 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_15(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_14 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_16(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_15 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_17(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_16 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_18(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_17 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_19(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_18 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_20(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_19 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_21(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_20 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_22(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_21 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_23(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_22 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_24(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_23 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_25(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_24 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_26(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_25 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_27(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_26 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_28(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_27 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_29(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_28 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_30(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_29 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_31(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_30 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
+#define X_STRUCT_L2_32(ACT, M,...)  X_STRUCT_L2_DEF(ACT, M)     X_STRUCT_L2_31 X_STRUCT_EXPAND((ACT, __VA_ARGS__))
 
 #endif
 
 #ifdef XTOSTRUCT_GOCODE
-#define XTOSTRUCT(...)  \
+#define XTOSTRUCT(...)   \
+    X_STRUCT_FUNC_COMMON \
     X_STRUCT_FUNC_TOX_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END  \
     X_STRUCT_FUNC_TOS_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END  \
     X_STRUCT_FUNC_TOG_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOG, __VA_ARGS__) X_STRUCT_FUNC_TOG_END
 #else
-#define XTOSTRUCT(...)  \
+#define XTOSTRUCT(...)   \
+    X_STRUCT_FUNC_COMMON \
     X_STRUCT_FUNC_TOX_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END  \
     X_STRUCT_FUNC_TOS_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
 #endif
+
+// for local class, gen code without template (no template)
+
+// generate typedef
+#define X_STRUCT_NT_TYPEDEF(M, x)    typedef x2struct::M##Reader  __XReader_##x; typedef x2struct::M##Writer __XWriter_##x;
+#define X_STRUCT_NT_TYPE_1(ACT, M)     ACT(M,1)
+#define X_STRUCT_NT_TYPE_2(ACT, M,...) ACT(M,2) X_STRUCT_NT_TYPE_1(ACT, __VA_ARGS__)
+#define X_STRUCT_NT_TYPE_3(ACT, M,...) ACT(M,3) X_STRUCT_NT_TYPE_2(ACT, __VA_ARGS__)
+#define X_STRUCT_NT_TYPE_4(ACT, M,...) ACT(M,4) X_STRUCT_NT_TYPE_3(ACT, __VA_ARGS__)
+
+// generate convert function
+#define X_STRUCT_FUNC_TOX_BEGIN_NT(x)                                       \
+    bool __x_condition(__XReader_##x& obj, const std::string&name) const {  \
+        (void)obj;(void)name;                                               \
+        return true;                                                        \
+    }                                                                       \
+    void __x_to_struct(__XReader_##x& obj) {
+
+
+#define X_STRUCT_FUNC_TOS_BEGIN_NT(x)                                       \
+    void __struct_to_str(__XWriter_##x& obj, const char *root) const {
+
+
+#define X_STRUCT_NT_BODY_1(...) X_STRUCT_FUNC_TOX_BEGIN_NT(1) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END X_STRUCT_FUNC_TOS_BEGIN_NT(1) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
+#define X_STRUCT_NT_BODY_2(...) X_STRUCT_FUNC_TOX_BEGIN_NT(2) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END X_STRUCT_FUNC_TOS_BEGIN_NT(2) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END X_STRUCT_NT_BODY_1(__VA_ARGS__) 
+#define X_STRUCT_NT_BODY_3(...) X_STRUCT_FUNC_TOX_BEGIN_NT(3) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END X_STRUCT_FUNC_TOS_BEGIN_NT(3) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END X_STRUCT_NT_BODY_2(__VA_ARGS__) 
+#define X_STRUCT_NT_BODY_4(...) X_STRUCT_FUNC_TOX_BEGIN_NT(4) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END X_STRUCT_FUNC_TOS_BEGIN_NT(4) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END X_STRUCT_NT_BODY_3(__VA_ARGS__) 
+
+
+// XTOSTRUCT_NT(types)(O(xx), A(xx), M(xx))  need c++11 or later 
+#define XTOSTRUCT_NT(...) \
+    X_STRUCT_FUNC_COMMON  \
+    X_STRUCT_N(X_STRUCT_NT_TYPE, X_STRUCT_NT_TYPEDEF, __VA_ARGS__) X_STRUCT_EXPAND(X_STRUCT_COUNT(X_STRUCT_NT_BODY,a,__VA_ARGS__, _32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1))
+
 
 
 #define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj, const char* name)

@@ -98,9 +98,13 @@ If you want to implement some custom types, you can add them in xtypes.h. For de
 - Define a class, implement format for encode, parse for decode
 - Using the template XType typedef a type
 
+### Local Class
+Many compilers do not support defining template functions in the local class, while macro XTOSTRUCT defines template functions, so the macro XTOSTRUCT_NT is required in the local class. In addition, applying local class to template functions requires c++0x. support.
+
+XTOSTRUCT_NT is used in the same way as XTOSTRUCT, and you need to specify which types of functions to generate by parameters. Support 4 types: Json/Bson/Xml/Config, such as XTOSTRUCT_NT(Json, Xml)(O(a,b,c), M(d));
+
 
 ### IMPORTANT
-- NOT support local class now
 - Encode/decode json is use [rapidjson](https://github.com/Tencent/rapidjson)
 - Decode xml is use [rapidxml](http://rapidxml.sourceforge.net)
 - Decode bson is use [libbson](https://github.com/mongodb/libbson/tree/1.0.0)

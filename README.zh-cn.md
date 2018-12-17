@@ -93,9 +93,13 @@ struct example {
 - 定义一个类，实现format用于序列化，parse用于反序列化
 - 利用模板XType typedef一个类型
 
+### 局部类
+许多编译器不支持在local class(在函数内部定义的类、结构体)中定义模板函数，而宏XTOSTRUCT会定义模板函数，因此在local class中需要宏XTOSTRUCT_NT。此外，将local class应用于模板函数需要c++0x支持。
+
+XTOSTRUCT_NT的使用方式与XTOSTRUCT基本相同，需要通过参数指定生成哪些类型的函数。 支持4种类型：Json/Bson/Xml/Config，例子：XTOSTRUCT_NT(Json, Xml)(O(a,b,c), M(d));
+
 
 ### 重要说明
-- 还不支持局部类(函数内部定义的类、结构体)
 - json的序列化和反序列化使用的是[rapidjson](https://github.com/Tencent/rapidjson)
 - xml的解析使用的是[rapidxml](http://rapidxml.sourceforge.net)
 - bson的解析使用的是[libbson](https://github.com/mongodb/libbson/tree/1.0.0)

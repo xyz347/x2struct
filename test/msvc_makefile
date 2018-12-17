@@ -15,6 +15,11 @@ check.exe:
 	./$@
 	@-rm *.exe *.obj
 
+nt.exe:
+	cl -o $@ /EHsc check.cpp $(INC) -DWINDOWS -DXNT
+	./$@
+	@-rm *.exe *.obj
+
 expand:
 	cl /E expand.cpp -DXTOSTRUCT_MACRO_TEST
 
