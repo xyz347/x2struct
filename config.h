@@ -8,6 +8,8 @@
 //#define XTOSTRUCT_LIBCONIFG
 //#define XTOSTRUCT_BSON
 
+//XTOSTRUCT_SUPPORT_CHAR_ARRAY
+
 #if (defined _MSC_VER || defined WINNT)
     #ifndef WINDOWS
         #define WINDOWS

@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (C) 2017 YY Inc. All rights reserved.
+* Copyright (C) 2019 YY Inc. All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); 
 * you may not use this file except in compliance with the License. 
@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "util.h"
-#include "xml_writer.h"
 #include "xtypes.h"
 
 #define X2STRUCT_BUFFER_SIZE 1024
@@ -149,6 +148,12 @@ public:
 
         return *this;
     }
+    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
+    XmlWriter& convert(const char*key, const char val[]) {
+        std::string str(val);
+        return this->convert(key, str);
+    }
+    #endif
     XmlWriter& convert(const char*key, bool val) {
         XmlKey xkey(key, this, true);
         if (val) {

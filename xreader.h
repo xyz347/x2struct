@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (C) 2017 YY Inc. All rights reserved.
+* Copyright (C) 2019 YY Inc. All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); 
 * you may not use this file except in compliance with the License. 
@@ -26,6 +26,10 @@
 #include <set>
 #include <stdexcept>
 #include <iostream>
+
+#ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
+#include <string.h>
+#endif
 
 #include "util.h"
 
@@ -141,6 +145,18 @@ public:
         }
         return true;
     }
+
+    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
+    bool convert(const char*key, char val[]) {
+        std::string str;
+        bool ret = ((doc_type*)this)->convert(key, str);
+        if (ret) {
+            strncpy(val, str.data(), str.length());
+            val[str.length()] = '\0';
+        }
+        return ret;
+    }
+    #endif
 
     std::string attribute(const char* key) {
         std::string val;

@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2017 YY Inc. All rights reserved.
+* Copyright (C) 2019 YY Inc. All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); 
 * you may not use this file except in compliance with the License. 
@@ -18,6 +18,7 @@
 #ifndef __X_TEST_EXAMPLE_H
 #define __X_TEST_EXAMPLE_H
 
+#define XTOSTRUCT_SUPPORT_CHAR_ARRAY
 #include <x2struct.hpp>
 #include <xtypes.h>
 
@@ -43,6 +44,7 @@ struct xstruct {
     XDate  start;
     int    tint;
     string tstring;
+    char   chArray[16];
     vector<int> vint;
     vector<string> vstring;
     vector<int64_t> vlong;
@@ -53,7 +55,7 @@ struct xstruct {
     map<int, sub> tmap;
     condition con;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
+    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #else
     XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif

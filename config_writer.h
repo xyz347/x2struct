@@ -1,5 +1,5 @@
 ﻿/*
-* Copyright (C) 2017 YY Inc. All rights reserved.
+* Copyright (C) 2019 YY Inc. All rights reserved.
 *
 * Licensed under the Apache License, Version 2.0 (the "License"); 
 * you may not use this file except in compliance with the License. 
@@ -146,6 +146,12 @@ public:
 
         return *this;
     }
+    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
+    ConfigWriter& convert(const char*key, const char val[]) {
+        std::string str(val);
+        return this->convert(key, str);
+    }
+    #endif
     ConfigWriter& convert(const char*key, bool val) {
         indent();
         x2struct_set_key(key);
