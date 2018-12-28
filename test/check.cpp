@@ -87,6 +87,8 @@ static void base_check(xstruct&x)
     EXPECT_EQ(x.tmap[109].b, "hello11");
 
     EXPECT_EQ(x.con.url, "hello12");
+
+    EXPECT_EQ(x.md, MASTER);
 }
 
 TEST(json, unmarshal)

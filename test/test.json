@@ -12,6 +12,7 @@
     "vvstring":[["hello4"],["hello5", "hello6"]],
     "vvsub":[[{"a":105, "b":"hello7"}],[{"a":106, "b":"hello8"}, {"a":107, "b":"hello9"}]],
     "tmap":{"108":{"a":111, "b":"hello10"}, "109":{"a":111, "b":"hello11"}},
+    "md":1,
     "con":[
         {
             "myip":"200", "cfgip":"100",

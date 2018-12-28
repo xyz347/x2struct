@@ -25,6 +25,11 @@
 using namespace std;
 using namespace x2struct;
 
+enum Mode {
+    MASTER = 1,
+    SLAVE = 2,
+};
+
 struct condition {
     string url;
     XTOSTRUCT(M(url));
@@ -54,8 +59,9 @@ struct xstruct {
     vector<vector<sub> > vvsub;
     map<int, sub> tmap;
     condition con;
+    Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
+    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con), OE(md)); // enum should use OE
 #else
     XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif
