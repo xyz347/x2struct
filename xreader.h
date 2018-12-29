@@ -123,8 +123,9 @@ public:
         return true;
     }
 
+    // because struct has a set, it's size is bigger than sizeof(int). add this to avoid enum hit this function
     template <typename TYPE>
-    bool convert(const char*key, TYPE& val) {
+    bool convert(const char*key, TYPE& val, typename x_enable_if<(sizeof(TYPE)>sizeof(int)), TYPE>::type *p=0) {
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
         if (NULL == obj) {
@@ -144,6 +145,12 @@ public:
             }
         }
         return true;
+    }
+
+    // for enum
+    template <typename TYPE>
+    bool convert(const char*key, TYPE& val, typename x_enable_if<(sizeof(TYPE)==sizeof(int)), TYPE>::type *p=0) {
+        return ((doc_type*)(this))->convert(key, *(int*)&val);
     }
 
     #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY

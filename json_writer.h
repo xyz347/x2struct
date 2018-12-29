@@ -245,7 +245,7 @@ public:
     }
 
     template <typename T>
-    void convert(const char*key, const T& data) {
+    void convert(const char*key, const T& data, typename x_enable_if<(sizeof(T)>sizeof(int)), T>::type *p=0) {
         x2struct_set_key(key);
         this->object_begin();
         data.__struct_to_str(*this, key);

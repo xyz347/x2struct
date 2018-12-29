@@ -84,7 +84,6 @@ struct example {
 
 - M: M表示必须存在对应的字段，如果M(a)，那么对应的文件（比如json）必须存在a这个key，否则抛异常，M是与O对应。
 - O: optional，表示可选的，在反序列化的时候，如果这个字段不存在也是可以的。O是与M相对应的
-- 如果是枚举，需要用AE/ME/OE
 
 ***
 可以通过XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ进行条件反序列化（但是这样序列化出来的会和原来不一样)

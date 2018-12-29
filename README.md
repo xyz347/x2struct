@@ -88,7 +88,6 @@ Members must in one of A,M or O. A can only put one member at a time, and M/O ca
 
 - M: Mandatory. An exception will throw if no key found for mandatory member when decode
 - O: Optional. Corresponding to M
-- enum use AE/ME/OE
 
 ***
 Conditional decode can be done with XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ.

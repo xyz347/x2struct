@@ -27,6 +27,14 @@
 
 namespace x2struct {
 
+// same as std::enable_if
+template<bool B, class T = void>
+struct x_enable_if {};
+
+template<class T>
+struct x_enable_if<true, T> { typedef T type; };
+
+
 struct cmp_str {
    bool operator()(char const *a, char const *b) const
    {

@@ -192,38 +192,19 @@ public:                                                                     \
         }
 
 // aliase name
-#define X_STRUCT_ACT_TOX_A_(M, M_NAME, A_NAME)                              \
+#define X_STRUCT_ACT_TOX_A(M, A_NAME)                                       \
     {                                                                       \
         bool me = false;                                                    \
-        std::string __alias__name__ = obj.hasa(M_NAME, A_NAME, &me);        \
+        std::string __alias__name__ = obj.hasa(#M, A_NAME, &me);            \
         const char*__an = __alias__name__.c_str();                          \
         if (obj.convert(__an, M)) {                                         \
-            if (obj.set_has()) __x_has_string.insert(M_NAME);               \
-        } else if (obj.convert(M_NAME, M)) {                                \
-            if (obj.set_has()) __x_has_string.insert(M_NAME);               \
+            if (obj.set_has()) __x_has_string.insert(#M);                   \
+        } else if (obj.convert(#M, M)) {                                    \
+            if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else if (me) {                                                    \
             obj.me_exception(__an);                                         \
         }                                                                   \
     }
-
-#define X_STRUCT_ACT_TOX_A(M, A_NAME)  X_STRUCT_ACT_TOX_A_(M, #M, A_NAME)
-
-// for enum begin
-#define X_STRUCT_ACT_TOX_AE(M, A_NAME) X_STRUCT_ACT_TOX_A_((*(int*)&M), #M, A_NAME)
-
-#define X_STRUCT_ACT_TOX_OE(M)                                              \
-        if (obj.convert(#M, (*(int*)&M)) && obj.set_has()) {                \
-            __x_has_string.insert(#M);                                      \
-        }
-
-#define X_STRUCT_ACT_TOX_ME(M)                                              \
-        if (obj.convert(#M, (*(int*)&M))) {                                 \
-            if (obj.set_has()) __x_has_string.insert(#M);                   \
-        } else {                                                            \
-            obj.me_exception(#M);                                           \
-        }
-// for enum end
-
 
 #define X_STRUCT_FUNC_TOX_END }
 
@@ -238,14 +219,6 @@ public:                                                                     \
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
         obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
-
-// enum begin
-#define X_STRUCT_ACT_TOS_OE(M)                                                      \
-        obj.convert(#M, (int)M);
-
-#define X_STRUCT_ACT_TOS_AE(M, A_NAME)                                              \
-        obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), (int)M);
-// enum end
 
 #define X_STRUCT_FUNC_TOS_END                                                       \
     }
@@ -303,16 +276,6 @@ public:                                                                     \
 #define X_STRUCT_L1_TOS_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_O, __VA_ARGS__)
 #define X_STRUCT_L1_TOS_M       X_STRUCT_L1_TOS_O
 #define X_STRUCT_L1_TOS_A(M,A)  X_STRUCT_ACT_TOS_A(M, A)
-
-// =============== for enum begin =======================. 
-#define X_STRUCT_L1_TOX_OE(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_OE, __VA_ARGS__)
-#define X_STRUCT_L1_TOX_ME(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_ME, __VA_ARGS__)
-#define X_STRUCT_L1_TOX_AE(M,A)  X_STRUCT_ACT_TOX_AE(M, A)
-
-#define X_STRUCT_L1_TOS_OE(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_OE, __VA_ARGS__)
-#define X_STRUCT_L1_TOS_ME       X_STRUCT_L1_TOS_OE
-#define X_STRUCT_L1_TOS_AE(M,A)  X_STRUCT_ACT_TOS_AE(M, A)
-// =============== for enum end =======================. 
 
 #define X_STRUCT_L1_TOG_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOG_O, __VA_ARGS__)
 #define X_STRUCT_L1_TOG_M       X_STRUCT_L1_TOG_O

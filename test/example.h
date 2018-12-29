@@ -61,7 +61,7 @@ struct xstruct {
     condition con;
     Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con), OE(md)); // enum should use OE
+    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con, md));
 #else
     XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif
