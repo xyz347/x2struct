@@ -28,6 +28,7 @@
 
 #include "util.h"
 #include "xtypes.h"
+#include "traits.h"
 
 #define LIBCONFIG_BUFFER_SIZE 1024
 #define LIBCONFIG_TYPE_OBJECT 0
@@ -260,7 +261,7 @@ public:
     }
 
     template <typename T>
-    void convert(const char*key, const T& data, typename x_enable_if<(sizeof(T)>sizeof(int)), T>::type *p=0) {
+    void convert(const char*key, const T& data, x_for_class(T) *p=0) {
         indent();
         x2struct_set_key(key);
         this->object_begin();

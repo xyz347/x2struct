@@ -32,6 +32,7 @@
 #endif
 
 #include "util.h"
+#include "traits.h"
 
 namespace x2struct {
 
@@ -123,9 +124,9 @@ public:
         return true;
     }
 
-    // because struct has a set, it's size is bigger than sizeof(int). add this to avoid enum hit this function
+    // add x_for_class to avoid enum hit this function
     template <typename TYPE>
-    bool convert(const char*key, TYPE& val, typename x_enable_if<(sizeof(TYPE)>sizeof(int)), TYPE>::type *p=0) {
+    bool convert(const char*key, TYPE& val, x_for_class(TYPE) *p=0) {
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
         if (NULL == obj) {
@@ -149,7 +150,7 @@ public:
 
     // for enum
     template <typename TYPE>
-    bool convert(const char*key, TYPE& val, typename x_enable_if<(sizeof(TYPE)==sizeof(int)), TYPE>::type *p=0) {
+    bool convert(const char*key, TYPE& val, x_for_enum(TYPE) *p=0) {
         return ((doc_type*)(this))->convert(key, *(int*)&val);
     }
 

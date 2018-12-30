@@ -29,6 +29,7 @@
 
 #include "util.h"
 #include "xtypes.h"
+#include "traits.h"
 
 struct _bson_t;
 
@@ -187,7 +188,7 @@ public:
     }
 
     template <typename T>
-    BsonWriter& convert(const char*key, const T& data, typename x_enable_if<(sizeof(T)>sizeof(int)), T>::type *p=0) {
+    BsonWriter& convert(const char*key, const T& data, x_for_class(T) *p=0) {
         if (_type!=top || key[0]!='\0') {
             BsonWriter child(key, _bson, doc);
             data.__struct_to_str(child, "");

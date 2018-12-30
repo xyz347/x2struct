@@ -27,6 +27,7 @@
 
 #include "util.h"
 #include "xtypes.h"
+#include "traits.h"
 
 #define X2STRUCT_BUFFER_SIZE 1024
 #define X2STRUCT_TYPE_OBJECT 0
@@ -251,7 +252,7 @@ public:
     }
 
     template <typename T>
-    void convert(const char*key, const T& data, typename x_enable_if<(sizeof(T)>sizeof(int)), T>::type *p=0) {
+    void convert(const char*key, const T& data, x_for_class(T) *p=0) {
         XmlKey xkey(key, this, false);
         this->object_begin();
         data.__struct_to_str(*this, key);

@@ -27,6 +27,7 @@
 #include "thirdparty/rapidjson/stringbuffer.h"
 
 #include "xtypes.h"
+#include "traits.h"
 
 namespace x2struct {
 
@@ -245,7 +246,7 @@ public:
     }
 
     template <typename T>
-    void convert(const char*key, const T& data, typename x_enable_if<(sizeof(T)>sizeof(int)), T>::type *p=0) {
+    void convert(const char*key, const T& data, x_for_class(T) *p=0) {
         x2struct_set_key(key);
         this->object_begin();
         data.__struct_to_str(*this, key);
