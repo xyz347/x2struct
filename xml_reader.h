@@ -91,13 +91,35 @@ public:
             _doc = 0;
         }
     }
+private:
+    class NodeOrAttr {
+    private:
+        rapidxml::xml_attribute<char> *attr;
+        const XML_READER_NODE* node;
+    public:
+        NodeOrAttr(rapidxml::xml_attribute<char> *a):attr(a),node(0){}
+        NodeOrAttr(const XML_READER_NODE* n):attr(0),node(n){}
+        NodeOrAttr():attr(0),node(0){}
+        operator bool() const {
+            return attr!=0 || node!=0;
+        }
+        std::string value() {
+            if (node != 0) {
+                return node->value();
+            } else if (attr != 0) {
+                return attr->value();
+            } else {
+                return "";
+            }
+        }
+    };
 public: // convert
-    #define XTOSTRUCT_XML_GETVAL()              \
-        const XML_READER_NODE* v = get_val(key);\
-        if (NULL!=v && v->value())
+    #define XTOSTRUCT_XML_GETVAL()      \
+        NodeOrAttr v = get_val(key);    \
+        if (v && !v.value().empty())
     bool convert(const char *key, std::string &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = v->value();
+            val = v.value();
             return true;
         } else {
             return false;
@@ -105,7 +127,7 @@ public: // convert
     }
     bool convert(const char *key, bool &val) {
         XTOSTRUCT_XML_GETVAL() {
-            std::string tmp=v->value();
+            std::string tmp=v.value();
             if (tmp=="1" || tmp=="true" || tmp=="TRUE" || tmp=="True") {
                 val = true;
             } else {
@@ -119,7 +141,7 @@ public: // convert
     }
     bool convert(const char *key, int16_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<int16_t>(v->value());
+            val = Util::tonum<int16_t>(v.value());
             return true;
         } else {
             return false;
@@ -127,7 +149,7 @@ public: // convert
     }
     bool convert(const char *key, uint16_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<uint16_t>(v->value());
+            val = Util::tonum<uint16_t>(v.value());
             return true;
         } else {
             return false;
@@ -135,7 +157,7 @@ public: // convert
     }
     bool convert(const char *key, int32_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<int32_t>(v->value());
+            val = Util::tonum<int32_t>(v.value());
             return true;
         } else {
             return false;
@@ -143,7 +165,7 @@ public: // convert
     }
     bool convert(const char *key, uint32_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<uint32_t>(v->value());
+            val = Util::tonum<uint32_t>(v.value());
             return true;
         } else {
             return false;
@@ -151,7 +173,7 @@ public: // convert
     }
     bool convert(const char *key, int64_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<int64_t>(v->value());
+            val = Util::tonum<int64_t>(v.value());
             return true;
         } else {
             return false;
@@ -159,7 +181,7 @@ public: // convert
     }
     bool convert(const char *key, uint64_t &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<uint64_t>(v->value());
+            val = Util::tonum<uint64_t>(v.value());
             return true;
         } else {
             return false;
@@ -167,7 +189,7 @@ public: // convert
     }
     bool convert(const char *key, double &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<double>(v->value());
+            val = Util::tonum<double>(v.value());
             return true;
         } else {
             return false;
@@ -175,7 +197,7 @@ public: // convert
     }
     bool convert(const char *key, float &val) {
         XTOSTRUCT_XML_GETVAL() {
-            val = Util::tonum<float>(v->value());
+            val = Util::tonum<float>(v.value());
             return true;
         } else {
             return false;
@@ -187,7 +209,13 @@ public: // convert
         return t;
     }
     bool has(const char*key) {
-        return _child_index.find(key)!=_child_index.end();
+        if (_child_index.find(key)!=_child_index.end()) {
+            return true;
+        } else if (0 != _val->first_attribute(key)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     size_t size(bool to_vec=true) {
         if (0 != _siblings) {
@@ -201,7 +229,11 @@ public: // convert
     }
     XmlReader operator[](const char *key) {
         if (has(key)) {
-            return XmlReader(&_childs[_child_index[key]], this, key);
+            if (_child_index.find(key)!=_child_index.end()) {
+                return XmlReader(&_childs[_child_index[key]], this, key);
+            } else {
+                return XmlReader(_siblings, this, key);
+            }
         } else {
             throw std::runtime_error(std::string("Did not have ")+key);
         }
@@ -301,15 +333,18 @@ private:
         }
     }
 
-    const XML_READER_NODE* get_val(const char *key) {
+    NodeOrAttr get_val(const char *key) {
         if (NULL == key) {
             return _val;
         } else {
             child_index_type::iterator iter;
             if (_child_index.end()!=(iter=_child_index.find(key))) {
                 return _childs[iter->second][0];
+            } else if (0 != _val) {
+                rapidxml::xml_attribute<char> *attr = _val->first_attribute(key);
+                return attr;
             } else {
-                return NULL;
+                return NodeOrAttr();
             }
         }
     }

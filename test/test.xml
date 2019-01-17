@@ -9,8 +9,7 @@
     <vstring>hello2</vstring>
     <vlong>666</vlong>
     <vlong>999</vlong>
-    <vsub>
-        <a>103</a>
+    <vsub a="103">
         <b>hello3</b>
     </vsub>
     <vvint>
