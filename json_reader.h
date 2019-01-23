@@ -30,7 +30,7 @@ namespace x2struct {
 
 class JsonReader:public XReader<JsonReader> {
 public:
-    friend xdoc_type;
+    friend class XReader<JsonReader>;
     using xdoc_type::convert;
 
     JsonReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new rapidjson::Document),_val(_doc) {

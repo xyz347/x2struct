@@ -38,7 +38,7 @@ class XmlReader:public XReader<XmlReader> {
     typedef rapidxml::xml_document<> XML_READER_DOCUMENT;
     typedef rapidxml::xml_node<> XML_READER_NODE;  
 public:
-    friend xdoc_type;
+    friend class XReader<XmlReader>;
     using xdoc_type::convert;
     XmlReader(const std::string& str, bool isfile=false):xdoc_type(0, ""),_doc(new XML_READER_DOCUMENT),_val(0),_siblings(0) {
         std::string err;

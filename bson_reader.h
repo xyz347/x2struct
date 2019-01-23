@@ -75,7 +75,7 @@ struct BsonDoc {
 
 class BsonReader:public XReader<BsonReader> {
 public:
-    friend xdoc_type;
+    friend class XReader<BsonReader> ;
     using xdoc_type::convert;
     BsonReader(const uint8_t*data, size_t length, bool copy=true):xdoc_type(0, ""),_doc(new BsonDoc) {
         init(data, length, copy);

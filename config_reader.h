@@ -31,7 +31,7 @@ class ConfigReader:public XReader<ConfigReader> {
     typedef libconfig::Setting CONFIG_READER_VALUE;
     typedef libconfig::SettingConstIterator CONFIG_READER_ITERATOR;
 public:
-    friend xdoc_type;
+    friend class XReader<ConfigReader>;
     using xdoc_type::convert;
 
     ConfigReader(const std::string& str, bool isfile=false, const std::string&root=""):xdoc_type(0, ""),_doc(new CONFIG_READER_DOCUMENT),_val(0) {
