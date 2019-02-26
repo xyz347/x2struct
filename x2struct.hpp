@@ -206,6 +206,10 @@ public:                                                                     \
         }                                                                   \
     }
 
+// Inheritance 
+#define X_STRUCT_ACT_TOX_I(B)   B::__x_to_struct(obj);
+
+
 #define X_STRUCT_FUNC_TOX_END }
 
 
@@ -219,6 +223,9 @@ public:                                                                     \
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
         obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
+
+// Inheritance 
+#define X_STRUCT_ACT_TOS_I(B)   B::__struct_to_str(obj, root);
 
 #define X_STRUCT_FUNC_TOS_END                                                       \
     }
@@ -270,10 +277,12 @@ public:                                                                     \
 #define X_STRUCT_L1_TOG(x) X_STRUCT_L1_TOG_##x
 
 #define X_STRUCT_L1_TOX_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_O, __VA_ARGS__)
+#define X_STRUCT_L1_TOX_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_M(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_M, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_A(M,A)  X_STRUCT_ACT_TOX_A(M, A)
 
 #define X_STRUCT_L1_TOS_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_O, __VA_ARGS__)
+#define X_STRUCT_L1_TOS_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOS_M       X_STRUCT_L1_TOS_O
 #define X_STRUCT_L1_TOS_A(M,A)  X_STRUCT_ACT_TOS_A(M, A)
 
@@ -444,7 +453,9 @@ public:                                                                     \
     X_STRUCT_FUNC_TOS_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
 #endif
 
-// for local class, gen code without template (no template)
+/////////////////////////////////////////////////////////////////////
+// for local class, gen code without template (no template) BEGIN
+/////////////////////////////////////////////////////////////////////
 
 // generate typedef
 #define X_STRUCT_NT_TYPEDEF(M, x)    typedef x2struct::M##Reader  __XReader_##x; typedef x2struct::M##Writer __XWriter_##x;
@@ -477,6 +488,9 @@ public:                                                                     \
     X_STRUCT_FUNC_COMMON  \
     X_STRUCT_N(X_STRUCT_NT_TYPE, X_STRUCT_NT_TYPEDEF, __VA_ARGS__) X_STRUCT_EXPAND(X_STRUCT_COUNT(X_STRUCT_NT_BODY,a,__VA_ARGS__, _32,_31,_30,_29,_28,_27,_26,_25,_24,_23,_22,_21,_20,_19,_18,_17,_16,_15,_14,_13,_12,_11,_10,_9,_8,_7,_6,_5,_4,_3,_2,_1))
 
+/////////////////////////////////////////////////////////////////////
+// for local class, gen code without template (no template) END
+/////////////////////////////////////////////////////////////////////
 
 
 #define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj, const char* name)

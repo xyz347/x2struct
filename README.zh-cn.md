@@ -15,6 +15,7 @@ x2struct
 ------
 - 支持vector/set/map
 - 支持结构体嵌套
+- 支持继承。[例子](test/inheritance.cpp)
 
 ***
 ### 范例
@@ -84,6 +85,7 @@ struct example {
 
 - M: M表示必须存在对应的字段，如果M(a)，那么对应的文件（比如json）必须存在a这个key，否则抛异常，M是与O对应。
 - O: optional，表示可选的，在反序列化的时候，如果这个字段不存在也是可以的。O是与M相对应的
+- I: 继承。如果有基类且定义了XTOSTRUCT宏，希望继承基类的变量，则用I包含所有的基类。[例子](test/inheritance.cpp)
 
 ***
 可以通过XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ进行条件反序列化（但是这样序列化出来的会和原来不一样)
