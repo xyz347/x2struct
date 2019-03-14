@@ -164,6 +164,7 @@ public:
         return ret;
     }
     size_t size(bool to_vec=true) {
+        (void)to_vec;
         if (BSON_TYPE_ARRAY==bson_iter_type(&_val->root)) {
             return _val->vecs.size();
         } else {

@@ -144,6 +144,7 @@ public:
 private:
     template <typename T>
     static T tonum_dummy(const std::string&str, Dummy<T> dmy) {
+        (void)dmy;
         T t;
         if (sizeof(t) <= 4) {
             int tmp;
@@ -161,12 +162,14 @@ private:
         return t;
     }
     static float tonum_dummy(const std::string&str, Dummy<float> dmy) {
+        (void)dmy;
         float t;
         sscanf(str.c_str(), "%f", &t);
         return t;
     }
 
     static double tonum_dummy(const std::string&str, Dummy<double> dmy) {
+        (void)dmy;
         double t;
         sscanf(str.c_str(), "%lf", &t);
         return t;

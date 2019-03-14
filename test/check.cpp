@@ -331,6 +331,8 @@ TEST(gocode, test)
 
 int main(int argc, char *argv[])
 {
+    (void)argc;
+    (void)argv;
     const std::vector<text_ctx>& tcs = TC_CONTAINER::tcs();
     for (size_t i=0; i<tcs.size(); ++i) {
         #ifdef XTOSTRUCT_GOCODE

@@ -133,6 +133,7 @@ public: // convert
         }
     }
     size_t size(bool to_vec=true) {
+        (void)to_vec;
         if (_val->IsArray()) {
             return (size_t)_val->Size();
         } else {

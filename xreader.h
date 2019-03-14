@@ -127,6 +127,7 @@ public:
     // add x_for_class to avoid enum hit this function
     template <typename TYPE>
     bool convert(const char*key, TYPE& val, x_for_class(TYPE) *p=0) {
+        (void)p;
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
         if (NULL == obj) {
@@ -139,7 +140,7 @@ public:
         } else {
             for (size_t i=0; i<len; ++i) {
                 doc_type sub = (*obj)[i];
-                if (val.__x_condition(sub, this->key_char())) {
+                if (val.__x_condition(sub)) {
                     val.__x_to_struct(sub);
                     break;
                 }
@@ -151,6 +152,7 @@ public:
     // for enum
     template <typename TYPE>
     bool convert(const char*key, TYPE& val, x_for_enum(TYPE) *p=0) {
+        (void)p;
         return ((doc_type*)(this))->convert(key, *(int*)&val);
     }
 

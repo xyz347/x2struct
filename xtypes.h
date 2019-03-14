@@ -43,9 +43,8 @@ public:
         _t.parse(str);
     }
     template<class DOC>
-    bool __x_condition(DOC& obj, const std::string&name) {
+    bool __x_condition(DOC& obj) {
         (void)obj;
-        (void)name;
         return true;
     }
     template<class DOC>

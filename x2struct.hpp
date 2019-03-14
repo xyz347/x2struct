@@ -172,8 +172,8 @@ public:                                                                     \
 
 #define X_STRUCT_FUNC_TOX_BEGIN                                             \
     template<typename DOC>                                                  \
-    bool __x_condition(DOC& obj, const std::string&name) const {            \
-        (void)obj;(void)name;                                               \
+    bool __x_condition(DOC& obj) const {                                    \
+        (void)obj;                                                          \
         return true;                                                        \
     }                                                                       \
     template<typename DOC>                                                  \
@@ -216,7 +216,7 @@ public:                                                                     \
 // struct to string
 #define X_STRUCT_FUNC_TOS_BEGIN                                                     \
     template <class CLASS>                                                          \
-    void __struct_to_str(CLASS& obj, const char *root) const {
+    void __struct_to_str(CLASS& obj, const char *root) const { (void)root;
 
 #define X_STRUCT_ACT_TOS_O(M)                                                       \
         obj.convert(#M, M);
@@ -493,10 +493,10 @@ public:                                                                     \
 /////////////////////////////////////////////////////////////////////
 
 
-#define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj, const char* name)
+#define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj)
 #define XTOSTRUCT_CONDITION_EQ(attr1, attr2)                    \
     template<typename DOC>                                      \
-    bool __x_condition(DOC& obj, const char* name) {            \
+    bool __x_condition(DOC& obj) {                              \
         return obj.attribute(attr1)==obj.attribute(attr2);      \
     }
 

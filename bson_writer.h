@@ -189,6 +189,7 @@ public:
 
     template <typename T>
     BsonWriter& convert(const char*key, const T& data, x_for_class(T) *p=0) {
+        (void)p;
         if (_type!=top || key[0]!='\0') {
             BsonWriter child(key, _bson, doc);
             data.__struct_to_str(child, "");

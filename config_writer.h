@@ -262,6 +262,7 @@ public:
 
     template <typename T>
     void convert(const char*key, const T& data, x_for_class(T) *p=0) {
+        (void)p;
         indent();
         x2struct_set_key(key);
         this->object_begin();

@@ -35,7 +35,7 @@ gocode:
 	@-rm $@
 
 check:
-	$(GPP) -o $@ check.cpp $(INC) $(LIBCONFIG) $(LIBBSON)
+	$(GPP) -o $@ -Wextra -Wall check.cpp $(INC) $(LIBCONFIG) $(LIBBSON)
 	./$@
 	@-rm $@
 

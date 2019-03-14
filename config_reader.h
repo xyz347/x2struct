@@ -128,6 +128,7 @@ public: // convert
         return _val->exists(key);
     }
     size_t size(bool to_vec=true) {
+        (void)to_vec;
         if (_val->isList()) {
             return (size_t)_val->getLength();
         } else {
