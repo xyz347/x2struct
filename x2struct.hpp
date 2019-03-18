@@ -53,6 +53,9 @@
 #include <typeinfo>
 #include "go_writer.h"
 #endif
+
+#include "traits.h"
+
 //#include <iostream>
 //using namespace std;
 
@@ -179,11 +182,25 @@ public:                                                                     \
     template<typename DOC>                                                  \
     void __x_to_struct(DOC& obj) {
 
+// optional
 #define X_STRUCT_ACT_TOX_O(M)                                               \
         if (obj.convert(#M, M) && obj.set_has()) {                          \
             __x_has_string.insert(#M);                                      \
         }
 
+// bit field
+#define X_STRUCT_ACT_TOX_B(M)                                               \
+        {                                                                   \
+            x_decltype(M) __tmp;                                            \
+            if (obj.convert(#M, __tmp)) {                                   \
+                if (obj.set_has()) {                                        \
+                    __x_has_string.insert(#M);                              \
+                }                                                           \
+                M = __tmp;                                                  \
+            }                                                               \
+        }
+
+//mandatory
 #define X_STRUCT_ACT_TOX_M(M)                                               \
         if (obj.convert(#M, M)) {                                           \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
@@ -277,11 +294,13 @@ public:                                                                     \
 #define X_STRUCT_L1_TOG(x) X_STRUCT_L1_TOG_##x
 
 #define X_STRUCT_L1_TOX_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_O, __VA_ARGS__)
+#define X_STRUCT_L1_TOX_B(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_B, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_M(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_M, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_A(M,A)  X_STRUCT_ACT_TOX_A(M, A)
 
 #define X_STRUCT_L1_TOS_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_O, __VA_ARGS__)
+#define X_STRUCT_L1_TOS_B       X_STRUCT_L1_TOS_O
 #define X_STRUCT_L1_TOS_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOS_M       X_STRUCT_L1_TOS_O
 #define X_STRUCT_L1_TOS_A(M,A)  X_STRUCT_ACT_TOS_A(M, A)

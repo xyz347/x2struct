@@ -34,7 +34,12 @@ using namespace std;
 // <c++11 not support using template. so we use macro all
 #define x_for_class(T) typename std::enable_if<std::is_class<T>::value, int>::type
 #define x_for_enum(T)  typename std::enable_if<std::is_enum<T>::value, int>::type
-#else
+#define x_decltype(T)  decltype(T)
+
+#else  // C11
+
+namespace x2struct {
+
 template<bool B, class T = void>
 struct x_enable_if {};
 
@@ -52,11 +57,39 @@ template <class T>
 struct x_is_class<T, typename x_tovoid<int T::*>::type >{static bool const value = true;};
 
 
-#define x_for_class(T) typename x_enable_if<x_is_class<T>::value, int>::type
+// thx https://stackoverflow.com/a/12199635/5845104
+template<int N> struct x_size { char value[N]; };
+x_size<1> x_decltype_encode(int8_t);
+x_size<2> x_decltype_encode(uint8_t);
+x_size<3> x_decltype_encode(int16_t);
+x_size<4> x_decltype_encode(uint16_t);
+x_size<5> x_decltype_encode(int32_t);
+x_size<6> x_decltype_encode(uint32_t);
+x_size<7> x_decltype_encode(int64_t);
+x_size<8> x_decltype_encode(uint64_t);
+
+
+template<int N> struct x_decltype_decode {};
+template <> struct x_decltype_decode<1> {typedef int8_t type;};
+template <> struct x_decltype_decode<2> {typedef uint8_t type;};
+template <> struct x_decltype_decode<3> {typedef int16_t type;};
+template <> struct x_decltype_decode<4> {typedef uint16_t type;};
+template <> struct x_decltype_decode<5> {typedef int32_t type;};
+template <> struct x_decltype_decode<6> {typedef uint32_t type;};
+template <> struct x_decltype_decode<7> {typedef int64_t type;};
+template <> struct x_decltype_decode<8> {typedef uint64_t type;};
+
+
+
+}
+
+#define x_for_class(T) typename x2struct::x_enable_if<x2struct::x_is_class<T>::value, int>::type
 // too complicated to implement is_enum
-#define x_for_enum(T)  typename x_enable_if<!x_is_class<T>::value, int>::type
+#define x_for_enum(T)  typename x2struct::x_enable_if<!x2struct::x_is_class<T>::value, int>::type
 
-#endif
+#define x_decltype(T) x2struct::x_decltype_decode<sizeof(x2struct::x_decltype_encode(T))>::type
 
-#endif
+#endif  // C11
+
+#endif  // __X_TO_TRAITS_H
 
