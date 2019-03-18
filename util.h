@@ -45,16 +45,20 @@ public:
     template <typename T>
     static std::string tostr(T data) {
         char buf[64];
-        if (sizeof(data) <= 4) {
-            sprintf(buf, "%d", (int)data);
-        } else {
-            #ifndef _MSC_VER
-            sprintf(buf, "%ld", (int64_t)data);
-            #else
-            sprintf(buf, "%lld", (int64_t)data);
-            #endif
+        size_t  i=sizeof(buf);
+
+        T t = data>=0?data:-data;
+        while (true) {
+            buf[--i] = '0'+t%10;
+            t /= 10;
+            if (0 == t) {
+                break;
+            }
         }
-        return buf;
+        if (data < 0) {
+            buf[--i] = '-';
+        }
+        return std::string(&buf[i], sizeof(buf)-i);
     }
 
     static std::string tostr(double data) {
@@ -142,24 +146,77 @@ public:
         return key;
     }
 private:
+    // 字符串到整型
     template <typename T>
     static T tonum_dummy(const std::string&str, Dummy<T> dmy) {
         (void)dmy;
-        T t;
-        if (sizeof(t) <= 4) {
-            int tmp;
-            sscanf(str.c_str(), "%d", &tmp);
-            t = (T)tmp;
-        } else {
-            int64_t tmp;
-            #ifndef _MSC_VER
-            sscanf(str.c_str(), "%ld", &tmp);
-            #else
-            sscanf(str.c_str(), "%lld", &tmp);
-            #endif
-            t = (T)tmp;
+        T t = 0;
+        size_t s = str.length();
+        if (0 == s) {
+            return t;
         }
-        return t;
+
+        size_t i = 0;
+        T rad = 10;
+        const char *d = str.data();
+        if ('-'==d[0] || '+'==d[0]) {
+            i = 1;
+        } else {
+            if ('0' == d[0]) {
+                if (s>1 && (d[1]=='x' || d[1]=='X')) {
+                    i = 2;
+                    rad = 16;
+                } else {
+                    i = 1;
+                    rad = 8;
+                }
+            }
+        }
+
+        std::string wrong("wrong number format");
+        std::string overflow("number out of range");
+
+        for (; i<s; ++i) {
+            T tmp;
+            if (d[i]<='9' && d[i]>='0') {
+                tmp = 0+d[i]-'0';
+            } else if (d[i]<='F' && d[i]>='A') {
+                tmp = 10+d[i]-'A';
+            } else if (d[i]<='f' && d[i]>='a') {
+                tmp = 10+d[i]-'a';
+            } else if (d[i]=='U' || d[i]=='u') {
+                if (i+1 == s) {
+                    break;
+                } else if (i+2==s && (d[i]=='L' || d[i]=='l')) {
+                    break;
+                } else {
+                    throw std::runtime_error(wrong);
+                }
+            } else if (d[i]=='L' || d[i]=='l') {
+                if (i+1 == s) {
+                    break;
+                } else {
+                    throw std::runtime_error(wrong);
+                }
+            }
+
+            if (tmp < rad) {
+                tmp = t*rad+tmp;
+                if (tmp >= t) {
+                    t = tmp;
+                } else {
+                    throw std::runtime_error(overflow);
+                }
+            } else {
+                throw std::runtime_error(wrong);
+            }
+        }
+
+        if ('-' != d[0]) {
+            return t;
+        } else {
+            return -t;
+        }
     }
     static float tonum_dummy(const std::string&str, Dummy<float> dmy) {
         (void)dmy;

@@ -62,7 +62,7 @@ static void base_check(xstruct&x)
 
     EXPECT_EQ(x.vvint.size(), 1U);
     EXPECT_EQ(x.vvint[0].size(), 2U);
-    EXPECT_EQ(x.vvint[0][0], 104);
+    EXPECT_EQ(x.vvint[0][0], -104);
     EXPECT_EQ(x.vvint[0][1], 105);
 
     EXPECT_EQ(x.vvstring.size(), 2U);

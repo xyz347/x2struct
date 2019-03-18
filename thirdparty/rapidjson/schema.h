@@ -409,7 +409,7 @@ public:
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
         allocator_(allocator),
         uri_(schemaDocument->GetURI(), *allocator),
-        pointer_(p),
+        pointer_(p, allocator),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
         enumCount_(),
@@ -1150,10 +1150,12 @@ private:
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
+            RegexType *r = static_cast<RegexType*>(allocator_->Malloc(sizeof(RegexType)));
             try {
-                return new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                return new (r) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
+                AllocatorType::Free(r);
             }
         return 0;
     }

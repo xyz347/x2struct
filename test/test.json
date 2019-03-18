@@ -8,7 +8,7 @@
     "vstring":["hello1", "hello2"],
     "vlong":[666, 999],
     "vsub":[{"a":103, "b":"hello3"}],
-    "vvint":[[104,105]],
+    "vvint":[[-104,105]],
     "vvstring":[["hello4"],["hello5", "hello6"]],
     "vvsub":[[{"a":105, "b":"hello7"}],[{"a":106, "b":"hello8"}, {"a":107, "b":"hello9"}]],
     "tmap":{"108":{"a":111, "b":"hello10"}, "109":{"a":111, "b":"hello11"}},
