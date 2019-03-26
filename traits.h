@@ -32,7 +32,8 @@ using namespace std;
 //using x_for_enum = typename std::enable_if<std::is_enum<T>::value, int>::type;
 
 // <c++11 not support using template. so we use macro all
-#define x_for_class(T) typename std::enable_if<std::is_class<T>::value, int>::type
+#define x_for_class(T, DEFT) typename std::enable_if<std::is_class<T>::value, DEFT>::type
+
 #define x_for_enum(T)  typename std::enable_if<std::is_enum<T>::value, int>::type
 #define x_decltype(T)  decltype(T)
 
@@ -83,7 +84,7 @@ template <> struct x_decltype_decode<8> {typedef uint64_t type;};
 
 }
 
-#define x_for_class(T) typename x2struct::x_enable_if<x2struct::x_is_class<T>::value, int>::type
+#define x_for_class(T, DEFT) typename x2struct::x_enable_if<x2struct::x_is_class<T>::value, DEFT>::type
 // too complicated to implement is_enum
 #define x_for_enum(T)  typename x2struct::x_enable_if<!x2struct::x_is_class<T>::value, int>::type
 

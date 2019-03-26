@@ -175,11 +175,6 @@ public:                                                                     \
 
 #define X_STRUCT_FUNC_TOX_BEGIN                                             \
     template<typename DOC>                                                  \
-    bool __x_condition(DOC& obj) const {                                    \
-        (void)obj;                                                          \
-        return true;                                                        \
-    }                                                                       \
-    template<typename DOC>                                                  \
     void __x_to_struct(DOC& obj) {
 
 // optional
@@ -188,7 +183,7 @@ public:                                                                     \
             __x_has_string.insert(#M);                                      \
         }
 
-// bit field
+// bit field. must be integer
 #define X_STRUCT_ACT_TOX_B(M)                                               \
         {                                                                   \
             x_decltype(M) __tmp;                                            \
@@ -200,7 +195,7 @@ public:                                                                     \
             }                                                               \
         }
 
-//mandatory
+// mandatory
 #define X_STRUCT_ACT_TOX_M(M)                                               \
         if (obj.convert(#M, M)) {                                           \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
@@ -293,18 +288,31 @@ public:                                                                     \
 #define X_STRUCT_L1_TOS(x) X_STRUCT_L1_TOS_##x
 #define X_STRUCT_L1_TOG(x) X_STRUCT_L1_TOG_##x
 
+/*
+  O Optional
+  M Mandatory
+  A Aliase
+  I Inherit
+  C Conditon
+*/
+// string to object
 #define X_STRUCT_L1_TOX_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_O, __VA_ARGS__)
-#define X_STRUCT_L1_TOX_B(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_B, __VA_ARGS__)
-#define X_STRUCT_L1_TOX_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_M(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_M, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_A(M,A)  X_STRUCT_ACT_TOX_A(M, A)
+#define X_STRUCT_L1_TOX_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_I, __VA_ARGS__)
+#define X_STRUCT_L1_TOX_B(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_B, __VA_ARGS__)
+//#define X_STRUCT_L1_TOX_C(M,F)  X_STRUCT_ACT_TOX_##M
+#define X_STRUCT_L1_TOX_C(M,F)  obj.set_condition((void*)this, __x_cond_##F); X_STRUCT_ACT_TOX_##M obj.set_condition(NULL, NULL);
 
+// object to string
 #define X_STRUCT_L1_TOS_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_O, __VA_ARGS__)
-#define X_STRUCT_L1_TOS_B       X_STRUCT_L1_TOS_O
-#define X_STRUCT_L1_TOS_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOS_M       X_STRUCT_L1_TOS_O
 #define X_STRUCT_L1_TOS_A(M,A)  X_STRUCT_ACT_TOS_A(M, A)
+#define X_STRUCT_L1_TOS_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_I, __VA_ARGS__)
+#define X_STRUCT_L1_TOS_B       X_STRUCT_L1_TOS_O
+#define X_STRUCT_L1_TOS_C(M,F)  X_STRUCT_ACT_TOS_##M
 
+// to Golang code
 #define X_STRUCT_L1_TOG_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOG_O, __VA_ARGS__)
 #define X_STRUCT_L1_TOG_M       X_STRUCT_L1_TOG_O
 #define X_STRUCT_L1_TOG_A(M,A)  X_STRUCT_ACT_TOG_A(M, A)
@@ -485,10 +493,6 @@ public:                                                                     \
 
 // generate convert function
 #define X_STRUCT_FUNC_TOX_BEGIN_NT(x)                                       \
-    bool __x_condition(__XReader_##x& obj, const std::string&name) const {  \
-        (void)obj;(void)name;                                               \
-        return true;                                                        \
-    }                                                                       \
     void __x_to_struct(__XReader_##x& obj) {
 
 
@@ -511,13 +515,7 @@ public:                                                                     \
 // for local class, gen code without template (no template) END
 /////////////////////////////////////////////////////////////////////
 
-
-#define XTOSTRUCT_CONDITION()   template<typename DOC> bool __x_condition(DOC& obj)
-#define XTOSTRUCT_CONDITION_EQ(attr1, attr2)                    \
-    template<typename DOC>                                      \
-    bool __x_condition(DOC& obj) {                              \
-        return obj.attribute(attr1)==obj.attribute(attr2);      \
-    }
+#define XTOSTRUCT_CONDITION(F)   template<typename DOC> static bool __x_cond_##F(void* self, DOC& obj)
 
 
 #endif

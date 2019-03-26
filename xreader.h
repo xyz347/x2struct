@@ -36,6 +36,7 @@
 
 namespace x2struct {
 
+
 /*
   DOC need implement
   bool has(const std::string)
@@ -46,10 +47,16 @@ class XReader {
 protected:
     typedef DOC doc_type;
     typedef XReader<DOC> xdoc_type;
+    typedef bool (*cond_f)(void*, doc_type&);
+
+    struct x_condition {
+        void* parent;
+        cond_f  cond;
+    };
 public:
     // only c++0x support reference initialize, so use pointer
-    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false){}
-    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
+    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false), _p_cond(NULL){}
+    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false), _p_cond(NULL){}
     ~XReader(){}
 public:
     template <typename TYPE>
@@ -126,8 +133,8 @@ public:
 
     // add x_for_class to avoid enum hit this function
     template <typename TYPE>
-    bool convert(const char*key, TYPE& val, x_for_class(TYPE) *p=0) {
-        (void)p;
+    bool convert(const char*key, TYPE& val, x_for_class(TYPE, int) *unused=0) {
+        (void)unused;
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
         if (NULL == obj) {
@@ -135,18 +142,21 @@ public:
         }
 
         size_t len = obj->size(false);
-        if (0==len) {
+        if (len <= 1) {
             val.__x_to_struct(*obj);
+        } else if (NULL == _p_cond) {
+            return false;
         } else {
+            x_condition *cond = _p_cond;
             for (size_t i=0; i<len; ++i) {
                 doc_type sub = (*obj)[i];
-                if (val.__x_condition(sub)) {
+                if (cond->cond(cond->parent, sub)) {
                     val.__x_to_struct(sub);
-                    break;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     // for enum
@@ -235,6 +245,15 @@ public:
     void set_has(bool set) {
         _set_has = set;
     }
+    void set_condition(void *parent, cond_f f) {
+        if (NULL == parent) {
+            this->_p_cond = NULL;
+        } else {
+            this->_cond.parent = parent;
+            this->_cond.cond = f;
+            this->_p_cond = &this->_cond;
+        }
+    }
 protected:
     doc_type* get_obj(const char *key, doc_type *tmp) {
         doc_type *obj = static_cast<doc_type*>(this);
@@ -247,6 +266,10 @@ protected:
     const char* _key;
     int _index;
     bool _set_has;
+
+private:
+    x_condition _cond;
+    x_condition *_p_cond;
 };
 
 }

@@ -87,6 +87,7 @@ struct example {
 - O: optional，表示可选的，在反序列化的时候，如果这个字段不存在也是可以的。O是与M相对应的
 - I: 继承。如果有基类且定义了XTOSTRUCT宏，希望继承基类的变量，则用I包含所有的基类。[例子](test/inheritance.cpp)
 - B: 用于位域，可选
+- C: 条件解析，从一个结构体数组里面解析出一个满足条件的object。C里面可以包含O/A/M，然后O/A/M不要超过一个变量
 
 ***
 可以通过XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ进行条件反序列化（但是这样序列化出来的会和原来不一样)

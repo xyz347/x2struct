@@ -49,10 +49,10 @@
             <b>hello11</b>
         </x109>
     </tmap>
-    <con myip="200" cfgip="100">
+    <con id="200">
         <url>not this</url>
     </con>
-    <con myip="200" cfgip="200">
+    <con id="100">
         <url>hello12</url>
     </con>
     <md>1</md>

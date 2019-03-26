@@ -15,11 +15,11 @@
     "md":1,
     "con":[
         {
-            "myip":"200", "cfgip":"100",
+            "id":200,
             "url":"not this"
         },
         {
-            "myip":"200", "cfgip":"200",
+            "id":100,
             "url":"hello12"
         }
     ]

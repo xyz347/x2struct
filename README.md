@@ -91,6 +91,7 @@ Members must in one of A,M or O. A can only put one member at a time, and M/O ca
 - O: Optional. Corresponding to M
 - I: Inheritance. If has base class and base class defined XTOSTRUCT, use I to include the base class. [example](test/inheritance.cpp)
 - B: For bit field, optional
+- C: Load conditional. load one object from array.
 
 ***
 Conditional decode can be done with XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ.

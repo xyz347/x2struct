@@ -252,7 +252,7 @@ public:
     }
 
     template <typename T>
-    void convert(const char*key, const T& data, x_for_class(T) *p=0) {
+    void convert(const char*key, const T& data, x_for_class(T, int) *p=0) {
         (void)p;
         XmlKey xkey(key, this, false);
         this->object_begin();

@@ -43,11 +43,6 @@ public:
         _t.parse(str);
     }
     template<class DOC>
-    bool __x_condition(DOC& obj) {
-        (void)obj;
-        return true;
-    }
-    template<class DOC>
     void __struct_to_str(DOC& obj, const char*key) const {
         std::string str = _t.format();
         obj.convert(key, str);
