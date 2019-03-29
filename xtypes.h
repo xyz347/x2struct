@@ -33,9 +33,20 @@
 
 namespace x2struct {
 
+struct x_condition_t {
+    typedef bool (*cond_f)(void*obj, void*doc);
+
+    void* parent;
+    cond_f  cond;
+
+    x_condition_t():parent(0),cond(0){}
+    void set(void*p, cond_f c){parent=p; cond=c;}
+};
+
 template<typename TYPE>
 class XType {
 public:
+    x_condition_t __x_cond;
     template<class DOC>
     void __x_to_struct(DOC& obj) {
         std::string str;

@@ -47,16 +47,10 @@ class XReader {
 protected:
     typedef DOC doc_type;
     typedef XReader<DOC> xdoc_type;
-    typedef bool (*cond_f)(void*, doc_type&);
-
-    struct x_condition {
-        void* parent;
-        cond_f  cond;
-    };
 public:
     // only c++0x support reference initialize, so use pointer
-    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false), _p_cond(NULL){}
-    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false), _p_cond(NULL){}
+    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false){}
+    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
     ~XReader(){}
 public:
     template <typename TYPE>
@@ -137,26 +131,32 @@ public:
         (void)unused;
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
-        if (NULL == obj) {
-            return false;
-        }
+        bool ret = false;
 
-        size_t len = obj->size(false);
-        if (len <= 1) {
-            val.__x_to_struct(*obj);
-        } else if (NULL == _p_cond) {
-            return false;
-        } else {
-            x_condition *cond = _p_cond;
-            for (size_t i=0; i<len; ++i) {
-                doc_type sub = (*obj)[i];
-                if (cond->cond(cond->parent, sub)) {
-                    val.__x_to_struct(sub);
-                    return true;
+        do {
+            if (NULL == obj) {
+                break;
+            }
+
+            size_t len = obj->size(false);
+            if (len <= 1) {
+                val.__x_to_struct(*obj);
+            } else if (NULL == val.__x_cond.cond) {
+                break;
+            } else {
+                for (size_t i=0; i<len; ++i) {
+                    doc_type sub = (*obj)[i];
+                    if (val.__x_cond.cond(val.__x_cond.parent, (void*)&sub)) {
+                        val.__x_to_struct(sub);
+                        ret = true;
+                        break;
+                    }
                 }
             }
-        }
-        return false;
+        } while(false);
+
+        val.__x_cond.set(0, 0);
+        return ret;
     }
 
     // for enum
@@ -200,8 +200,8 @@ public:
         }
     }
 
-    std::string hasa(const std::string&key, const std::string&alias, bool *me) {
-        return Util::alias_parse(key, alias, static_cast<doc_type*>(this)->type(), me);
+    std::string hasa(const std::string&key, const std::string&alias, bool *md) {
+        return Util::alias_parse(key, alias, static_cast<doc_type*>(this)->type(), md);
     }
     std::string path() {
         std::vector<std::string> nodes;
@@ -227,10 +227,10 @@ public:
         }
         return p;
     }
-    void me_exception(const std::string&key) {
+    void md_exception(const std::string&key) {
         std::string err;
         err.reserve(128);
-        err.append("miss ");
+        err.append("miss mandatory node ");
         std::string p = path();
         if (!p.empty()) {
             err.append(p).append(".");
@@ -245,7 +245,7 @@ public:
     void set_has(bool set) {
         _set_has = set;
     }
-    void set_condition(void *parent, cond_f f) {
+    /*void set_condition(void *parent, cond_f f) {
         if (NULL == parent) {
             this->_p_cond = NULL;
         } else {
@@ -253,7 +253,7 @@ public:
             this->_cond.cond = f;
             this->_p_cond = &this->_cond;
         }
-    }
+    }*/
 protected:
     doc_type* get_obj(const char *key, doc_type *tmp) {
         doc_type *obj = static_cast<doc_type*>(this);
@@ -266,10 +266,10 @@ protected:
     const char* _key;
     int _index;
     bool _set_has;
-
+/*
 private:
     x_condition _cond;
-    x_condition *_p_cond;
+    x_condition *_p_cond;*/
 };
 
 }

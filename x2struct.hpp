@@ -61,7 +61,7 @@
 
 namespace x2struct {
 
-#define X2STRUCT_OPT_ME     "me"    // must exist
+#define X2STRUCT_OPT_M     "m"    // mandatory
 
 class X {
 public:
@@ -174,6 +174,7 @@ public:                                                                     \
     }
 
 #define X_STRUCT_FUNC_TOX_BEGIN                                             \
+    x2struct::x_condition_t __x_cond;                                       \
     template<typename DOC>                                                  \
     void __x_to_struct(DOC& obj) {
 
@@ -200,27 +201,29 @@ public:                                                                     \
         if (obj.convert(#M, M)) {                                           \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else {                                                            \
-            obj.me_exception(#M);                                           \
+            obj.md_exception(#M);                                           \
         }
 
 // aliase name
 #define X_STRUCT_ACT_TOX_A(M, A_NAME)                                       \
     {                                                                       \
-        bool me = false;                                                    \
-        std::string __alias__name__ = obj.hasa(#M, A_NAME, &me);            \
+        bool md = false;                                                    \
+        std::string __alias__name__ = obj.hasa(#M, A_NAME, &md);            \
         const char*__an = __alias__name__.c_str();                          \
         if (obj.convert(__an, M)) {                                         \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else if (obj.convert(#M, M)) {                                    \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
-        } else if (me) {                                                    \
-            obj.me_exception(__an);                                         \
+        } else if (md) {                                                    \
+            obj.md_exception(__an);                                         \
         }                                                                   \
     }
 
 // Inheritance 
 #define X_STRUCT_ACT_TOX_I(B)   B::__x_to_struct(obj);
 
+// conditional
+#define X_STRUCT_ACT_TOX_C(M)   M.__x_cond.set((void*)this, __x_cond_static_##M<DOC>);
 
 #define X_STRUCT_FUNC_TOX_END }
 
@@ -301,8 +304,7 @@ public:                                                                     \
 #define X_STRUCT_L1_TOX_A(M,A)  X_STRUCT_ACT_TOX_A(M, A)
 #define X_STRUCT_L1_TOX_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOX_B(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_B, __VA_ARGS__)
-//#define X_STRUCT_L1_TOX_C(M,F)  X_STRUCT_ACT_TOX_##M
-#define X_STRUCT_L1_TOX_C(M,F)  obj.set_condition((void*)this, __x_cond_##F); X_STRUCT_ACT_TOX_##M obj.set_condition(NULL, NULL);
+#define X_STRUCT_L1_TOX_C(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOX_C, __VA_ARGS__)
 
 // object to string
 #define X_STRUCT_L1_TOS_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_O, __VA_ARGS__)
@@ -310,7 +312,7 @@ public:                                                                     \
 #define X_STRUCT_L1_TOS_A(M,A)  X_STRUCT_ACT_TOS_A(M, A)
 #define X_STRUCT_L1_TOS_I(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOS_I, __VA_ARGS__)
 #define X_STRUCT_L1_TOS_B       X_STRUCT_L1_TOS_O
-#define X_STRUCT_L1_TOS_C(M,F)  X_STRUCT_ACT_TOS_##M
+#define X_STRUCT_L1_TOS_C(...)
 
 // to Golang code
 #define X_STRUCT_L1_TOG_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOG_O, __VA_ARGS__)
@@ -493,6 +495,7 @@ public:                                                                     \
 
 // generate convert function
 #define X_STRUCT_FUNC_TOX_BEGIN_NT(x)                                       \
+    x2struct::x_condition_t<__XReader_##x> __x_cond;                        \
     void __x_to_struct(__XReader_##x& obj) {
 
 
@@ -515,7 +518,16 @@ public:                                                                     \
 // for local class, gen code without template (no template) END
 /////////////////////////////////////////////////////////////////////
 
-#define XTOSTRUCT_CONDITION(F)   template<typename DOC> static bool __x_cond_##F(void* self, DOC& obj)
+// C is class name, M is member name
+#define XTOSTRUCT_CONDITION(C, M)                                       \
+template<typename DOC>                                                  \
+static bool __x_cond_static_##M(void* obj, void* doc) {                 \
+    C *self = static_cast<C*>(obj);                                     \
+    return self->__x_cond_##M(*(static_cast<DOC*>(doc)));               \
+}                                                                       \
+template<typename DOC>                                                  \
+bool __x_cond_##M(DOC& obj)
+
 
 
 #endif

@@ -59,14 +59,13 @@ struct xstruct {
     condition con;
     Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,me"),O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md), C(O(con), con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
 #else
-    XTOSTRUCT(A(id,"config:id _id,me"),O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap), C(O(con), con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif
-    XTOSTRUCT_CONDITION(con) {
-        const xstruct *t = (const xstruct*)self;
-        int  id;
-        return obj.convert("id", id)&&id==t->id;
+    XTOSTRUCT_CONDITION(xstruct, con) {
+        int  _id;
+        return obj.convert("id", _id)&&_id==this->id;
     }
 };
 

@@ -107,7 +107,7 @@ public:
         return slice.size();
     }
 
-    static std::string alias_parse(const std::string&key, const std::string&alias, const std::string&type, bool *me) {
+    static std::string alias_parse(const std::string&key, const std::string&alias, const std::string&type, bool *md) {
         std::vector<std::string> type_all(2);
 
         std::vector<std::string> types;
@@ -131,10 +131,10 @@ public:
 
             std::vector<std::string> name_opt;
             split(name_opt, type_all[i], ',');
-            if (0 != me) {
+            if (0 != md) {
                 for (size_t i=1; i<name_opt.size(); ++i) {
-                    if (name_opt[i]=="me") {
-                        *me = true;
+                    if (name_opt[i]=="m") {
+                        *md = true;
                         break;
                     }
                 }
