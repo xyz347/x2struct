@@ -169,12 +169,12 @@ public:
 private:                                                                    \
     std::set<std::string> __x_has_string;                                   \
 public:                                                                     \
+    x2struct::x_condition_t __x_cond;                                       \
     bool xhas(const std::string& name) const {                              \
         return __x_has_string.find(name)!=__x_has_string.end();             \
     }
 
 #define X_STRUCT_FUNC_TOX_BEGIN                                             \
-    x2struct::x_condition_t __x_cond;                                       \
     template<typename DOC>                                                  \
     void __x_to_struct(DOC& obj) {
 
@@ -495,7 +495,6 @@ public:                                                                     \
 
 // generate convert function
 #define X_STRUCT_FUNC_TOX_BEGIN_NT(x)                                       \
-    x2struct::x_condition_t<__XReader_##x> __x_cond;                        \
     void __x_to_struct(__XReader_##x& obj) {
 
 
