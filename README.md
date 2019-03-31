@@ -320,7 +320,6 @@ customize type
 	- std::string format() const; use to format data to string
 	- void parse(const std::string&); use to load string to data
 - typedef XType<xxx> to define customize type
-- use -> visit member variable
 - following is an IPv4 example
 
 ```C++
@@ -357,7 +356,7 @@ int main(int argc, char *argv[]) {
     string json="{\"ip\":\"192.168.1.2\", \"mask\":\"255.255.255.0\"}";
 
     x2struct::X::loadjson(json, t, false);
-    cout<<t.ip->ip<<','<<t.mask->ip<<endl;
+    cout<<t.ip.ip<<','<<t.mask.ip<<endl;
     cout<<x2struct::X::tojson(t)<<endl;
     return 0;
 }

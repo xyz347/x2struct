@@ -319,7 +319,6 @@ int main(int argc, char *argv[]) {
 	- std::string format() const; 用于将对象转为字符串
 	- void parse(const std::string&); 用于将字符串转为对象
 - 最后用typedef XType<xxx> 完成自定义类型的定义
-- 需要用 -> 来访问自定义类型的成员变量
 - 以下代码是一个IPv4的例子
 
 ```C++
@@ -360,7 +359,7 @@ int main(int argc, char *argv[]) {
     string json="{\"ip\":\"192.168.1.2\", \"mask\":\"255.255.255.0\"}";
 
     x2struct::X::loadjson(json, t, false);
-    cout<<t.ip->ip<<','<<t.mask->ip<<endl; // 用->访问成员变量
+    cout<<t.ip.ip<<','<<t.mask.ip<<endl; // 用->访问成员变量
     cout<<x2struct::X::tojson(t)<<endl;
     return 0;
 }

@@ -38,7 +38,7 @@ static void base_check(xstruct&x)
 {
     EXPECT_EQ(x.id, 100);
 
-    EXPECT_EQ(x.start->unix_time, 1218196800);
+    EXPECT_EQ(x.start.unix_time, 1218196800);
 
     EXPECT_EQ(x.tint, 101);
 

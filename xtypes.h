@@ -44,25 +44,25 @@ struct x_condition_t {
 };
 
 template<typename TYPE>
-class XType {
+class XType:public TYPE {
 public:
     x_condition_t __x_cond;
     template<class DOC>
     void __x_to_struct(DOC& obj) {
         std::string str;
         obj.convert(NULL, str);
-        _t.parse(str);
+        this->parse(str);
     }
     template<class DOC>
     void __struct_to_str(DOC& obj, const char*key) const {
-        std::string str = _t.format();
+        std::string str = this->format();
         obj.convert(key, str);
     }
-    TYPE* operator->() {
+    /*TYPE* operator->() {
         return &_t;
     }
 private:
-    TYPE _t;
+    TYPE _t;*/
 };
 
 // YYYY-MM-DD HH:MM:SS
