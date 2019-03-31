@@ -18,7 +18,10 @@ x2struct
 * [check exist](#check-exist)
 * [local class](#local-class)
 * [customize type](#customize-type)
+* [Format indent](#format-indent)
 * [xml bson libconfig](#xml-bson-libconfig)
+* [Generate Golang struct](#generate-golang-struct)
+* [IMPORTANT](#important)
 
 Basic usage
 ----
@@ -57,6 +60,15 @@ int main(int argc, char *argv[]) {
     Group n;
     x2struct::X::loadjson(json, n, false); // json to C++ object
     cout<<n.name<<endl;
+
+    vector<int> vi;
+    x2struct::X::loadjson("[1,2,3]", vi, false); // load vector directory
+    cout<<vi.size()<<','<<vi[1]<<endl;
+
+    map<int, int> m;
+    x2struct::X::loadjson("{\"1\":10, \"2\":20}", m, false); // load map directory
+    cout<<m.size()<<','<<m[2]<<endl;
+
     return 0;
 }
 ```
@@ -272,127 +284,135 @@ int main(int argc, char *argv[]) {
 
 local class
 ----
+- XTOSTRUCT will add some template function, and local class could not define template function
+- use XTOSTRUCT_NT(types) instead of XTOSTRUCT, types support Json/Xml/Bson/Config
+- need C++11 support
+- not support load conditional now
 
+```C++
+// nt.cpp
+// g++ -o t nt.cpp -std=c++11
+#include <iostream>
+#include "x2struct/x2struct.hpp"
+
+using namespace std;
+
+int main(int argc, char *argv[]) {
+    struct Test {
+        int64_t id;
+        string  name;
+        XTOSTRUCT_NT(Json)(O(id, name));
+    };
+
+    Test t;
+    string json="{\"id\":123, \"name\":\"Pony\"}";
+
+    x2struct::X::loadjson(json, t, false);
+    cout<<t.name<<endl;
+    return 0;
+}
+```
 
 customize type
 ----
+- customize type is string
+- need implement:
+	- std::string format() const; use to format data to string
+	- void parse(const std::string&); use to load string to data
+- typedef XType<xxx> to define customize type
+- use -> visit member variable
+- following is an IPv4 example
+
+```C++
+#include <iostream>
+#include "x2struct/x2struct.hpp"
+
+using namespace std;
+
+// just example, no error handle
+struct _XIPv4 {
+    uint32_t ip;
+    std::string format() const {
+        char buf[64];
+        int  len = sprintf(buf, "%u.%u.%u.%u", ip>>24, 0xff&(ip>>16), 0xff&(ip>>8), 0xff&ip);
+        return string(buf, len);
+    }
+    void parse(const std::string& d) {
+        uint32_t u[4];
+        sscanf(d.c_str(), "%u.%u.%u.%u", &u[0], &u[1], &u[2], &u[3]);
+        ip = (u[0]<<24)+(u[1]<<16)+(u[2]<<8)+u[3];
+    }
+};
+
+typedef x2struct::XType<_XIPv4> XIPv4;
+
+struct Test {
+    XIPv4 ip;
+    XIPv4 mask;
+    XTOSTRUCT(O(ip, mask));
+};
+
+int main(int argc, char *argv[]) {
+    Test t;
+    string json="{\"ip\":\"192.168.1.2\", \"mask\":\"255.255.255.0\"}";
+
+    x2struct::X::loadjson(json, t, false);
+    cout<<t.ip->ip<<','<<t.mask->ip<<endl;
+    cout<<x2struct::X::tojson(t)<<endl;
+    return 0;
+}
+```
+
+Format indent
+----
+- last two parameters of tojson control format indent
 
 
 xml bson libconfig
 ----
+- need to modify [config.h](config.h) to enable
+- not support load vector map directory
+- xml/libconfig not permit use digit as key, so if want to use map<int, xxx>, key need add 'x', e.g. x100
+- mongoxclient(https://github.com/xyz347/mongoxclient) is a wrapper of mongo-cxx-driver use bson
 
 
-# x2struct
-
-*Read this in other languages: [简体中文](README.zh-cn.md).*
-
-------
-
-- Decode json/xml/libconfig/bson to C++ struct or encode C++ struct to json/xml/libconfig/bson
-- Convert C++ struct define to Golang struct define(Incomplete, only for testing)
-
-------
-- Header file only
-- bson/libconfig depend on lib file
-- json is enabled by default, modify config.h to enable other:
-    - xml need to define macro XTOSTRUCT_XML
-    - bson need to define macro XTOSTRUCT_BSON
-    - libconfig need to define macro XTOSTRUCT_LIBCONFIG
-    - to generate Golang code, need to define macro XTOSTRUCT_GOCODE
-
-------
-- support vector/set/map
-- support structure nesting
-- support inheritance. [example](test/inheritance.cpp)
-
-***
-### EXAMPLE
-Take a look at test/example_xxx.cpp or code below
-
+Generate Golang struct
+----
+- use to generate Golang struct define by C++ struct
+- need to define macro XTOSTRUCT_GOCODE
 ```C++
-// test.cpp
-
-#include <string>
+// go.cpp
+// g++ -o t go.cpp -DXTOSTRUCT_GOCODE
 #include <iostream>
-#include <vector>
-#include "x2struct.hpp" // include this header file
+#include "x2struct/x2struct.hpp"
 
 using namespace std;
 
-// struct define
-struct range {
-    int min;
-    int max;
-    XTOSTRUCT(M(min, max)); // add macro in the end of struct define
+struct Test {
+    int64_t id;
+    vector<string>  names;
+    XTOSTRUCT(O(id, names));
 };
 
-struct example {
-    int a;
-    string b;
-    std::vector<range> rs;  // structure nesting is ok
-    XTOSTRUCT(A(a, "_id"), O(b, rs));
-};
-
-
-/*
- g++ -o t test.cpp
- ./t
-*/
 int main(int argc, char *argv[]) {
-    example x;
-    
-    // json string to struct
-    x2struct::X::loadjson("{\"a\":1, \"b\":\"x2struct\", \"rs\":[{\"min\":1, \"max\":2}, {\"min\":10, \"max\":20}]}", x, false);
+    Test t;
 
-    // struct to json string
-    cout<<x2struct::X::tojson(x)<<endl;
-    
-    // xml/bson/libconfig is similar
-    return 0;
+    cout<<x2struct::X::togocode(t, true, true, true)<<endl; // last 3 parameter to generate (json/bson/xml) tags
+    return 0;
+}
+
+```
+
+output is:
+```go
+type Test struct {
+        Id      int64       `json:"id" bson:"id" xml:"id"`
+        Names   []string    `json:"names" bson:"names" xml:"names"`
 }
 ```
 
-### USAGE
-add macro XTOSTRUCT in the end of struct define. contains all struct members
-``` C++
-struct example {
-    int a;
-    std::string b;
-    std::vector<float> c;
-    std::vector<int> d;
-    XTOSTRUCT(A(a, "id"), O(b), M(c, d)); // add this line
-};
-```
-
-Members must in one of A,M or O. A can only put one member at a time, and M/O can put multiple members.
-
-- A: Alias. Used when the member name and key are inconsistent. such as member named UID, and key is "_id"<br>
-  Generic alias  A(a, "_id")  "_id" effective for json/xml/bson/libconfig <br>
-  Special alias A(a, "bson:_id")，"_id" only effective for bson. json/xml/libconfig use "a" <br>
-  A(a, "id,bson:_id") bson use "_id"，others use "id"
-
-- M: Mandatory. An exception will throw if no key found for mandatory member when decode
-- O: Optional. Corresponding to M
-- I: Inheritance. If has base class and base class defined XTOSTRUCT, use I to include the base class. [example](test/inheritance.cpp)
-- B: For bit field, optional
-- C: Load conditional. load one object from array.
-
-***
-Conditional decode can be done with XTOSTRUCT_CONDITION/XTOSTRUCT_CONDITION_EQ.
-For details, please refer to the struct condition in x2struct_test.cpp.
-***
-
-If you want to implement some custom types, you can add them in xtypes.h. For details, please refer to XDate. key points:
-- Define a class, implement format for encode, parse for decode
-- Using the template XType typedef a type
-
-### Local Class
-Many compilers do not support defining template functions in the local class, while macro XTOSTRUCT defines template functions, so the macro XTOSTRUCT_NT is required in the local class. In addition, applying local class to template functions requires c++0x. support.
-
-XTOSTRUCT_NT is used in the same way as XTOSTRUCT, and you need to specify which types of functions to generate by parameters. Support 4 types: Json/Bson/Xml/Config, such as XTOSTRUCT_NT(Json, Xml)(O(a,b,c), M(d));
-
-
-### IMPORTANT
+IMPORTANT
+----
 - Encode/decode json is use [rapidjson](https://github.com/Tencent/rapidjson)
 - Decode xml is use [rapidxml](http://rapidxml.sourceforge.net)
 - Decode bson is use [libbson](https://github.com/mongodb/libbson/tree/1.0.0)
