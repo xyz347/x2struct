@@ -359,7 +359,7 @@ int main(int argc, char *argv[]) {
     string json="{\"ip\":\"192.168.1.2\", \"mask\":\"255.255.255.0\"}";
 
     x2struct::X::loadjson(json, t, false);
-    cout<<t.ip.ip<<','<<t.mask.ip<<endl; // 用->访问成员变量
+    cout<<t.ip.ip<<','<<t.mask.ip<<endl;
     cout<<x2struct::X::tojson(t)<<endl;
     return 0;
 }
