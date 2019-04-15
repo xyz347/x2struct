@@ -421,4 +421,4 @@ type Test struct {
 - libconfig的反序列化用的是[libconfig](https://github.com/hyperrealm/libconfig)
 - xml/bson的序列化是我自己写的，没有参考RFC，可能有和标准不一样的地方.
 - bson/libconfig的库是预编译的. 环境是: Ubuntu12.04 g++4.9.2. 其他环境如果想使用bson/libconfig可能需要自行编译这两个库
-
+- 有疑问可以加QQ群878041110

@@ -109,8 +109,8 @@ Alias
 - used for scenes where the variable name and json key name are inconsistent
 - use A to include alias variable. "A" take two parameters, 1st is variable, 2nd is tag-field
 - tag format is "[type:]alias[,extension]", Tag-field can contain multiple tags, separated by spaces
-- type if one of "json"/"xml"/"bson"/"config", no type field in tag  means this tag is applied to all type
-    - "tid" means use tid as alias for all type
+- type is one of "json"/"xml"/"bson"/"config", no type field in tag  means this tag is applied to all type
+    - for example, "tid" means use tid as alias for all type
     - "tid json:xid" means json use "xid" as alias and other types use "tid"
 - extension only support "m" now, means mandatory(A like O, optional)
 - if no alias in json, loadjson will also try variable name
