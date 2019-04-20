@@ -125,10 +125,35 @@ public:
         return true;
     }
 
+    #ifdef X_SUPPORT_C0X
+    // class/struct that not defined macro XTOSTRUCT
+    template <typename TYPE, typename std::enable_if<!x_has_x2struct<TYPE>::value, int>::type = 0>
+    bool convert(const char*key, TYPE& val, x_for_class(TYPE, int) *unused=0) {
+        (void)unused;
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        bool ret = false;
+
+        do {
+            if (NULL == obj) {
+                break;
+            }
+            x_str_to_struct(*obj, val);
+            ret = true;
+        } while(false);
+
+        return ret;
+    }
+
+    // class/struct that defined macro XTOSTRUCT
+    template <typename TYPE, typename std::enable_if<x_has_x2struct<TYPE>::value, int>::type = 0>
+    bool convert(const char*key, TYPE& val) {
+    #else
     // add x_for_class to avoid enum hit this function
     template <typename TYPE>
     bool convert(const char*key, TYPE& val, x_for_class(TYPE, int) *unused=0) {
         (void)unused;
+    #endif
         doc_type tmp;
         doc_type *obj = get_obj(key, &tmp);
         bool ret = false;
@@ -141,6 +166,7 @@ public:
             size_t len = obj->size(false);
             if (len <= 1) {
                 val.__x_to_struct(*obj);
+                ret = true;
             } else if (NULL == val.__x_cond.cond) {
                 break;
             } else {

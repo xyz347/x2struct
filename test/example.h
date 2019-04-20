@@ -36,11 +36,19 @@ struct condition {
     XTOSTRUCT(M(url));
 };
 
+#ifdef X_SUPPORT_C0X
+struct sub {
+    int    a;
+    string b;
+};
+XTOSTRUCT_OUT(sub, M(a), O(b));
+#else
 struct sub {
     int    a;
     string b;
     XTOSTRUCT(M(a), O(b));
 };
+#endif
 
 struct xstruct {
     int    id;

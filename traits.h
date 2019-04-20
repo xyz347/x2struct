@@ -25,6 +25,31 @@
 using namespace std;
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || _MSC_VER>=1700
+
+#define X_SUPPORT_C0X
+#define X_SELF __x_self
+
+namespace x2struct {
+
+template <typename T>
+struct x_has_x2struct
+{
+    typedef char YES;
+    typedef char NO[2];
+
+    template <typename C> static YES& check(decltype(&C::__x_cond));
+    template <typename> static NO& check(...);
+
+    static bool const value = sizeof(check<T>(0)) == sizeof(YES);
+};
+
+struct x_fake_set {
+    void insert(const std::string &s){(void)s;}
+};
+
+}
+
+
 //template <class T>
 //using x_for_class = typename std::enable_if<std::is_class<T>::value, int>::type;
 
@@ -38,6 +63,8 @@ using namespace std;
 #define x_decltype(T)  decltype(T)
 
 #else  // C11
+
+#define X_SELF this
 
 namespace x2struct {
 

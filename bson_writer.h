@@ -187,9 +187,29 @@ public:
         return *this;
     }
 
+
+    #ifdef X_SUPPORT_C0X
+    // class/struct that not defined macro XTOSTRUCT
+    template <typename T, typename std::enable_if<!x_has_x2struct<T>::value, int>::type = 0>
+    BsonWriter& convert(const char*key, const T& data, x_for_class(T, int) *unused=0) {
+        (void)unused;
+        if (_type!=top || key[0]!='\0') {
+            BsonWriter child(key, _bson, doc);
+            x_struct_to_str(child, "", data);
+        } else {
+            x_struct_to_str(*this, "", data);
+        }
+        return *this;
+    }
+
+    // class/struct that defined macro XTOSTRUCT
+    template <typename T, typename std::enable_if<x_has_x2struct<T>::value, int>::type = 0>
+    BsonWriter& convert(const char*key, const T& data) {
+    #else
     template <typename T>
     BsonWriter& convert(const char*key, const T& data, x_for_class(T, int) *p=0) {
         (void)p;
+    #endif
         if (_type!=top || key[0]!='\0') {
             BsonWriter child(key, _bson, doc);
             data.__struct_to_str(child, "");

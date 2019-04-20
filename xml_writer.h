@@ -251,9 +251,26 @@ public:
         this->object_end();
     }
 
+
+    #ifdef X_SUPPORT_C0X
+    // class/struct that not defined macro XTOSTRUCT
+    template <typename T, typename std::enable_if<!x_has_x2struct<T>::value, int>::type = 0>
+    void convert(const char*key, const T& data, x_for_class(T, int) *unused=0) {
+        (void)unused;
+        XmlKey xkey(key, this, false);
+        this->object_begin();
+        x_struct_to_str(*this, key, data);
+        this->object_end();
+    }
+
+    // class/struct that defined macro XTOSTRUCT
+    template <typename T, typename std::enable_if<x_has_x2struct<T>::value, int>::type = 0>
+    void convert(const char*key, const T& data) {
+    #else
     template <typename T>
     void convert(const char*key, const T& data, x_for_class(T, int) *p=0) {
         (void)p;
+    #endif
         XmlKey xkey(key, this, false);
         this->object_begin();
         data.__struct_to_str(*this, key);

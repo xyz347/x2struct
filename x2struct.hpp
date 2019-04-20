@@ -26,6 +26,7 @@
 #include <set>
 #include <stdexcept>
 
+#include "traits.h"
 #include "util.h"
 #include "xreader.h"
 
@@ -54,7 +55,6 @@
 #include "go_writer.h"
 #endif
 
-#include "traits.h"
 
 //#include <iostream>
 //using namespace std;
@@ -163,6 +163,8 @@ public:
 };
 
 } // namespace
+#else
+#include "traits.h"
 #endif // XTOSTRUCT_MACRO_TEST
 
 #define X_STRUCT_FUNC_COMMON                                                \
@@ -174,13 +176,24 @@ public:                                                                     \
         return __x_has_string.find(name)!=__x_has_string.end();             \
     }
 
+#ifndef X_SUPPORT_C0X
 #define X_STRUCT_FUNC_TOX_BEGIN                                             \
     template<typename DOC>                                                  \
     void __x_to_struct(DOC& obj) {
+#else
+#define X_STRUCT_FUNC_TOX_BEGIN                                             \
+    template<typename DOC>                                                  \
+    void __x_to_struct(DOC& obj) { auto X_SELF = this;
+
+#define X_STRUCT_FUNC_TOX_BEGIN_OUT(NAME)                                   \
+    template<typename DOC>                                                  \
+    void x_str_to_struct(DOC& obj, NAME& __xval__) { x2struct::x_fake_set __x_has_string; auto X_SELF = &__xval__;
+
+#endif
 
 // optional
 #define X_STRUCT_ACT_TOX_O(M)                                               \
-        if (obj.convert(#M, M) && obj.set_has()) {                          \
+        if (obj.convert(#M, X_SELF->M) && obj.set_has()) {                  \
             __x_has_string.insert(#M);                                      \
         }
 
@@ -192,13 +205,13 @@ public:                                                                     \
                 if (obj.set_has()) {                                        \
                     __x_has_string.insert(#M);                              \
                 }                                                           \
-                M = __tmp;                                                  \
+                X_SELF->M = __tmp;                                          \
             }                                                               \
         }
 
 // mandatory
 #define X_STRUCT_ACT_TOX_M(M)                                               \
-        if (obj.convert(#M, M)) {                                           \
+        if (obj.convert(#M, X_SELF->M)) {                                   \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else {                                                            \
             obj.md_exception(#M);                                           \
@@ -210,9 +223,9 @@ public:                                                                     \
         bool md = false;                                                    \
         std::string __alias__name__ = obj.hasa(#M, A_NAME, &md);            \
         const char*__an = __alias__name__.c_str();                          \
-        if (obj.convert(__an, M)) {                                         \
+        if (obj.convert(__an, X_SELF->M)) {                                 \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
-        } else if (obj.convert(#M, M)) {                                    \
+        } else if (obj.convert(#M, X_SELF->M)) {                            \
             if (obj.set_has()) __x_has_string.insert(#M);                   \
         } else if (md) {                                                    \
             obj.md_exception(__an);                                         \
@@ -229,15 +242,26 @@ public:                                                                     \
 
 
 // struct to string
+#ifndef X_SUPPORT_C0X
 #define X_STRUCT_FUNC_TOS_BEGIN                                                     \
     template <class CLASS>                                                          \
     void __struct_to_str(CLASS& obj, const char *root) const { (void)root;
+#else
+#define X_STRUCT_FUNC_TOS_BEGIN                                                     \
+    template <class CLASS>                                                          \
+    void __struct_to_str(CLASS& obj, const char *root) const { (void)root;auto X_SELF = this;
+
+#define X_STRUCT_FUNC_TOS_BEGIN_OUT(NAME)                                           \
+    template <class CLASS>                                                          \
+    void x_struct_to_str(CLASS& obj, const char *root, const NAME&__xval__) { (void)root;auto X_SELF = &__xval__;
+
+#endif
 
 #define X_STRUCT_ACT_TOS_O(M)                                                       \
-        obj.convert(#M, M);
+        obj.convert(#M, X_SELF->M);
 
 #define X_STRUCT_ACT_TOS_A(M, A_NAME)                                               \
-        obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), M);
+        obj.convert(x2struct::Util::alias_parse(#M, A_NAME, obj.type(), 0).c_str(), X_SELF->M);
 
 // Inheritance 
 #define X_STRUCT_ACT_TOS_I(B)   B::__struct_to_str(obj, root);
@@ -481,6 +505,11 @@ public:                                                                     \
     X_STRUCT_FUNC_TOX_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END  \
     X_STRUCT_FUNC_TOS_BEGIN  X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
 #endif
+
+// for class/struct that could not modify(could not add XTOSTUCT macro)
+#define XTOSTRUCT_OUT(NAME, ...)  \
+    X_STRUCT_FUNC_TOX_BEGIN_OUT(NAME) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END \
+    X_STRUCT_FUNC_TOS_BEGIN_OUT(NAME) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
 
 /////////////////////////////////////////////////////////////////////
 // for local class, gen code without template (no template) BEGIN

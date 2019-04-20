@@ -18,6 +18,7 @@ x2struct
 * [check exist](#check-exist)
 * [local class](#local-class)
 * [customize type](#customize-type)
+* [thirdparty class](#thirdparty-class)
 * [Format indent](#format-indent)
 * [xml bson libconfig](#xml-bson-libconfig)
 * [Generate Golang struct](#generate-golang-struct)
@@ -366,6 +367,50 @@ Format indent
 ----
 - last two parameters of tojson control format indent
 
+
+thirdparty class
+----
+- need c++11 support
+- use XTOSTRUCT_OUT instead of XTOSTRUCT
+
+```c++
+#include <sys/time.h>
+#include "x2struct/x2struct.hpp"
+
+using namespace std;
+
+/*
+struct timeval {
+    time_t      tv_sec;
+    suseconds_t tv_usec;
+};
+*/
+
+// timeval is thirdparty struct
+XTOSTRUCT_OUT(timeval, O(tv_sec, tv_usec));
+
+struct T {
+    int  a;
+    string b;
+    timeval t;
+    XTOSTRUCT(O(a, b, t));
+};
+
+
+int main(int argc, char *argv[]) {
+    T t;
+    T r;
+    t.a = 123;
+    t.b = "x2struct";
+    t.t.tv_sec = 888;
+    t.t.tv_usec = 999;
+    string s = x2struct::X::tojson(t);
+    cout<<s<<endl;
+    x2struct::X::loadjson(s, r, false);
+    cout<<r.a<<','<<r.b<<','<<r.t.tv_sec<<','<<r.t.tv_usec<<endl;
+    return 0;
+}
+```
 
 xml bson libconfig
 ----
