@@ -373,6 +373,7 @@ int main(int argc, char *argv[]) {
 
 ```c++
 #include <sys/time.h>
+#include <iostream>
 #include "x2struct/x2struct.hpp"
 
 using namespace std;

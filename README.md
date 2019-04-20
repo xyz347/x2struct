@@ -375,6 +375,7 @@ thirdparty class
 
 ```c++
 #include <sys/time.h>
+#include <iostream>
 #include "x2struct/x2struct.hpp"
 
 using namespace std;

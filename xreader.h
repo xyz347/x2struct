@@ -25,7 +25,7 @@
 #include <vector>
 #include <set>
 #include <stdexcept>
-#include <iostream>
+//#include <iostream>
 
 #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
 #include <string.h>
