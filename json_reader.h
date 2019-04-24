@@ -94,7 +94,11 @@ public: // convert
         XTOSTRUCT_JSON_GETVAL(GetString);
     }
     bool convert(const char*key, bool &val) {
-        XTOSTRUCT_JSON_GETVAL(GetBool);
+        try {
+            XTOSTRUCT_JSON_GETVAL(GetBool);
+        } catch (...) {
+            XTOSTRUCT_JSON_GETVAL(GetInt64, (bool));
+        }
     }
     bool convert(const char*key, int16_t &val) {
         XTOSTRUCT_JSON_GETVAL(GetInt, (int16_t));
