@@ -18,7 +18,7 @@
 #define __X_GO_WRITER_H
 
 
-#include <stdint.h>
+#include "xstdint.h"
 #include <string>
 #include <map>
 #include <vector>

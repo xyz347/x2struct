@@ -19,7 +19,7 @@
 #define __X_BSON_WRITER_H
 
 
-#include <stdint.h>
+#include "xstdint.h"
 #include <string>
 #include <map>
 #include <vector>

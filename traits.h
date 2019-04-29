@@ -18,7 +18,7 @@
 #ifndef __X_TO_TRAITS_H
 #define __X_TO_TRAITS_H
 
-#include <stdint.h>
+#include "xstdint.h"
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || _MSC_VER>=1700
 #include <type_traits>

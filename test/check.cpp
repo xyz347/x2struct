@@ -16,7 +16,7 @@
 
 
 
-#include <stdint.h>
+#include "xstdint.h"
 #include <iostream>
 #include <fstream>
 #include <string>

@@ -23,7 +23,7 @@
 #endif
 
 #include <time.h>
-#include <stdint.h>
+#include "xstdint.h"
 #include <string>
 #include <stdexcept>
 

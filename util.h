@@ -21,7 +21,7 @@
 #include <vector>
 //#include <iostream>
 
-#include <stdint.h>
+#include "xstdint.h"
 #include <stdio.h>
 #include <string.h>
 

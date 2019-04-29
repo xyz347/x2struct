@@ -19,7 +19,7 @@
 #define __X_READER_H
 
 
-#include <stdint.h>
+#include "xstdint.h"
 #include <string>
 #include <map>
 #include <vector>
