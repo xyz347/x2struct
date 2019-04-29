@@ -254,7 +254,7 @@ public:
         return p;
     }
     void md_exception(const std::string&key) {
-        std::string err;
+        /*std::string err;
         err.reserve(128);
         err.append("miss mandatory node ");
         std::string p = path();
@@ -262,6 +262,22 @@ public:
             err.append(p).append(".");
         }
         err.append(key);
+        throw std::runtime_error(err);*/
+        read_exception("miss mandatory node", key);
+    }
+    void read_exception(const char* what, const std::string&key) {
+        std::string err;
+        err.reserve(128);
+        if (NULL != what) {
+            err.append(what);
+        }
+        err.append("[");
+        std::string p = path();
+        if (!p.empty()) {
+            err.append(p).append(".");
+        }
+        err.append(key);
+        err.append("]");
         throw std::runtime_error(err);
     }
 

@@ -86,7 +86,11 @@ public: // convert
     #define XTOSTRUCT_JSON_GETVAL(f, ...)           \
         const rapidjson::Value *v = get_val(key);   \
         if (NULL != v) {                            \
-            val = __VA_ARGS__ v->f();               \
+            try {                                   \
+                val = __VA_ARGS__ v->f();           \
+            } catch (const std::exception&e) {      \
+                read_exception(e.what(), key);      \
+            }                                       \
             return true;                            \
         } else return false
 
@@ -94,10 +98,23 @@ public: // convert
         XTOSTRUCT_JSON_GETVAL(GetString);
     }
     bool convert(const char*key, bool &val) {
-        try {
+        /*try {
             XTOSTRUCT_JSON_GETVAL(GetBool);
         } catch (...) {
             XTOSTRUCT_JSON_GETVAL(GetInt64, (bool));
+        }*/
+        const rapidjson::Value *v = get_val(key);
+        if (NULL == v) {
+            return false;
+        } else if (v->IsBool()) {
+            val = v->GetBool();
+            return true;
+        } else if (v->IsInt64()) {
+            val = (bool)(v->GetInt64());
+            return true;
+        } else {
+            read_exception("wish bool, but not bool or int", key);
+            return false;
         }
     }
     bool convert(const char*key, int16_t &val) {

@@ -38,7 +38,7 @@
 typedef signed __int64       int64_t;
 typedef unsigned __int64     uint64_t;
 #else
-#include "xstdint.h"
+#include <stdint.h>
 #endif
 
 
