@@ -20,7 +20,7 @@
 
 #define XTOSTRUCT_SUPPORT_CHAR_ARRAY
 #include <x2struct.hpp>
-#include <xtypes.h>
+//#include <xtypes.h>
 
 using namespace std;
 using namespace x2struct;

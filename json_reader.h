@@ -110,7 +110,7 @@ public: // convert
             val = v->GetBool();
             return true;
         } else if (v->IsInt64()) {
-            val = (bool)(v->GetInt64());
+            val = (0 != (v->GetInt64()));
             return true;
         } else {
             read_exception("wish bool, but not bool or int", key);
