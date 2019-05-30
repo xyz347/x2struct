@@ -117,6 +117,12 @@ public: // convert
             return false;
         }
     }
+    bool convert(const char*key, int8_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt, (int8_t));
+    }
+    bool convert(const char*key, uint8_t &val) {
+        XTOSTRUCT_JSON_GETVAL(GetInt, (uint8_t));
+    }
     bool convert(const char*key, int16_t &val) {
         XTOSTRUCT_JSON_GETVAL(GetInt, (int16_t));
     }
