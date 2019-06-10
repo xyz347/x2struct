@@ -126,6 +126,15 @@ public:
     }
 
     #ifdef X_SUPPORT_C0X
+    // shared_ptr
+    template <typename TYPE>
+    bool convert(const char*key, std::shared_ptr<TYPE>& val) {
+        if (NULL == val.get()) {
+            val.reset(new TYPE);
+        }
+        return this->convert(key, *val);
+    }
+
     // class/struct that not defined macro XTOSTRUCT
     template <typename TYPE, typename std::enable_if<!x_has_x2struct<TYPE>::value, int>::type = 0>
     bool convert(const char*key, TYPE& val, x_for_class(TYPE, int) *unused=0) {

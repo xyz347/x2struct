@@ -45,6 +45,12 @@ static void base_check(xstruct&x)
     EXPECT_EQ(x.tstring, "hello\"");
     EXPECT_TRUE(0==strcmp(x.chArray, "It's Array"));
 
+    #ifdef X_SUPPORT_C0X
+    EXPECT_EQ(x.sp->a, 123);
+    #else
+    EXPECT_EQ(x.sp.a, 123);
+    #endif
+
     EXPECT_EQ(x.vint.size(), 1U);
     EXPECT_EQ(x.vint[0], 102);
 

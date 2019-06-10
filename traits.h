@@ -22,6 +22,7 @@
 
 #if __GXX_EXPERIMENTAL_CXX0X__ || _MSC_VER>=1700
 #include <type_traits>
+#include <memory>
 #endif
 
 using namespace std;

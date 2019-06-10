@@ -50,12 +50,22 @@ struct sub {
 };
 #endif
 
+struct SharePtr {
+    int a;
+    XTOSTRUCT(O(a));
+};
+
 struct xstruct {
     int    id;
     XDate  start;
     int    tint;
     string tstring;
     char   chArray[16];
+    #ifdef X_SUPPORT_C0X
+    std::shared_ptr<SharePtr> sp;
+    #else
+    SharePtr sp;
+    #endif
     vector<int> vint;
     vector<string> vstring;
     vector<int64_t> vlong;
@@ -67,9 +77,9 @@ struct xstruct {
     condition con;
     Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, sp, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
 #else
-    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(tint, tstring, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(tint, tstring, sp, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif
     XTOSTRUCT_CONDITION(xstruct, con) {
         int  _id;
