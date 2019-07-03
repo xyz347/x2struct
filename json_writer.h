@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <set>
 #include <map>
 
@@ -208,6 +209,17 @@ public:
         this->array_begin();
         for (size_t i=0; i<data.size(); ++i) {
             this->convert("", data[i]);
+        }
+        this->array_end();
+        return *this;
+    }
+
+    template<typename T>
+    JsonWriter& convert(const char*key, const std::list<T>&data) {
+        x2struct_set_key(key);
+        this->array_begin();
+        for (typename std::list<T>::const_iterator it=data.begin(); it!=data.end(); ++it) {
+            this->convert("", *it);
         }
         this->array_end();
         return *this;

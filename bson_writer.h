@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
 #include <set>
 
 #include "thirdparty/libbson/include/libbson-1.0/bson.h"
@@ -146,6 +147,15 @@ public:
         BsonWriter child(key, _bson, array);
         for (size_t i=0; i<data.size(); ++i) {
             child.convert(Util::tostr(i).c_str(), data[i]);
+        }
+        return *this;
+    }
+    template<typename T>
+    BsonWriter& convert(const char*key, const std::list<T>&data) {
+        BsonWriter child(key, _bson, array);
+        size_t i = 0;
+        for (typename std::list<T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter,++i) {
+            child.convert(Util::tostr(i).c_str(), *iter);
         }
         return *this;
     }

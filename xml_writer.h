@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <set>
 #include <map>
 //#include <iostream>
@@ -212,6 +213,18 @@ public:
         for (size_t i=0; i<data.size(); ++i) {
             XmlKey xkey(key, this, true);
             this->convert("", data[i]);
+        }
+        this->array_end();
+        return *this;
+    }
+
+    template<typename T>
+    XmlWriter& convert(const char*key, const std::list<T>&data) {
+        key=key[0]=='\0'?"x":key;
+        this->array_begin();
+        for (typename std::list<T>::const_iterator it=data.begin(); it!=data.end(); ++it) {
+            XmlKey xkey(key, this, true);
+            this->convert("", *it);
         }
         this->array_end();
         return *this;

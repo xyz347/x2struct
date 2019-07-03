@@ -67,6 +67,7 @@ struct xstruct {
     SharePtr sp;
     #endif
     vector<int> vint;
+    list<int> lint;
     vector<string> vstring;
     vector<int64_t> vlong;
     vector<sub> vsub;
@@ -77,7 +78,7 @@ struct xstruct {
     condition con;
     Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, sp, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, sp, vint, lint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
 #else
     XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(tint, tstring, sp, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif

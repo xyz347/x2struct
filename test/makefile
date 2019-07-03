@@ -40,7 +40,7 @@ check:
 	@-rm $@
 
 checkc11:
-	$(GPP) -o $@ -Wextra -Wall check.cpp $(INC) $(LIBCONFIG) $(LIBBSON) -std=c++11
+	$(GPP) -o $@ -fsanitize=address -Wextra -Wall check.cpp $(INC) $(LIBCONFIG) $(LIBBSON) -std=c++11
 	./$@
 	@-rm $@
 

@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
 #include <set>
 #include <stdexcept>
 //#include <iostream>
@@ -65,6 +66,23 @@ public:
         val.resize(s);
         for (size_t i=0; i<s; ++i) {
             (*obj)[i].convert(NULL, val[i]);   // [implement] doc_type operator[](size_t)
+        }
+        return true;
+    }
+
+    template <typename TYPE>
+    bool convert(const char*key, std::list<TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        size_t s = obj->size();
+        for (size_t i=0; i<s; ++i) {
+            TYPE _t;
+            (*obj)[i].convert(NULL, _t);
+            val.push_back(_t);
         }
         return true;
     }

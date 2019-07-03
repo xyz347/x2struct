@@ -6,6 +6,8 @@
     <tstring>hello&quot;</tstring>
     <chArray>It's Array</chArray>
     <vint>102</vint>
+    <lint>12</lint>
+    <lint>34</lint>
     <vstring>hello1</vstring>
     <vstring>hello2</vstring>
     <vlong>666</vlong>

@@ -21,6 +21,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <list>
 
 #include <config.h>
 #include "gtest_stub.h"
@@ -36,6 +37,7 @@
 
 static void base_check(xstruct&x)
 {
+    int i;
     EXPECT_EQ(x.id, 100);
 
     EXPECT_EQ(x.start.unix_time, 1218196800);
@@ -53,6 +55,13 @@ static void base_check(xstruct&x)
 
     EXPECT_EQ(x.vint.size(), 1U);
     EXPECT_EQ(x.vint[0], 102);
+
+    EXPECT_EQ(x.lint.size(), 2U);
+    i=0;
+    int lint[] = {12,34};
+    for (std::list<int>::const_iterator iter=x.lint.begin(); iter!=x.lint.end(); ++iter,++i) {
+        EXPECT_EQ(*iter, lint[i]);
+    }
 
     EXPECT_EQ(x.vstring.size(), 2U);
     EXPECT_EQ(x.vstring[0], "hello1");
@@ -119,6 +128,7 @@ TEST(json, marshal)
     xstruct x;
     X::loadjson("test.json", x, true);
     string n = X::tojson(x);
+    cout<<n<<endl;
 
     xstruct y;
     X::loadjson(n, y, false);
