@@ -247,7 +247,7 @@ public:
         XmlKey xkey(key, this, false);
         this->object_begin();
         for (typename std::map<std::string,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
-            this->convert(iter->first, iter->second);
+            this->convert(iter->first.c_str(), iter->second);
         }
         this->object_end();
     }
@@ -266,6 +266,17 @@ public:
 
 
     #ifdef X_SUPPORT_C0X
+    // unordered_map
+    template <typename T>
+    void convert(const char*key, const std::unordered_map<std::string, T> &data) {
+        XmlKey xkey(key, this, false);
+        this->object_begin();
+        for (typename std::unordered_map<std::string,T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+            this->convert(iter->first.c_str(), iter->second);
+        }
+        this->object_end();
+    }
+
     // shared_ptr
     template <typename TYPE>
     void convert(const char*key, const std::shared_ptr<TYPE>& val) {

@@ -199,6 +199,21 @@ public:
 
 
     #ifdef X_SUPPORT_C0X
+    // unordered_map
+    template<typename T>
+    BsonWriter& convert(const char*key, const std::unordered_map<std::string, T>&data) {
+        if (_type!=top || key[0]!='\0') {
+            BsonWriter child(key, _bson, doc);
+            for (typename std::unordered_map<std::string, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                child.convert(iter->first.c_str(), iter->second);
+            }
+        } else {
+            for (typename std::unordered_map<std::string, T>::const_iterator iter=data.begin(); iter!=data.end(); ++iter) {
+                this->convert(iter->first.c_str(), iter->second);
+            }
+        }
+        return *this;
+    }
     // shared_ptr
     template <typename TYPE>
     BsonWriter& convert(const char*key, const std::shared_ptr<TYPE>& val) {

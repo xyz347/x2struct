@@ -144,6 +144,23 @@ public:
     }
 
     #ifdef X_SUPPORT_C0X
+    // unordered_map
+    template <typename TYPE>
+    bool convert(const char*key, std::unordered_map<std::string,TYPE> &val) {
+        doc_type tmp;
+        doc_type *obj = get_obj(key, &tmp);
+        if (NULL == obj) {
+            return false;
+        }
+
+        for (doc_type d=obj->begin(); d; d=d.next()) { // [implement] doc_type begin(); doc_type next(); operator bool() const;
+            TYPE _t;
+            d.convert(NULL, _t);
+            val[d.key()] = _t;
+        }
+        return true;
+    }
+
     // shared_ptr
     template <typename TYPE>
     bool convert(const char*key, std::shared_ptr<TYPE>& val) {

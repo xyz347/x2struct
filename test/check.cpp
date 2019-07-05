@@ -53,6 +53,10 @@ static void base_check(xstruct&x)
     EXPECT_EQ(x.sp.a, 123);
     #endif
 
+    EXPECT_EQ(x.umap.size(), 2U);
+    EXPECT_EQ(x.umap["a"], 100);
+    EXPECT_EQ(x.umap["b"], 101);
+
     EXPECT_EQ(x.vint.size(), 1U);
     EXPECT_EQ(x.vint[0], 102);
 

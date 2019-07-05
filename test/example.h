@@ -63,8 +63,10 @@ struct xstruct {
     char   chArray[16];
     #ifdef X_SUPPORT_C0X
     std::shared_ptr<SharePtr> sp;
+    std::unordered_map<std::string, int> umap;
     #else
     SharePtr sp;
+    std::map<std::string, int> umap;
     #endif
     vector<int> vint;
     list<int> lint;
@@ -78,7 +80,7 @@ struct xstruct {
     condition con;
     Mode md;
 #ifndef XTOSTRUCT_GOCODE
-    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, sp, vint, lint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
+    XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(start, tint, tstring, chArray, sp, umap, vint, lint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, md, con));
 #else
     XTOSTRUCT(A(id,"config:id _id,m"),C(con), O(tint, tstring, sp, vint, vstring, vlong, vsub, vvint, vvstring, vvsub, tmap, con));
 #endif

@@ -2,6 +2,10 @@
     <_id>100</_id>
     <start>2008-08-08 20:00:00</start>
 	<sp><a>123</a></sp>
+	<umap>
+		<a>100</a>
+		<b>101</b>
+	</umap>
     <tint>101</tint>
     <tstring>hello&quot;</tstring>
     <chArray>It's Array</chArray>
