@@ -99,6 +99,10 @@ public:
     }
     template <typename TYPE>
     static std::string toxml(const TYPE&t, const std::string&root, int indentCount=-1, char indentChar=' ') {
+        if (root.empty()) {
+            throw std::runtime_error("root of toxml must not empty");
+        }
+
         XmlWriter writer(indentCount, indentChar);
         writer.convert(root.c_str(), t);
         return writer.toStr();

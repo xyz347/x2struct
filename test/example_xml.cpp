@@ -29,7 +29,13 @@ int main(int argc, char *argv[]) {
     // struct <--> string
     cout<<"======== struct <-----> string ==========="<<endl;
     X::loadxml("test.xml", x, true);   // load xml from file, if from string, last parameter give false
-    cout<<X::toxml(x, "")<<endl<<endl;     // struct to string.
+
+    std::string xstr = X::toxml(x, "hello");
+    cout<<xstr<<endl<<endl;     // struct to string.
+
+    xstruct y;
+    X::loadxml(xstr, y, false);
+    cout<<X::tojson(y)<<endl;
 
 #if 0 // not support now
     // map <--> string
