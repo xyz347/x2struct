@@ -85,7 +85,7 @@ public:
 public: // convert
     #define XTOSTRUCT_JSON_GETVAL(f, ...)           \
         const rapidjson::Value *v = get_val(key);   \
-        if (NULL != v) {                            \
+        if (v != nullptr && !v->IsNull()) {         \
             try {                                   \
                 val = __VA_ARGS__ v->f();           \
             } catch (const std::exception&e) {      \
