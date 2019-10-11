@@ -244,7 +244,7 @@ private:
             return _val;
         } else if (NULL != _val) {
             rapidjson::Value::ConstMemberIterator iter = _val->FindMember(key);
-            if (iter != _val->MemberEnd()) {
+            if (iter != _val->MemberEnd() && !(iter->value.IsNull())) {
                 return &iter->value;
             } else {
                 return NULL;
