@@ -229,7 +229,7 @@ private:
     
     JsonReader* child(const char*key, JsonReader*tmp) {
         rapidjson::Value::ConstMemberIterator iter;
-        if (NULL!=_val && _val->MemberEnd()!=(iter=_val->FindMember(key))) {
+        if (NULL!=_val && _val->MemberEnd()!=(iter=_val->FindMember(key)) && !(iter->value.IsNull())) {
             tmp->_key = key;
             tmp->_parent = this;
             tmp->_val = &iter->value;
