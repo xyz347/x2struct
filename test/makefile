@@ -15,7 +15,7 @@ json:
 	@-rm $@
 
 xml:
-	$(GPP) -o $@ example_xml.cpp $(INC)
+	$(GPP) -o $@  -DXTOSTRUCT_XML example_xml.cpp $(INC)
 	./$@
 	@-rm $@
 

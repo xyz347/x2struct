@@ -26,8 +26,6 @@
 #include <unordered_map>
 #endif
 
-using namespace std;
-
 #if __GXX_EXPERIMENTAL_CXX0X__ || _MSC_VER>=1700
 
 #define X_SUPPORT_C0X

@@ -346,6 +346,9 @@ public:                                                                     \
 #define X_STRUCT_L1_TOG_O(...)  X_STRUCT_N2(X_STRUCT_L2, X_STRUCT_ACT_TOG_O, __VA_ARGS__)
 #define X_STRUCT_L1_TOG_M       X_STRUCT_L1_TOG_O
 #define X_STRUCT_L1_TOG_A(M,A)  X_STRUCT_ACT_TOG_A(M, A)
+#define X_STRUCT_L1_TOG_I(...)
+#define X_STRUCT_L1_TOG_B(...)
+#define X_STRUCT_L1_TOG_C(...)
 
 #ifndef _MSC_VER
 
@@ -528,11 +531,11 @@ public:                                                                     \
 
 // generate convert function
 #define X_STRUCT_FUNC_TOX_BEGIN_NT(x)                                       \
-    void __x_to_struct(__XReader_##x& obj) {
+    void __x_to_struct(__XReader_##x& obj) {  auto X_SELF = this;
 
 
 #define X_STRUCT_FUNC_TOS_BEGIN_NT(x)                                       \
-    void __struct_to_str(__XWriter_##x& obj, const char *root) const {
+    void __struct_to_str(__XWriter_##x& obj, const char *root) const {  (void)root;auto X_SELF = this;
 
 
 #define X_STRUCT_NT_BODY_1(...) X_STRUCT_FUNC_TOX_BEGIN_NT(1) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOX, __VA_ARGS__) X_STRUCT_FUNC_TOX_END X_STRUCT_FUNC_TOS_BEGIN_NT(1) X_STRUCT_N(X_STRUCT_L1, X_STRUCT_L1_TOS, __VA_ARGS__) X_STRUCT_FUNC_TOS_END
