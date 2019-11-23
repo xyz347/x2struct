@@ -325,6 +325,7 @@ private:
         if (_child_index.end()!=(iter=_child_index.find(key))) {
             tmp->_key = key;
             tmp->_parent = this;
+            tmp->_set_has = this->_set_has;
             tmp->_siblings = &_childs[iter->second];
             tmp->init();
             return tmp;

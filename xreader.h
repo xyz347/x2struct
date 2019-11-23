@@ -50,8 +50,20 @@ protected:
     typedef XReader<DOC> xdoc_type;
 public:
     // only c++0x support reference initialize, so use pointer
-    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1), _set_has(false){}
-    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)), _set_has(false){}
+    XReader(const doc_type *parent, const char* key):_parent(parent), _key(key), _index(-1) {
+        if (NULL != parent) {
+            _set_has = parent->_set_has;
+        } else {
+            _set_has = false;
+        }
+    }
+    XReader(const doc_type *parent, size_t index):_parent(parent), _key(0), _index(int(index)) {
+        if (NULL != parent) {
+            _set_has = parent->_set_has;
+        } else {
+            _set_has = false;
+        }
+    }
     ~XReader(){}
 public:
     template <typename TYPE>

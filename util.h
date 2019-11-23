@@ -63,13 +63,13 @@ public:
 
     static std::string tostr(double data) {
         char buf[64];
-        sprintf(buf, "%lf", data);
+        snprintf(buf, sizeof(buf)-1, "%lf", data);
         return buf;
     }
 
     static std::string tostr(float data) {
         char buf[64];
-        sprintf(buf, "%f", data);
+        snprintf(buf, sizeof(buf)-1, "%f", data);
         return buf;
     }
 
@@ -221,14 +221,22 @@ private:
     static float tonum_dummy(const std::string&str, Dummy<float> dmy) {
         (void)dmy;
         float t;
+        #ifndef _MSC_VER
         sscanf(str.c_str(), "%f", &t);
+        #else
+        sscanf_s(str.c_str(), "%f", &t);
+        #endif
         return t;
     }
 
     static double tonum_dummy(const std::string&str, Dummy<double> dmy) {
         (void)dmy;
         double t;
+        #ifndef _MSC_VER
         sscanf(str.c_str(), "%lf", &t);
+        #else
+        sscanf_s(str.c_str(), "%lf", &t);
+        #endif
         return t;
     }
     

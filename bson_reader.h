@@ -249,6 +249,7 @@ private:
             tmp->_key = key;
             tmp->_parent = this;
             tmp->_val = _val->doc->Get(&iter->second);
+            tmp->_set_has = this->_set_has;
             return tmp;
         } else {
             return NULL;

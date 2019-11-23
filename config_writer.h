@@ -138,7 +138,7 @@ public:
                     append(val[i]);
                 } else {
                     char tmp[16];
-                    int l = sprintf(tmp, "\\x%02X", c);
+                    int l = snprintf(tmp, sizeof(tmp)-1, "\\x%02X", c);
                     append(tmp, l);
                 }
             }

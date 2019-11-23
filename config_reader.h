@@ -220,6 +220,7 @@ private:
         if (NULL!=_val && _val->exists(key)) {
             tmp->_key = key;
             tmp->_parent = this;
+            tmp->_set_has = this->_set_has;
             tmp->_val = &(*_val)[key];
             return tmp;
         } else {
