@@ -20,6 +20,7 @@ x2struct
 * [customize type](#customize-type)
 * [thirdparty class](#thirdparty-class)
 * [Format indent](#format-indent)
+* [Qt support](#qt-support)
 * [xml bson libconfig](#xml-bson-libconfig)
 * [Generate Golang struct](#generate-golang-struct)
 * [IMPORTANT](#important)
@@ -367,6 +368,10 @@ Format indent
 ----
 - last two parameters of tojson control format indent
 
+Qt support
+----
+- modify config.h to enable macro XTOSTRUCT_QT
+- support QString/QList/QMap/QVector now
 
 thirdparty class
 ----

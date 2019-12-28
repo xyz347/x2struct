@@ -30,6 +30,7 @@
 #include "util.h"
 #include "xtypes.h"
 #include "traits.h"
+#include "xwriter.h"
 
 #define LIBCONFIG_BUFFER_SIZE 1024
 #define LIBCONFIG_TYPE_OBJECT 0
@@ -37,8 +38,11 @@
 
 namespace x2struct {
 
-class ConfigWriter {
+class ConfigWriter:public XWriter<ConfigWriter> {
 public:
+    friend class XWriter<ConfigWriter>;
+    using xdoc_type::convert;
+
     ConfigWriter(int indentCount=0, char indentChar=' '):_indentCount(indentCount),_indentChar(indentChar) {
         if (_indentCount > 0) {
             if (_indentChar!=' ' && _indentChar!='\t') {
@@ -148,12 +152,6 @@ public:
 
         return *this;
     }
-    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
-    ConfigWriter& convert(const char*key, const char val[]) {
-        std::string str(val);
-        return this->convert(key, str);
-    }
-    #endif
     ConfigWriter& convert(const char*key, bool val) {
         indent();
         x2struct_set_key(key);
@@ -321,12 +319,6 @@ public:
         data.__struct_to_str(*this, key);
         this->object_end();
     }
-
-    template <typename T>
-    void convert(const char*key, const XType<T>& data) {
-        data.__struct_to_str(*this, key);
-    }
-
 private:
     void append(const char* str, int len) {
         if (len < 0) {

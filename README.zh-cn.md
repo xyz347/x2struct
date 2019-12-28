@@ -18,6 +18,7 @@ x2struct
 * [自定义类型](#自定义类型)
 * [第三方类和结构体](#第三方类和结构体)
 * [格式化缩进](#格式化缩进)
+* [Qt支持](#qt支持)
 * [xml bson libconfig](#xml-bson-libconfig)
 * [生成Golang结构体](#生成golang结构体)
 * [重要说明](#重要说明)
@@ -415,6 +416,11 @@ int main(int argc, char *argv[]) {
 ----
 - tojson的最后两个参数控制
 
+
+Qt支持
+----
+- 修改config.h，开启XTOSTRUCT_QT这个宏
+- 当前支持 QString/QMap/QList/QVector 
 
 xml bson libconfig
 ----

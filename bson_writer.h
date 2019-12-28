@@ -31,18 +31,22 @@
 #include "util.h"
 #include "xtypes.h"
 #include "traits.h"
+#include "xwriter.h"
 
 struct _bson_t;
 
 namespace x2struct {
 
-class BsonWriter {
+class BsonWriter:public XWriter<BsonWriter> {
     enum {
         top,
         doc,
         array
     };
 public:
+    friend class XWriter<BsonWriter>;
+    using xdoc_type::convert;
+
     BsonWriter(const char*key="", _bson_t*parent=0, int type=top) {
         _parent = parent;
         _bson = new bson_t;
@@ -251,11 +255,6 @@ public:
             data.__struct_to_str(*this, "");
         }
         return *this;
-    }
-
-    template <typename T>
-    void convert(const char*key, const XType<T>& data) {
-        data.__struct_to_str(*this, key);
     }
 private:
     mutable _bson_t* _parent;

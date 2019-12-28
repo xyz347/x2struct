@@ -16,4 +16,7 @@
     #endif
 #endif
 
+// support qt
+//#define XTOSTRUCT_QT
+
 #endif

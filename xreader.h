@@ -28,6 +28,13 @@
 #include <stdexcept>
 //#include <iostream>
 
+#ifdef XTOSTRUCT_QT
+#include <QString>
+#include <QList>
+#include <QMap>
+#include <QVector>
+#endif
+
 #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
 #include <string.h>
 #endif
@@ -352,6 +359,59 @@ public:
             this->_p_cond = &this->_cond;
         }
     }*/
+
+    #ifdef XTOSTRUCT_QT
+    bool convert(const char*key, QString &val) {
+        std::string str;
+        bool ret = ((doc_type*)this)->convert(key, str);
+        if (ret) {
+            val = QString::fromStdString(str);
+        }
+        return ret;
+    }
+
+    template<typename T>
+    bool convert(const char*key, QList<T> &val) {
+        std::list<T> sl;
+        bool ret = ((doc_type*)this)->convert(key, sl);
+        if (ret) {
+            val = QList<T>::fromStdList(sl);
+        }
+        return ret;
+    }
+
+    template<typename T>
+    bool convert(const char*key, QVector<T> &val) {
+        std::vector<T> sv;
+        bool ret = ((doc_type*)this)->convert(key, sv);
+        if (ret) {
+            val = QVector<T>::fromStdVector(sv);
+        }
+        return ret;
+    }
+
+    template<typename T>
+    bool convert(const char*key, QMap<std::string, T> &val) {
+        std::map<std::string, T> sm;
+        bool ret = ((doc_type*)this)->convert(key, sm);
+        if (ret) {
+            val = QMap<std::string, T>::fromStdMap(sm);
+        }
+        return ret;
+    }
+
+    template<typename T>
+    bool convert(const char*key, QMap<QString, T> &val) {
+        std::map<std::string, T> sm;
+        bool ret = ((doc_type*)this)->convert(key, sm);
+        if (ret) {
+            for (typename std::map<std::string, T>::const_iterator iter = sm.begin(); iter!=sm.end(); iter++) {
+                val[QString::fromStdString(iter->first)] = iter->second;
+            }
+        }
+        return ret;
+    }
+    #endif
 protected:
     doc_type* get_obj(const char *key, doc_type *tmp) {
         doc_type *obj = static_cast<doc_type*>(this);

@@ -22,6 +22,10 @@
 #include <x2struct.hpp>
 //#include <xtypes.h>
 
+#ifdef XTOSTRUCT_QT
+#include <QString>
+#endif
+
 using namespace std;
 using namespace x2struct;
 
@@ -59,7 +63,11 @@ struct xstruct {
     int    id;
     XDate  start;
     int    tint;
+    #ifdef XTOSTRUCT_QT
+    QString tstring;
+    #else
     string tstring;
+    #endif
     char   chArray[16];
     #ifdef X_SUPPORT_C0X
     std::shared_ptr<SharePtr> sp;

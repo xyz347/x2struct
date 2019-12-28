@@ -29,14 +29,18 @@
 
 #include "xtypes.h"
 #include "traits.h"
+#include "xwriter.h"
 
 namespace x2struct {
 
-class JsonWriter {
+class JsonWriter:public XWriter<JsonWriter> {
     typedef rapidjson::StringBuffer JSON_WRITER_BUFFER;
     typedef rapidjson::Writer<rapidjson::StringBuffer> JSON_WRITER_WRITER;
     typedef rapidjson::PrettyWriter<rapidjson::StringBuffer> JSON_WRITER_PRETTY;
 public:
+    friend class XWriter<JsonWriter>;
+    using xdoc_type::convert;
+
     JsonWriter(int indentCount=0, char indentChar=' ') {
         _buf = new JSON_WRITER_BUFFER;
         if (indentCount < 0) {
@@ -115,12 +119,6 @@ public:
         }
         return *this;
     }
-    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
-    JsonWriter& convert(const char*key, const char val[]) {
-        std::string str(val);
-        return this->convert(key, str);
-    }
-    #endif
     JsonWriter& convert(const char*key, bool val) {
         x2struct_set_key(key);
         if (0 != _writer) {
@@ -301,12 +299,6 @@ public:
         data.__struct_to_str(*this, key);
         this->object_end();
     }
-
-    template <typename T>
-    void convert(const char*key, const XType<T>& data) {
-        data.__struct_to_str(*this, key);
-    }
-
 private:
     JSON_WRITER_BUFFER* _buf;
     JSON_WRITER_WRITER* _writer;

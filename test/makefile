@@ -39,6 +39,11 @@ check:
 	./$@
 	@-rm $@
 
+checkqt:
+	$(GPP) -o $@ -Wextra -Wall check.cpp $(INC) $(LIBCONFIG) $(LIBBSON) -DXTOSTRUCT_QT -I /usr/include/qt4  -I /usr/include/qt4/QtCore -lQtCore
+	./$@
+	@-rm $@
+
 checkc11:
 	$(GPP) -o $@ -fsanitize=address -Wextra -Wall check.cpp $(INC) $(LIBCONFIG) $(LIBBSON) -std=c++11
 	./$@
