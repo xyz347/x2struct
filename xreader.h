@@ -375,7 +375,7 @@ public:
         std::list<T> sl;
         bool ret = ((doc_type*)this)->convert(key, sl);
         if (ret) {
-            val = QList<T>::fromStdList(sl);
+            val = QList<T>(sl.begin(), sl.end());
         }
         return ret;
     }

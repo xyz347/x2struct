@@ -48,7 +48,7 @@ public:
 
     template<typename T>
     doc_type& convert(const char*key, const QList<T>&data) {
-        std::list<T> sl = data.toStdList();
+        std::list<T> sl = std::list<T>(data.begin(), data.end());
         doc_type *dt = (doc_type*)this;
         dt->convert(key, sl);
         return *dt;
