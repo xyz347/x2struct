@@ -66,7 +66,7 @@ public:
     doc_type& convert(const char*key, const QMap<QString, T>&data) {
         std::map<std::string, T> sm;
         for (typename QMap<QString, T>::const_iterator iter=data.begin(); iter!=data.end(); iter++) {
-            sm[iter->first.toStdString()] = iter->second;
+            sm[iter.key().toStdString()] = iter.value();
         }
         doc_type *dt = (doc_type*)this;
         dt->convert(key, sm);
