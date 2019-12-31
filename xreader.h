@@ -375,7 +375,7 @@ public:
         std::list<T> sl;
         bool ret = ((doc_type*)this)->convert(key, sl);
         if (ret) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 14)
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
             val = QList<T>::fromStdList(sl);
 #else
             val = QList<T>(sl.begin(), sl.end());
