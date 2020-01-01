@@ -375,7 +375,12 @@ public:
         std::list<T> sl;
         bool ret = ((doc_type*)this)->convert(key, sl);
         if (ret) {
-            val = QList<T>(sl.begin(), sl.end());
+        #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+                    val = QList<T>::fromStdList(sl);
+                    #else
+                                val = QList<T>(sl.begin(), sl.end());
+                                #endif
+            //val = QList<T>(sl.begin(), sl.end());
         }
         return ret;
     }
@@ -408,6 +413,25 @@ public:
             for (typename std::map<std::string, T>::const_iterator iter = sm.begin(); iter!=sm.end(); iter++) {
                 val[QString::fromStdString(iter->first)] = iter->second;
             }
+        }
+        return ret;
+    }
+    #endif
+
+    #ifdef __APPLE__
+    bool convert(const char*key, long &val) {
+        int64_t i;
+        bool ret = ((doc_type*)this)->convert(key, i);
+        if (ret) {
+            val = (long)i;
+        }
+        return ret;
+    }
+    bool convert(const char*key, unsigned long &val) {
+        uint64_t i;
+        bool ret = ((doc_type*)this)->convert(key, i);
+        if (ret) {
+            val = (unsigned long)i;
         }
         return ret;
     }

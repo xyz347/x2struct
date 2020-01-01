@@ -95,6 +95,15 @@ public:
         data.__struct_to_str(*dt, key);
         return *dt;
     }
+
+    #ifdef __APPLE__
+    doc_type& convert(const char*key, long val) {
+        return ((doc_type*)this)->convert(key, (int64_t)val);
+    }
+    doc_type& convert(const char*key, unsigned long val) {
+        return ((doc_type*)this)->convert(key, (uint64_t)val);
+    }
+    #endif
 };
 
 }
