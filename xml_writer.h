@@ -29,6 +29,7 @@
 #include "util.h"
 #include "xtypes.h"
 #include "traits.h"
+#include "xwriter.h"
 
 #define X2STRUCT_BUFFER_SIZE 1024
 #define X2STRUCT_TYPE_OBJECT 0
@@ -36,7 +37,7 @@
 
 namespace x2struct {
 
-class XmlWriter {
+class XmlWriter:public XWriter<XmlWriter> {
 private:
     class XmlKey{
     public:
@@ -72,6 +73,9 @@ private:
     };
     friend class XmlKey;
 public:
+    friend class XWriter<XmlWriter>;
+    using xdoc_type::convert;
+
     XmlWriter(int indentCount=0, char indentChar=' '):_indentCount(indentCount),_indentChar(indentChar) {
         if (_indentCount > 0) {
             if (_indentChar!=' ' && _indentChar!='\t') {
@@ -150,12 +154,6 @@ public:
 
         return *this;
     }
-    #ifdef XTOSTRUCT_SUPPORT_CHAR_ARRAY
-    XmlWriter& convert(const char*key, const char val[]) {
-        std::string str(val);
-        return this->convert(key, str);
-    }
-    #endif
     XmlWriter& convert(const char*key, bool val) {
         XmlKey xkey(key, this, true);
         if (val) {
@@ -309,12 +307,6 @@ public:
         data.__struct_to_str(*this, key);
         this->object_end();
     }
-
-    template <typename T>
-    void convert(const char*key, const XType<T>& data) {
-        data.__struct_to_str(*this, key);
-    }
-
 private:
     void append(const char* str, int len) {
         if (len < 0) {

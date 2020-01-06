@@ -22,6 +22,10 @@
 #include <vector>
 #include <iostream>
 
+#ifdef XTOSTRUCT_QT
+#include <QString>
+#endif
+
 typedef void(*test_case)();
 
 struct text_ctx {
@@ -65,6 +69,19 @@ public:
     }
 };
 
+class COUT {
+public:
+    template <class TYPE>
+    static void out(const TYPE &d) {
+        std::cout<<d;
+    }
+    #ifdef XTOSTRUCT_QT
+    static void out(const QString &d) {
+        std::cout<<d.toStdString();
+    }
+    #endif
+};
+
 #define TEST(a, b) static void a##_##b();  static AUTO_ADD_TC __aat__##a##_##b(a##_##b, #a, #b); static void a##_##b()
 
 #define EXPECT_EQ(a,b) \
@@ -72,7 +89,9 @@ do {\
     if (!((a)==(b))) {\
         std::cout<<std::endl<<"++++++++++"<<__FILE__<<':'<<__LINE__<<'['<<__FUNCTION__<<']'<<"EXPECT_EQ fail."<<std::endl;\
         std::cout<<"expect:"<<b<<std::endl;\
-        std::cout<<"actual:"<<a<<std::endl;\
+        std::cout<<"actual:";\
+        COUT::out(a);\
+        std::cout<<std::endl;\
         ++Status::c();\
     }\
 }while(false)
