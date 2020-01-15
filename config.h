@@ -19,4 +19,10 @@
 // support qt
 //#define XTOSTRUCT_QT
 
+
+// support xhas
+// xhas will add a std::set in struct and will crash if use memset
+// if want to use memset, can close this macro, but xhas will not work
+#define XTOSTRUCT_XHAS
+
 #endif

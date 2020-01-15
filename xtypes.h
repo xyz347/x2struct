@@ -31,6 +31,14 @@
 #undef _XOPEN_SOURCE
 #endif
 
+
+#ifdef XTOSTRUCT_XHAS
+    #include <set>
+    #define XTOSTRUCT_XHAS_CONTAINER std::set<std::string>
+#else
+    #define XTOSTRUCT_XHAS_CONTAINER x2struct::fake_set 
+#endif
+
 namespace x2struct {
 
 struct x_condition_t {
@@ -42,6 +50,20 @@ struct x_condition_t {
     x_condition_t():parent(0),cond(0){}
     void set(void*p, cond_f c){parent=p; cond=c;}
 };
+
+#ifndef XTOSTRUCT_XHAS
+class fake_set {
+public:
+    int find(const std::string& key) const {
+        return 0;
+    }
+    int end() const {
+        return 0;
+    }
+    void insert(const std::string& key) {
+    }
+};
+#endif
 
 template<typename TYPE>
 class XType:public TYPE {

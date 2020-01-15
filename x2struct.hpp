@@ -173,7 +173,7 @@ public:
 
 #define X_STRUCT_FUNC_COMMON                                                \
 private:                                                                    \
-    std::set<std::string> __x_has_string;                                   \
+    XTOSTRUCT_XHAS_CONTAINER __x_has_string;                                \
 public:                                                                     \
     x2struct::x_condition_t __x_cond;                                       \
     bool xhas(const std::string& name) const {                              \
