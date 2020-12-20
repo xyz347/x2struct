@@ -104,6 +104,9 @@ public:
         return ((doc_type*)this)->convert(key, (uint64_t)val);
     }
     #endif
+    doc_type& convert(const char*key, char val) {
+        return ((doc_type*)this)->convert(key, (int8_t)val);
+    }
 };
 
 }

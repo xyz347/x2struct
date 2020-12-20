@@ -16,5 +16,7 @@
 #endif
 
 
+#define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
+
 #endif
 

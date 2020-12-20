@@ -435,6 +435,13 @@ public:
         return ret;
     }
     #endif
+
+    bool convert(const char*key, char &val) {
+        int8_t tmp;
+        bool ret = ((doc_type*)this)->convert(key, tmp);
+        val = tmp;
+        return ret;
+    }
 protected:
     doc_type* get_obj(const char *key, doc_type *tmp) {
         doc_type *obj = static_cast<doc_type*>(this);
